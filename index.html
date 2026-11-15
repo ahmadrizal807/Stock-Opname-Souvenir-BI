@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#002F6C" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- =================================================================== -->
+  <!-- KONFIGURASI AUTO-UPDATE APK (UBAH ANGKA VERSI TIAP EDIT KE GITHUB)  -->
+  <!-- =================================================================== -->
+  <meta name="app-version" content="1.0.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <title>SIM-SOUVENIR BI | Monitoring & Stock Opname Souvenir</title>
+
+  <!-- Dynamic PWA Manifest -->
+  <link rel="manifest" id="pwaManifest" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            bi: {
+              navy: '#002F6C',
+              dark: '#001B40',
+              blue: '#005596',
+              light: '#E6F0FA',
+              gold: '#C59B27',
+              goldLight: '#FBF6E8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }
+    .no-scrollbar { scrollbar-width: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+
+    /* Bottom Navigation Pill & Tactile Feedback */
+    .bn-btn.active { color: #002F6C; font-weight: 700; }
+    .dark .bn-btn.active { color: #ffffff; }
+    .bn-btn svg { padding: 4px 14px; box-sizing: content-box; border-radius: 9999px; transition: background 0.2s ease; }
+    .bn-btn.active svg { background: #dbeafe; }
+    .dark .bn-btn.active svg { background: #1e3a5f; }
+
+    @keyframes sheetSlideUp {
+      from { transform: translateY(35%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .sheet-panel:not(.hidden) { animation: sheetSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+
+    /* Scoped Mobile Card Transformation */
+    @media (max-width: 767px) {
+      input, select, textarea { font-size: 16px !important; }
+      button:active { transform: scale(0.97); }
+
+      .mobile-card-table,
+      .mobile-card-table tbody { display: block; width: 100%; }
+      .mobile-card-table thead { display: none; }
+
+      .mobile-card-table tbody tr {
+        display: block;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 0.875rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      }
+      .dark .mobile-card-table tbody tr {
+        background: #0f172a;
+        border-color: #1e293b;
+      }
+      .mobile-card-table tbody tr.row-low { border-left: 4px solid #f59e0b; }
+      .mobile-card-table tbody tr.row-empty { border-left: 4px solid #e11d48; }
+      .mobile-card-table tbody tr.row-verified { border-color: #86efac; }
+      .dark .mobile-card-table tbody tr.row-verified { border-color: #166534; }
+
+      .mobile-card-table tbody td {
+        display: block;
+        padding: 0;
+        text-align: left !important;
+      }
+
+      .responsive-modal { align-items: flex-end !important; padding: 0 !important; }
+      .responsive-modal > div {
+        max-width: 100% !important;
+        border-radius: 1.35rem 1.35rem 0 0 !important;
+        max-height: 92vh;
+        overflow-y: auto;
+      }
+    }
+
+    /* Official Print Layout */
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 12px;
+      }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200 min-h-screen flex flex-col">
+
+  <!-- ===================================================================== -->
+  <!-- HEADER INSTITUSIONAL BANK INDONESIA                                   -->
+  <!-- ===================================================================== -->
+  <header class="sticky top-0 z-30 bg-gradient-to-r from-bi-dark via-bi-navy to-bi-blue text-white shadow-lg border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-14 md:h-16 gap-3">
+        <!-- Brand & Identitas Satker -->
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 md:w-11 md:h-11 shrink-0 rounded-xl bg-white/10 border border-white/20 p-1.5 flex items-center justify-center shadow-inner backdrop-blur-sm overflow-hidden">
+            <img
+              src="logo-bi.png"
+              alt="Logo Bank Indonesia"
+              class="w-full h-full object-contain grayscale invert contrast-200 mix-blend-screen opacity-95"
+              onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.classList.remove('hidden');"
+            />
+            <i data-lucide="landmark" class="hidden w-5 h-5 text-bi-gold"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <h1 class="font-extrabold text-base md:text-lg tracking-tight leading-none">SIM-SOUVENIR</h1>
+              <span class="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white border border-white/20 rounded-md backdrop-blur-sm">
+                BANK INDONESIA
+              </span>
+            </div>
+            <p class="hidden sm:block text-xs text-blue-100/90 mt-1 truncate">
+              Sistem Monitoring Inventaris & Stock Opname Kegiatan Sosialisasi
+            </p>
+          </div>
+        </div>
+
+        <!-- Desktop Quick Actions & Theme Switcher -->
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="syncStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 text-[11px] font-semibold text-blue-100 border border-white/15">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="syncStatusText">Siap</span>
+          </span>
+          <button type="button" onclick="openMutationModal('OUT')" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition border border-white/15">
+            <i data-lucide="send" class="w-3.5 h-3.5 text-bi-gold"></i>
+            Distribusi Kegiatan
+          </button>
+          <button type="button" onclick="openItemModal()" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-bi-gold hover:bg-amber-400 text-xs font-extrabold text-bi-dark transition shadow-sm">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            Tambah Souvenir
+          </button>
+          <div class="hidden md:block h-5 w-px bg-white/20 mx-1"></div>
+          <button type="button" onclick="checkAppUpdate(true)" title="Cek Pembaruan Aplikasi" class="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition text-blue-100">
+            <i data-lucide="refresh-cw" id="updateIcon" class="w-4 h-4"></i>
+          </button>
+          <button type="button" onclick="toggleTheme()" title="Ubah Tema Gelap / Terang" class="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition text-blue-100">
+            <i data-lucide="moon" id="themeIcon" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN DASHBOARD CONTAINER                                              -->
+  <!-- ===================================================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6 pb-28 md:pb-8 space-y-4 md:space-y-6">
+
+    <!-- 1. Executive KPI Strip -->
+    <section class="flex md:grid md:grid-cols-2 lg:grid-cols-4 overflow-x-auto snap-x no-scrollbar gap-3 md:gap-4 -mx-4 px-4 md:mx-0 md:px-0">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 md:p-5 min-w-[10.5rem] md:min-w-0 shrink-0 snap-start border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Jenis Souvenir</span>
+          <div class="hidden md:flex w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-bi-navy dark:text-blue-400 items-center justify-center">
+            <i data-lucide="package" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-2 md:mt-3 flex items-baseline gap-2">
+          <h2 id="kpiTotalSku" class="text-2xl font-extrabold text-slate-900 dark:text-white">0</h2>
+          <span class="text-xs text-slate-500 dark:text-slate-400">SKU</span>
+        </div>
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400" id="kpiTotalCategories">0 kategori aktif</p>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 md:p-5 min-w-[10.5rem] md:min-w-0 shrink-0 snap-start border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Stok Fisik</span>
+          <div class="hidden md:flex w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 items-center justify-center">
+            <i data-lucide="layers" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-2 md:mt-3 flex items-baseline gap-2">
+          <h2 id="kpiTotalPhysical" class="text-2xl font-extrabold text-slate-900 dark:text-white">0</h2>
+          <span class="text-xs text-slate-500 dark:text-slate-400">unit</span>
+        </div>
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Buku: <span id="kpiTotalSystem" class="font-semibold text-slate-700 dark:text-slate-200">0</span> unit</p>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 md:p-5 min-w-[10.5rem] md:min-w-0 shrink-0 snap-start border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Stok Kritis</span>
+          <div class="hidden md:flex w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 items-center justify-center">
+            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-2 md:mt-3 flex items-baseline gap-2">
+          <h2 id="kpiLowStock" class="text-2xl font-extrabold text-amber-600 dark:text-amber-400">0</h2>
+          <span class="text-xs text-slate-500 dark:text-slate-400">item</span>
+        </div>
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400"><span id="kpiOutStock" class="font-bold text-rose-500">0</span> stok kosong</p>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 md:p-5 min-w-[10.5rem] md:min-w-0 shrink-0 snap-start border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Selisih Opname</span>
+          <div class="hidden md:flex w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 items-center justify-center">
+            <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-2 md:mt-3 flex items-baseline gap-2">
+          <h2 id="kpiVarianceCount" class="text-2xl font-extrabold text-slate-900 dark:text-white">0</h2>
+          <span class="text-xs text-slate-500 dark:text-slate-400">item</span>
+        </div>
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate" id="kpiLastOpname">Belum ada BA</p>
+      </div>
+    </section>
+
+    <!-- 2. Audit Progress Bar -->
+    <section class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+        <div class="flex items-center gap-2 text-xs">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-bi-light dark:bg-blue-950 text-bi-navy dark:text-blue-300">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+          </span>
+          <span class="font-bold text-slate-800 dark:text-slate-100">Progres Pengecekan Fisik Gudang:</span>
+          <span id="auditProgressText" class="font-mono font-bold text-bi-blue dark:text-blue-400">0/0 SKU (0%)</span>
+        </div>
+        <div class="flex items-center gap-3 text-[11px]">
+          <button type="button" onclick="markAllVerified(true)" class="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">Tandai Semua Tercek</button>
+          <span class="text-slate-300 dark:text-slate-700">|</span>
+          <button type="button" onclick="markAllVerified(false)" class="font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:underline">Reset Centang Audit</button>
+        </div>
+      </div>
+      <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+        <div id="auditProgressBar" class="h-full bg-gradient-to-r from-bi-navy via-bi-blue to-emerald-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </section>
+
+    <!-- 3. Main Workspace Card -->
+    <section class="md:bg-white md:dark:bg-slate-900 md:rounded-2xl md:border md:border-slate-200/80 md:dark:border-slate-800 md:shadow-sm overflow-hidden">
+
+      <!-- Desktop Tab Header -->
+      <div class="hidden md:flex items-center justify-between gap-3 px-6 py-3.5 border-b border-slate-200 dark:border-slate-800">
+        <nav class="flex gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl" role="tablist">
+          <button type="button" onclick="switchTab('opname')" id="tab-btn-opname" class="tab-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-white dark:bg-slate-900 text-bi-navy dark:text-white shadow-sm">
+            <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+            Master & Stock Opname
+          </button>
+          <button type="button" onclick="switchTab('mutations')" id="tab-btn-mutations" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+            <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+            Log Mutasi Kegiatan
+          </button>
+          <button type="button" onclick="switchTab('reports')" id="tab-btn-reports" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+            <i data-lucide="file-check-2" class="w-4 h-4"></i>
+            Berita Acara Opname
+          </button>
+        </nav>
+
+        <button type="button" onclick="openSheet('dataSheet')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 transition">
+          <i data-lucide="database" class="w-3.5 h-3.5 text-bi-blue"></i>
+          Export & Backup
+        </button>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- TAB 1: MASTER & STOCK OPNAME                                      -->
+      <!-- ================================================================= -->
+      <div id="view-opname" class="p-0 md:p-6 space-y-3 md:space-y-4">
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
+          <div class="grid grid-cols-2 sm:flex gap-2 flex-1">
+            <div class="relative col-span-2 sm:col-span-1 flex-1 max-w-md">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input
+                type="text"
+                id="searchInput"
+                oninput="renderInventoryTable()"
+                placeholder="Cari SKU, nama souvenir, atau rak..."
+                class="w-full h-10 md:h-9 pl-10 pr-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 focus:ring-2 focus:ring-bi-blue/30 focus:border-bi-blue outline-none transition"
+              />
+            </div>
+
+            <select id="categoryFilter" onchange="renderInventoryTable()" class="h-10 md:h-9 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 outline-none focus:border-bi-blue">
+              <option value="ALL">Semua Kategori</option>
+              <option value="VIP & Eksekutif">VIP & Eksekutif</option>
+              <option value="Sosialisasi CBP Rupiah">Sosialisasi CBP Rupiah</option>
+              <option value="Edukasi QRIS & Digital">Edukasi QRIS & Digital</option>
+              <option value="Seminar & Rakor">Seminar & Rakor</option>
+              <option value="Umum & Kunjungan">Umum & Kunjungan</option>
+            </select>
+
+            <select id="statusFilter" onchange="renderInventoryTable()" class="h-10 md:h-9 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 outline-none focus:border-bi-blue">
+              <option value="ALL">Semua Status</option>
+              <option value="UNVERIFIED">Belum Dicek Fisik</option>
+              <option value="LOW">Stok Menipis / Habis</option>
+              <option value="VARIANCE">Ada Selisih Opname</option>
+              <option value="MATCH">Opname Sesuai</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="openMutationModal('IN')" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold border border-emerald-200 dark:border-emerald-800 transition">
+              <i data-lucide="package-plus" class="w-4 h-4"></i>
+              Terima Pengadaan
+            </button>
+            <button type="button" onclick="openFinalizeOpnameModal()" class="w-full md:w-auto justify-center inline-flex items-center gap-1.5 px-4 py-2.5 md:py-2 rounded-xl bg-bi-navy hover:bg-bi-dark text-white text-xs font-bold shadow-sm transition">
+              <i data-lucide="file-check-2" class="w-4 h-4 text-bi-gold"></i>
+              Finalisasi Berita Acara Opname
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-bi-light/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/50 text-xs text-bi-navy dark:text-blue-200">
+          <div class="flex items-center gap-2 min-w-0">
+            <i data-lucide="sparkles" class="w-4 h-4 text-bi-blue shrink-0"></i>
+            <span class="truncate sm:whitespace-normal">
+              <strong>Hitung Cepat:</strong> Sesuaikan angka <strong>Stok Fisik</strong> lalu tekan <span class="font-bold text-emerald-700 dark:text-emerald-400">✓ Cek</span> untuk menandai item selesai diaudit.
+            </span>
+          </div>
+          <button type="button" onclick="syncAllPhysicalToSystem()" class="shrink-0 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-blue-50 font-bold text-bi-blue dark:text-blue-300 border border-blue-200 dark:border-blue-800 transition text-[11px]">
+            Fisik = Sistem
+          </button>
+        </div>
+
+        <div class="md:overflow-x-auto md:rounded-xl md:border md:border-slate-200 md:dark:border-slate-800">
+          <table class="mobile-card-table w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100/90 dark:bg-slate-800/90 text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+                <th class="py-3 px-4 w-10 text-center">Cek</th>
+                <th class="py-3 px-3">Kode & Nama Souvenir</th>
+                <th class="py-3 px-3">Kategori & Lokasi</th>
+                <th class="py-3 px-3 text-center">Saldo Buku</th>
+                <th class="py-3 px-3 text-center w-40">Stok Fisik (Opname)</th>
+                <th class="py-3 px-3 text-center">Selisih</th>
+                <th class="py-3 px-3 text-center">Status Stok</th>
+                <th class="py-3 px-4 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTableBody" class="md:divide-y md:divide-slate-200 md:dark:divide-slate-800 text-[13px]"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- TAB 2: LOG MUTASI KEGIATAN                                        -->
+      <!-- ================================================================= -->
+      <div id="view-mutations" class="hidden p-0 md:p-6 space-y-3 md:space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Riwayat Distribusi & Penerimaan Souvenir</h3>
+            <p class="hidden sm:block text-xs text-slate-500 dark:text-slate-400">Jejak audit penggunaan souvenir untuk kegiatan sosialisasi/edukasi, pengadaan baru, dan penyesuaian opname.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="mutationTypeFilter" onchange="renderMutationTable()" class="w-full sm:w-auto h-10 md:h-9 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 outline-none">
+              <option value="ALL">Semua Jenis Mutasi</option>
+              <option value="OUT">Keluar (Distribusi Kegiatan)</option>
+              <option value="IN">Masuk (Pengadaan / Restock)</option>
+              <option value="ADJ">Penyesuaian Opname</option>
+            </select>
+            <button type="button" onclick="openMutationModal('OUT')" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-bi-navy hover:bg-bi-dark text-white text-xs font-bold transition">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              Catat Mutasi Baru
+            </button>
+          </div>
+        </div>
+
+        <div class="md:overflow-x-auto md:rounded-xl md:border md:border-slate-200 md:dark:border-slate-800">
+          <table class="mobile-card-table w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100/90 dark:bg-slate-800/90 text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+                <th class="py-3 px-4">Tanggal</th>
+                <th class="py-3 px-3">Jenis</th>
+                <th class="py-3 px-3">Souvenir & SKU</th>
+                <th class="py-3 px-3 text-center">Jumlah</th>
+                <th class="py-3 px-3">Kegiatan / Keterangan</th>
+                <th class="py-3 px-4">Unit / PIC</th>
+              </tr>
+            </thead>
+            <tbody id="mutationTableBody" class="md:divide-y md:divide-slate-200 md:dark:divide-slate-800 text-[13px]"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- TAB 3: BERITA ACARA OPNAME                                        -->
+      <!-- ================================================================= -->
+      <div id="view-reports" class="hidden p-0 md:p-6 space-y-3 md:space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Arsip Berita Acara Stock Opname</h3>
+            <p class="hidden sm:block text-xs text-slate-500 dark:text-slate-400">Dokumen hasil pemeriksaan fisik berkala yang telah disahkan dan siap cetak resmi.</p>
+          </div>
+          <button type="button" onclick="openFinalizeOpnameModal()" class="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-4 py-2.5 md:py-2 rounded-xl bg-bi-navy hover:bg-bi-dark text-white text-xs font-bold transition">
+            <i data-lucide="file-plus-2" class="w-4 h-4 text-bi-gold"></i>
+            Buat Berita Acara Baru
+          </button>
+        </div>
+
+        <div id="opnameReportsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Desktop Footer -->
+  <footer class="hidden md:block border-t border-slate-200 dark:border-slate-800 py-4 px-6 text-xs text-slate-500 dark:text-slate-400">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <span>SIM-SOUVENIR BI <span id="footerVersionLabel" class="font-mono text-[11px] opacity-75">v1.0.0</span> &bull; Tata Kelola Inventaris & Stock Opname Kegiatan Sosialisasi</span>
+      <button type="button" onclick="confirmResetDemoData()" class="hover:text-rose-600 underline transition">Reset ke Data Simulasi Awal</button>
+    </div>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: TAMBAH / EDIT MASTER SOUVENIR                                -->
+  <!-- ===================================================================== -->
+  <div id="itemModal" onclick="if(event.target===this) closeModal('itemModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 bg-bi-navy text-white flex items-center justify-between">
+        <h3 id="itemModalTitle" class="font-bold text-sm flex items-center gap-2">
+          <i data-lucide="package-plus" class="w-4 h-4 text-bi-gold"></i>
+          Tambah Item Souvenir Baru
+        </h3>
+        <button type="button" onclick="closeModal('itemModal')" class="text-white/70 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="itemForm" onsubmit="saveItem(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="editItemId" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Kode SKU *</label>
+            <input type="text" id="itemSku" required placeholder="SVN-BI-001" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 uppercase font-mono outline-none focus:border-bi-blue" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Kategori Kegiatan *</label>
+            <select id="itemCategory" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue">
+              <option value="VIP & Eksekutif">VIP & Eksekutif</option>
+              <option value="Sosialisasi CBP Rupiah">Sosialisasi CBP Rupiah</option>
+              <option value="Edukasi QRIS & Digital">Edukasi QRIS & Digital</option>
+              <option value="Seminar & Rakor">Seminar & Rakor</option>
+              <option value="Umum & Kunjungan">Umum & Kunjungan</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Nama Barang / Souvenir *</label>
+          <input type="text" id="itemName" required placeholder="Contoh: Plakat Kristal Gedung Bank Indonesia" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Saldo Buku *</label>
+            <input type="number" id="itemSystemStock" min="0" required value="0" inputmode="numeric" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Batas Min *</label>
+            <input type="number" id="itemMinStock" min="1" required value="10" inputmode="numeric" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Satuan *</label>
+            <input type="text" id="itemUnit" required value="Pcs" placeholder="Pcs / Box" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Lokasi Penyimpanan / Rak *</label>
+          <input type="text" id="itemLocation" required placeholder="Contoh: Lemari Souvenir A1 - Ruang Humas" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+        </div>
+
+        <div class="pt-3 flex justify-end gap-2 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" onclick="closeModal('itemModal')" class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">Batal</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-bi-navy hover:bg-bi-dark text-white font-bold shadow-sm">Simpan Souvenir</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: CATAT MUTASI (DISTRIBUSI KEGIATAN / PENGADAAN)               -->
+  <!-- ===================================================================== -->
+  <div id="mutationModal" onclick="if(event.target===this) closeModal('mutationModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 bg-bi-navy text-white flex items-center justify-between">
+        <h3 class="font-bold text-sm flex items-center gap-2">
+          <i data-lucide="arrow-left-right" class="w-4 h-4 text-bi-gold"></i>
+          Catat Mutasi Souvenir
+        </h3>
+        <button type="button" onclick="closeModal('mutationModal')" class="text-white/70 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="mutationForm" onsubmit="saveMutation(event)" class="p-6 space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <label class="cursor-pointer">
+            <input type="radio" name="mutType" value="OUT" checked class="peer hidden" onchange="updateMutationPreview()" />
+            <div class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-rose-500 peer-checked:bg-rose-50/60 dark:peer-checked:bg-rose-950/30 text-center font-bold transition">
+              <i data-lucide="send" class="w-4 h-4 mx-auto mb-1 text-rose-600"></i>
+              Keluar (Kegiatan)
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="mutType" value="IN" class="peer hidden" onchange="updateMutationPreview()" />
+            <div class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-50/60 dark:peer-checked:bg-emerald-950/30 text-center font-bold transition">
+              <i data-lucide="package-plus" class="w-4 h-4 mx-auto mb-1 text-emerald-600"></i>
+              Masuk (Pengadaan)
+            </div>
+          </label>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Pilih Souvenir *</label>
+          <select id="mutItemId" required onchange="updateMutationPreview()" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue"></select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Jumlah Unit *</label>
+            <input type="number" id="mutQty" min="1" required inputmode="numeric" oninput="updateMutationPreview()" placeholder="0" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue font-bold" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Tanggal *</label>
+            <input type="date" id="mutDate" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+          </div>
+        </div>
+
+        <div id="mutStockPreview" class="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs flex items-center justify-between"></div>
+
+        <div>
+          <label id="mutActivityLabel" class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Nama Kegiatan Sosialisasi / Keperluan *</label>
+          <input type="text" id="mutActivity" required placeholder="Contoh: Sosialisasi Cinta Bangga Paham Rupiah" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Fungsi / Unit Pemohon / PIC *</label>
+          <input type="text" id="mutPic" required placeholder="Contoh: Unit Kehumasan / SPPUR / UMKM" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+        </div>
+
+        <div class="pt-3 flex justify-end gap-2 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" onclick="closeModal('mutationModal')" class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">Batal</button>
+          <button type="submit" id="mutSubmitBtn" class="px-5 py-2.5 rounded-xl bg-bi-navy hover:bg-bi-dark text-white font-bold shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">Simpan Mutasi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: FINALISASI BERITA ACARA STOCK OPNAME                         -->
+  <!-- ===================================================================== -->
+  <div id="opnameModal" onclick="if(event.target===this) closeModal('opnameModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 bg-bi-navy text-white flex items-center justify-between">
+        <h3 class="font-bold text-sm flex items-center gap-2">
+          <i data-lucide="file-check-2" class="w-4 h-4 text-bi-gold"></i>
+          Pengesahan Berita Acara Stock Opname
+        </h3>
+        <button type="button" onclick="closeModal('opnameModal')" class="text-white/70 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form onsubmit="finalizeStockOpname(event)" class="p-6 space-y-4 text-xs">
+        <div id="opnameSummaryBox" class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 space-y-1.5 border border-slate-200 dark:border-slate-700"></div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Petugas Pelaksana *</label>
+            <input type="text" id="opnameAuditor" required placeholder="Nama Pegawai / PIC" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Satuan Kerja / Unit *</label>
+            <input type="text" id="opnameUnit" required value="KPWBI Prov. Jawa Tengah" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Catatan / Penjelasan Selisih Audit</label>
+          <textarea id="opnameNotes" rows="2" placeholder="Contoh: Stock opname rutin bulanan. Selisih telah dikonfirmasi dengan PIC kegiatan." class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue"></textarea>
+        </div>
+
+        <label class="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 cursor-pointer">
+          <input type="checkbox" id="opnameSyncCheckbox" checked class="mt-0.5 rounded text-bi-navy focus:ring-bi-blue" />
+          <span class="text-slate-700 dark:text-slate-300 leading-relaxed">
+            <strong>Rekonsiliasi Otomatis:</strong> Sesuaikan Saldo Buku mengikuti Stok Fisik dan catat selisihnya ke <em>Log Mutasi</em>.
+          </span>
+        </label>
+
+        <div class="pt-3 flex justify-end gap-2 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" onclick="closeModal('opnameModal')" class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">Batal</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-bi-navy hover:bg-bi-dark text-white font-bold shadow-sm">Sahkan Berita Acara</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 4: PRATINJAU & CETAK BERITA ACARA RESMI                         -->
+  <!-- ===================================================================== -->
+  <div id="baPreviewModal" onclick="if(event.target===this) closeModal('baPreviewModal')" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+      <div class="px-5 py-3.5 bg-bi-navy text-white flex items-center justify-between shrink-0">
+        <h3 class="font-bold text-sm flex items-center gap-2">
+          <i data-lucide="file-text" class="w-4 h-4 text-bi-gold"></i>
+          Pratinjau Dokumen Resmi Berita Acara
+        </h3>
+        <button type="button" onclick="closeModal('baPreviewModal')" class="text-white/70 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="baPreviewContent" class="p-4 sm:p-6 overflow-y-auto overflow-x-auto bg-white text-slate-900 flex-1"></div>
+      <div class="px-5 py-3 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2 shrink-0">
+        <button type="button" onclick="closeModal('baPreviewModal')" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-700">Tutup</button>
+        <button type="button" onclick="triggerPrintBA()" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-bi-navy hover:bg-bi-dark text-white text-xs font-bold shadow-sm">
+          <i data-lucide="printer" class="w-4 h-4 text-bi-gold"></i>
+          Cetak / Simpan PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 5: CUSTOM CONFIRMATION DIALOG                                   -->
+  <!-- ===================================================================== -->
+  <div id="confirmModal" onclick="if(event.target===this) closeModal('confirmModal')" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+      <div class="p-6 space-y-4">
+        <div class="flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 id="confirmTitle" class="font-bold text-sm text-slate-900 dark:text-white">Konfirmasi Tindakan</h4>
+            <p id="confirmMessage" class="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed"></p>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('confirmModal')" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">Batal</button>
+          <button type="button" id="confirmActionBtn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm">Ya, Lanjutkan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MOBILE BOTTOM NAVIGATION BAR & ACTION SHEETS                          -->
+  <!-- ===================================================================== -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 grid grid-cols-5 items-end bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400" style="padding-bottom: env(safe-area-inset-bottom)">
+    <button type="button" class="bn-btn active flex flex-col items-center gap-0.5 py-2 text-[11px]" data-t="opname" onclick="switchTab('opname')">
+      <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+      <span>Stok</span>
+    </button>
+    <button type="button" class="bn-btn flex flex-col items-center gap-0.5 py-2 text-[11px]" data-t="mutations" onclick="switchTab('mutations')">
+      <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+      <span>Mutasi</span>
+    </button>
+    <div class="flex justify-center">
+      <button type="button" onclick="openSheet('addSheet')" aria-label="Aksi Cepat" class="-mt-6 w-14 h-14 rounded-full bg-bi-gold text-bi-dark shadow-lg ring-4 ring-slate-50 dark:ring-slate-950 flex items-center justify-center">
+        <i data-lucide="plus" class="w-6 h-6 stroke-[2.5]"></i>
+      </button>
+    </div>
+    <button type="button" class="bn-btn flex flex-col items-center gap-0.5 py-2 text-[11px]" data-t="reports" onclick="switchTab('reports')">
+      <i data-lucide="file-check-2" class="w-5 h-5"></i>
+      <span>Berita Acara</span>
+    </button>
+    <button type="button" class="bn-btn flex flex-col items-center gap-0.5 py-2 text-[11px]" onclick="openSheet('dataSheet')">
+      <i data-lucide="database" class="w-5 h-5"></i>
+      <span>Data</span>
+    </button>
+  </nav>
+
+  <!-- Action Sheet Overlay -->
+  <div id="sheetOverlay" class="fixed inset-0 z-40 hidden items-end md:items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0 md:p-4" onclick="if(event.target===this) closeSheet()">
+    <!-- Quick Add Sheet -->
+    <div id="addSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-slate-900 rounded-t-2xl md:rounded-2xl p-5 space-y-2.5 border-t md:border border-slate-200 dark:border-slate-800" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
+      <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
+      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Pilih Tindakan Cepat</h4>
+      <button type="button" onclick="sheetGo(() => openMutationModal('OUT'))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
+        <span class="w-9 h-9 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center"><i data-lucide="send" class="w-4 h-4"></i></span>
+        <div>
+          <div>Distribusi ke Kegiatan</div>
+          <div class="text-[11px] font-normal text-slate-500">Catat pengambilan souvenir sosialisasi/rapat</div>
+        </div>
+      </button>
+      <button type="button" onclick="sheetGo(() => openMutationModal('IN'))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
+        <span class="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center"><i data-lucide="package-plus" class="w-4 h-4"></i></span>
+        <div>
+          <div>Terima Pengadaan Baru</div>
+          <div class="text-[11px] font-normal text-slate-500">Tambah stok masuk dari vendor/logistik</div>
+        </div>
+      </button>
+      <button type="button" onclick="sheetGo(() => openItemModal())" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
+        <span class="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-bi-gold flex items-center justify-center"><i data-lucide="plus" class="w-4 h-4"></i></span>
+        <div>
+          <div>Tambah Master Souvenir</div>
+          <div class="text-[11px] font-normal text-slate-500">Daftarkan jenis/SKU souvenir baru</div>
+        </div>
+      </button>
+    </div>
+
+    <!-- Data & Backup Sheet -->
+    <div id="dataSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-slate-900 rounded-t-2xl md:rounded-2xl p-5 space-y-2.5 border-t md:border border-slate-200 dark:border-slate-800" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
+      <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
+      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Manajemen Data & Aplikasi</h4>
+      <button type="button" onclick="sheetGo(exportToCSV)" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
+        <i data-lucide="file-spreadsheet" class="w-5 h-5 text-emerald-600"></i>
+        <span>Export Laporan Excel (.CSV)</span>
+      </button>
+      <button type="button" onclick="sheetGo(exportBackupJSON)" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
+        <i data-lucide="download" class="w-5 h-5 text-blue-600"></i>
+        <span>Backup Database (.JSON)</span>
+      </button>
+      <label class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition cursor-pointer">
+        <i data-lucide="upload" class="w-5 h-5 text-amber-600"></i>
+        <span>Restore Database (.JSON)</span>
+        <input type="file" accept=".json" onchange="closeSheet(); importBackupJSON(event)" class="hidden" />
+      </label>
+      <button type="button" onclick="sheetGo(() => checkAppUpdate(true))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
+        <i data-lucide="refresh-cw" class="w-5 h-5 text-bi-blue"></i>
+        <span>Cek Pembaruan Versi App</span>
+      </button>
+      <button type="button" onclick="sheetGo(confirmResetDemoData)" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-sm font-bold text-rose-600 text-left transition">
+        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+        <span>Reset ke Data Simulasi Awal</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Hidden Official Print Area -->
+  <div id="printArea" class="hidden"></div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-24 md:bottom-5 left-4 right-4 md:left-auto md:right-5 z-50 flex flex-col gap-2 md:max-w-sm pointer-events-none"></div>
+
+  <!-- ===================================================================== -->
+  <!-- APPLICATION ENGINE                                                    -->
+  <!-- ===================================================================== -->
+  <script>
+    'use strict';
+
+    /**
+     * KONFIGURASI BACKEND & STORAGE
+     * Isi GAS_URL dengan URL Web App Google Apps Script jika ingin sinkron cloud.
+     * Jika dikosongkan (""), aplikasi otomatis berjalan lancar di penyimpanan lokal HP.
+     */
+    const GAS_URL = '';
+    const STORAGE_KEY = 'bi_souvenir_opname_pro_v2';
+
+    const DEFAULT_DATA = {
+      items: [
+        {
+          id: 'itm-1',
+          sku: 'SVN-BI-001',
+          name: 'Plakat Kristal Gedung Bank Indonesia',
+          category: 'VIP & Eksekutif',
+          systemStock: 18,
+          physicalStock: 18,
+          minStock: 10,
+          unit: 'Box',
+          location: 'Lemari Kaca VIP - Lt. 2',
+          verified: true
+        },
+        {
+          id: 'itm-2',
+          sku: 'SVN-BI-002',
+          name: 'Tumbler Vacuum Stainless Logo BI',
+          category: 'Seminar & Rakor',
+          systemStock: 65,
+          physicalStock: 63,
+          minStock: 25,
+          unit: 'Pcs',
+          location: 'Rak Gudang Humas A1',
+          verified: true
+        },
+        {
+          id: 'itm-3',
+          sku: 'SVN-BI-003',
+          name: 'Goodie Bag & Buku Edukasi CBP Rupiah',
+          category: 'Sosialisasi CBP Rupiah',
+          systemStock: 140,
+          physicalStock: 140,
+          minStock: 50,
+          unit: 'Paket',
+          location: 'Rak Gudang Utama B2',
+          verified: false
+        },
+        {
+          id: 'itm-4',
+          sku: 'SVN-BI-004',
+          name: 'Payung Lipat Otomatis Eksklusif QRIS',
+          category: 'Edukasi QRIS & Digital',
+          systemStock: 12,
+          physicalStock: 12,
+          minStock: 20,
+          unit: 'Pcs',
+          location: 'Rak Gudang Humas A2',
+          verified: false
+        },
+        {
+          id: 'itm-5',
+          sku: 'SVN-BI-005',
+          name: 'Pouch Tenun Nusantara & Pin Resmi BI',
+          category: 'VIP & Eksekutif',
+          systemStock: 24,
+          physicalStock: 25,
+          minStock: 15,
+          unit: 'Set',
+          location: 'Lemari Kaca VIP - Lt. 2',
+          verified: true
+        },
+        {
+          id: 'itm-6',
+          sku: 'SVN-BI-006',
+          name: 'Notes Kulit & Pulpen Metal BI',
+          category: 'Umum & Kunjungan',
+          systemStock: 0,
+          physicalStock: 0,
+          minStock: 30,
+          unit: 'Set',
+          location: 'Rak Gudang Utama B1',
+          verified: false
+        }
+      ],
+      mutations: [
+        {
+          id: 'mut-101',
+          date: new Date().toISOString().split('T')[0],
+          type: 'OUT',
+          itemId: 'itm-3',
+          itemSku: 'SVN-BI-003',
+          itemName: 'Goodie Bag & Buku Edukasi CBP Rupiah',
+          qty: 60,
+          activity: 'Sosialisasi Cinta Bangga Paham (CBP) Rupiah - Universitas',
+          pic: 'Unit Kehumasan & Edukasi'
+        },
+        {
+          id: 'mut-102',
+          date: new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0],
+          type: 'OUT',
+          itemId: 'itm-1',
+          itemSku: 'SVN-BI-001',
+          itemName: 'Plakat Kristal Gedung Bank Indonesia',
+          qty: 4,
+          activity: 'Rapat Koordinasi Tim Pengendalian Inflasi Daerah (TPID)',
+          pic: 'Fungsi Pelaksanaan Pengembangan UMKM & KI'
+        },
+        {
+          id: 'mut-103',
+          date: new Date(Date.now() - 86400000 * 5).toISOString().split('T')[0],
+          type: 'IN',
+          itemId: 'itm-2',
+          itemSku: 'SVN-BI-002',
+          itemName: 'Tumbler Vacuum Stainless Logo BI',
+          qty: 100,
+          activity: 'Penerimaan Pengadaan Souvenir Batch II',
+          pic: 'Logistik & Pengadaan'
+        }
+      ],
+      reports: []
+    };
+
+    function sanitizeState(raw) {
+      const base = raw && typeof raw === 'object' ? raw : {};
+      const items = Array.isArray(base.items)
+        ? base.items.map((item, idx) => ({
+            id: String(item.id || `itm-${Date.now()}-${idx}`),
+            sku: String(item.sku || `SVN-BI-${String(idx + 1).padStart(3, '0')}`).toUpperCase(),
+            name: String(item.name || 'Item Souvenir'),
+            category: String(item.category || 'Umum & Kunjungan'),
+            systemStock: Math.max(0, parseInt(item.systemStock, 10) || 0),
+            physicalStock: Math.max(0, parseInt(item.physicalStock, 10) || 0),
+            minStock: Math.max(1, parseInt(item.minStock, 10) || 10),
+            unit: String(item.unit || 'Pcs'),
+            location: String(item.location || '-'),
+            verified: Boolean(item.verified)
+          }))
+        : JSON.parse(JSON.stringify(DEFAULT_DATA.items));
+
+      const mutations = Array.isArray(base.mutations) ? base.mutations : [];
+      const reports = Array.isArray(base.reports) ? base.reports : [];
+      return { items, mutations, reports };
+    }
+
+    function setSyncStatus(label, colorClass = 'bg-emerald-400') {
+      const textEl = document.getElementById('syncStatusText');
+      const badgeEl = document.getElementById('syncStatusBadge');
+      if (!textEl || !badgeEl) return;
+      textEl.textContent = label;
+      const dot = badgeEl.querySelector('span');
+      if (dot) dot.className = `w-2 h-2 rounded-full ${colorClass}`;
+    }
+
+    const StorageAdapter = {
+      loadLocal() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) {
+            const initial = sanitizeState(DEFAULT_DATA);
+            this.saveLocal(initial);
+            return initial;
+          }
+          return sanitizeState(JSON.parse(raw));
+        } catch (err) {
+          console.error('Local load error:', err);
+          return sanitizeState(DEFAULT_DATA);
+        }
+      },
+      saveLocal(data) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (err) {
+          console.error('Local save error:', err);
+        }
+      },
+      async syncFromCloud() {
+        if (!GAS_URL) {
+          setSyncStatus('Mode Lokal', 'bg-emerald-400');
+          return;
+        }
+        try {
+          setSyncStatus('Sinkron...', 'bg-amber-400');
+          const res = await fetch(`${GAS_URL}?action=load&t=${Date.now()}`, { cache: 'no-store' });
+          const json = await res.json();
+          if (json && json.status === 'success' && json.data) {
+            appState = sanitizeState(json.data);
+            this.saveLocal(appState);
+            renderInventoryTable();
+            renderMutationTable();
+            renderReportsList();
+          }
+          setSyncStatus('Cloud Aktif', 'bg-emerald-400');
+        } catch (err) {
+          console.warn('Cloud sync fallback to local:', err);
+          setSyncStatus('Offline Lokal', 'bg-amber-400');
+        }
+      },
+      save(data) {
+        this.saveLocal(data);
+        if (!GAS_URL) return;
+        setSyncStatus('Menyimpan...', 'bg-amber-400');
+        fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'save', data })
+        })
+          .then(r => r.json())
+          .then(() => setSyncStatus('Tersimpan', 'bg-emerald-400'))
+          .catch(() => setSyncStatus('Gagal Sync', 'bg-rose-400'));
+      }
+    };
+
+    let appState = StorageAdapter.loadLocal();
+    let pendingConfirmCallback = null;
+    let isCheckingUpdate = false;
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    /**
+     * =====================================================================
+     * AUTO-UPDATE ENGINE UNTUK APK & GITHUB PAGES
+     * =====================================================================
+     */
+    function getCurrentAppVersion() {
+      const meta = document.querySelector('meta[name="app-version"]');
+      return meta ? meta.getAttribute('content').trim() : '1.0.0';
+    }
+
+    async function checkAppUpdate(manual = false) {
+      if (isCheckingUpdate) return;
+      if (window.location.protocol === 'file:') {
+        if (manual) showToast('Auto-update aktif setelah di-upload ke GitHub Pages.', 'info');
+        return;
+      }
+
+      isCheckingUpdate = true;
+      const icon = document.getElementById('updateIcon');
+      if (icon) icon.classList.add('animate-spin');
+
+      try {
+        const currentVersion = getCurrentAppVersion();
+        const targetUrl = `${window.location.pathname}?_v=${Date.now()}`;
+        const response = await fetch(targetUrl, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
+          }
+        });
+
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const htmlText = await response.text();
+        const match = htmlText.match(/<meta\s+name=["']app-version["']\s+content=["']([^"']+)["']/i);
+        const remoteVersion = match ? match[1].trim() : null;
+
+        if (remoteVersion && remoteVersion !== currentVersion) {
+          showToast(`Pembaruan ditemukan (v${remoteVersion}). Memuat ulang aplikasi...`, 'info');
+
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+          }
+
+          setTimeout(() => {
+            const cleanUrl = `${window.location.origin}${window.location.pathname}?updated=${Date.now()}`;
+            window.location.replace(cleanUrl);
+          }, 900);
+        } else if (manual) {
+          showToast(`Aplikasi sudah versi terbaru (v${currentVersion}).`, 'success');
+        }
+      } catch (err) {
+        if (manual) showToast('Gagal mengecek pembaruan. Periksa koneksi internet.', 'error');
+      } finally {
+        isCheckingUpdate = false;
+        if (icon) icon.classList.remove('animate-spin');
+      }
+    }
+
+    /**
+     * PWA Manifest Setup (Aman untuk Android WebView)
+     */
+    function setupPWAManifest() {
+      const manifest = {
+        name: 'SIM-SOUVENIR Bank Indonesia',
+        short_name: 'SIM-SOUVENIR',
+        start_url: '.',
+        display: 'standalone',
+        background_color: '#002F6C',
+        theme_color: '#002F6C',
+        description: 'Sistem Monitoring Inventaris & Stock Opname Souvenir Bank Indonesia'
+      };
+      const encoded = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+      const linkEl = document.getElementById('pwaManifest');
+      if (linkEl) linkEl.setAttribute('href', encoded);
+    }
+
+    /**
+     * Theme Switcher
+     */
+    function initTheme() {
+      const saved = localStorage.getItem('bi_theme_mode') || 'light';
+      const isDark = saved === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+      const icon = document.getElementById('themeIcon');
+      if (icon) icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+      lucide.createIcons();
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('bi_theme_mode', isDark ? 'dark' : 'light');
+      const icon = document.getElementById('themeIcon');
+      if (icon) icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+      lucide.createIcons();
+    }
+
+    /**
+     * Toast Notification
+     */
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const styles = {
+        success: 'bg-emerald-600 text-white',
+        error: 'bg-rose-600 text-white',
+        info: 'bg-bi-navy text-white'
+      };
+      toast.className = `${styles[type] || styles.info} px-4 py-3 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2.5 transform transition-all duration-300 translate-y-2 opacity-0`;
+      toast.innerHTML = `
+        <i data-lucide="${type === 'error' ? 'alert-circle' : 'check-circle'}" class="w-4 h-4 shrink-0"></i>
+        <span>${escapeHtml(message)}</span>
+      `;
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    /**
+     * Custom Confirm Dialog
+     */
+    function showConfirmDialog(title, message, onConfirm) {
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmMessage').textContent = message;
+      pendingConfirmCallback = onConfirm;
+      document.getElementById('confirmActionBtn').onclick = () => {
+        closeModal('confirmModal');
+        if (typeof pendingConfirmCallback === 'function') pendingConfirmCallback();
+      };
+      openModal('confirmModal');
+    }
+
+    /**
+     * Navigation Tabs
+     */
+    function switchTab(tabName) {
+      ['opname', 'mutations', 'reports'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (btn) {
+          btn.className = 'tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+        }
+      });
+
+      document.getElementById(`view-${tabName}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+      if (activeBtn) {
+        activeBtn.className = 'tab-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-white dark:bg-slate-900 text-bi-navy dark:text-white shadow-sm';
+      }
+
+      document.querySelectorAll('.bn-btn[data-t]').forEach(b => b.classList.toggle('active', b.dataset.t === tabName));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (tabName === 'mutations') renderMutationTable();
+      if (tabName === 'reports') renderReportsList();
+      lucide.createIcons();
+    }
+
+    /**
+     * Update KPIs & Audit Progress Bar
+     */
+    function updateKPIs() {
+      const items = appState.items;
+      const totalSku = items.length;
+      const categories = new Set(items.map(i => i.category)).size;
+      const totalSystem = items.reduce((sum, i) => sum + Number(i.systemStock), 0);
+      const totalPhysical = items.reduce((sum, i) => sum + Number(i.physicalStock), 0);
+      const lowStock = items.filter(i => i.physicalStock > 0 && i.physicalStock <= i.minStock).length;
+      const outStock = items.filter(i => i.physicalStock === 0).length;
+      const varianceCount = items.filter(i => i.physicalStock !== i.systemStock).length;
+      const verifiedCount = items.filter(i => i.verified).length;
+      const pct = totalSku > 0 ? Math.round((verifiedCount / totalSku) * 100) : 0;
+
+      document.getElementById('kpiTotalSku').textContent = totalSku;
+      document.getElementById('kpiTotalCategories').textContent = `${categories} kategori aktif`;
+      document.getElementById('kpiTotalPhysical').textContent = totalPhysical.toLocaleString('id-ID');
+      document.getElementById('kpiTotalSystem').textContent = totalSystem.toLocaleString('id-ID');
+      document.getElementById('kpiLowStock').textContent = lowStock + outStock;
+      document.getElementById('kpiOutStock').textContent = outStock;
+      document.getElementById('kpiVarianceCount').textContent = varianceCount;
+      document.getElementById('kpiLastOpname').textContent = appState.reports.length > 0
+        ? `BA Terakhir: ${appState.reports[0].date}`
+        : 'Belum ada BA';
+
+      document.getElementById('auditProgressText').textContent = `${verifiedCount}/${totalSku} SKU (${pct}%)`;
+      document.getElementById('auditProgressBar').style.width = `${pct}%`;
+    }
+
+    /**
+     * Render Master Inventory & Inline Opname Table
+     */
+    function renderInventoryTable() {
+      const tbody = document.getElementById('inventoryTableBody');
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const catFilter = document.getElementById('categoryFilter').value;
+      const statusFilter = document.getElementById('statusFilter').value;
+
+      const filtered = appState.items.filter(item => {
+        const matchSearch =
+          item.sku.toLowerCase().includes(search) ||
+          item.name.toLowerCase().includes(search) ||
+          item.location.toLowerCase().includes(search);
+        const matchCat = catFilter === 'ALL' || item.category === catFilter;
+
+        const variance = item.physicalStock - item.systemStock;
+        let matchStatus = true;
+        if (statusFilter === 'UNVERIFIED') matchStatus = !item.verified;
+        if (statusFilter === 'LOW') matchStatus = item.physicalStock <= item.minStock;
+        if (statusFilter === 'VARIANCE') matchStatus = variance !== 0;
+        if (statusFilter === 'MATCH') matchStatus = variance === 0;
+
+        return matchSearch && matchCat && matchStatus;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="py-12 text-center text-slate-400">
+              <i data-lucide="package-search" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+              <p class="font-semibold">Tidak ada item souvenir yang sesuai dengan filter.</p>
+            </td>
+          </tr>
+        `;
+        updateKPIs();
+        lucide.createIcons();
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        const variance = item.physicalStock - item.systemStock;
+        const safeId = escapeHtml(item.id);
+        const rowClass = item.physicalStock === 0
+          ? 'row-empty'
+          : (item.physicalStock <= item.minStock ? 'row-low' : (item.verified ? 'row-verified' : ''));
+
+        let varianceBadge = '';
+        if (variance === 0) {
+          varianceBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"><i data-lucide="check" class="w-3 h-3"></i> Sesuai</span>`;
+        } else if (variance < 0) {
+          varianceBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">${variance} ${escapeHtml(item.unit)}</span>`;
+        } else {
+          varianceBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">+${variance} ${escapeHtml(item.unit)}</span>`;
+        }
+
+        let stockStatusBadge = '';
+        if (item.physicalStock === 0) {
+          stockStatusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200">Habis</span>`;
+        } else if (item.physicalStock <= item.minStock) {
+          stockStatusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">Menipis</span>`;
+        } else {
+          stockStatusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">Aman</span>`;
+        }
+
+        const verifyBtnClass = item.verified
+          ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+          : 'bg-white dark:bg-slate-800 text-slate-400 border-slate-300 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600';
+
+        return `
+          <tr class="${rowClass} hover:bg-slate-50/90 dark:hover:bg-slate-800/40 transition">
+            <td class="py-3.5 px-4 text-center hidden md:table-cell">
+              <button type="button" onclick="toggleVerified('${safeId}')" title="${item.verified ? 'Sudah dicek fisik' : 'Tandai sudah dicek fisik'}" class="w-7 h-7 rounded-lg border inline-flex items-center justify-center transition ${verifyBtnClass}">
+                <i data-lucide="check" class="w-4 h-4 stroke-[2.5]"></i>
+              </button>
+            </td>
+
+            <td class="py-3.5 px-3">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-mono text-[11px] font-bold text-bi-blue dark:text-blue-400">${escapeHtml(item.sku)}</span>
+                    ${item.verified ? '<span class="md:hidden px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">✓ Tercek</span>' : ''}
+                  </div>
+                  <div class="font-bold text-slate-900 dark:text-white mt-0.5 leading-snug">${escapeHtml(item.name)}</div>
+                </div>
+                <div class="md:hidden shrink-0">${stockStatusBadge}</div>
+              </div>
+            </td>
+
+            <td class="py-3.5 px-3 mt-1.5 md:mt-0">
+              <div class="flex flex-wrap items-center gap-2 md:block">
+                <span class="inline-block px-2 py-0.5 rounded-md text-[11px] font-semibold bg-bi-light text-bi-navy dark:bg-blue-950 dark:text-blue-200">
+                  ${escapeHtml(item.category)}
+                </span>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400 md:mt-1 flex items-center gap-1">
+                  <i data-lucide="map-pin" class="w-3 h-3 shrink-0"></i>
+                  <span>${escapeHtml(item.location)}</span>
+                </div>
+              </div>
+            </td>
+
+            <td class="py-3.5 px-3 text-center hidden md:table-cell">
+              <span class="font-bold text-sm text-slate-700 dark:text-slate-200">${item.systemStock}</span>
+              <span class="text-[11px] text-slate-400 block">${escapeHtml(item.unit)}</span>
+            </td>
+
+            <td class="py-3.5 px-3 text-center mt-3 md:mt-0">
+              <!-- Mobile Metric Strip -->
+              <div class="flex md:hidden items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/70">
+                <div>
+                  <span class="block text-[10px] uppercase font-bold text-slate-400">Buku</span>
+                  <span class="font-bold text-sm">${item.systemStock} <span class="text-[11px] font-normal text-slate-500">${escapeHtml(item.unit)}</span></span>
+                </div>
+                <div class="inline-flex items-center rounded-xl border ${variance !== 0 ? 'border-amber-400 bg-amber-50/60 dark:bg-amber-950/30' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'} overflow-hidden">
+                  <button type="button" data-f="${safeId}-m-mob" onclick="adjustPhysicalInline('${safeId}', -1)" class="px-3 py-2 font-bold text-slate-600 dark:text-slate-300">-</button>
+                  <input type="number" min="0" value="${item.physicalStock}" data-f="${safeId}-i-mob" inputmode="numeric" onfocus="this.select()" onblur="setPhysicalInline('${safeId}', this.value)" onchange="setPhysicalInline('${safeId}', this.value)" class="w-12 text-center font-extrabold text-sm bg-transparent outline-none" />
+                  <button type="button" data-f="${safeId}-p-mob" onclick="adjustPhysicalInline('${safeId}', 1)" class="px-3 py-2 font-bold text-slate-600 dark:text-slate-300">+</button>
+                </div>
+                <div class="text-right">
+                  <span class="block text-[10px] uppercase font-bold text-slate-400 mb-0.5">Selisih</span>
+                  ${varianceBadge}
+                </div>
+              </div>
+
+              <!-- Desktop Stepper -->
+              <div class="hidden md:inline-flex items-center rounded-xl border ${variance !== 0 ? 'border-amber-400 bg-amber-50/40 dark:bg-amber-950/20' : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800'} overflow-hidden">
+                <button type="button" data-f="${safeId}-m" onclick="adjustPhysicalInline('${safeId}', -1)" class="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold">-</button>
+                <input type="number" min="0" value="${item.physicalStock}" data-f="${safeId}-i" inputmode="numeric" onfocus="this.select()" onblur="setPhysicalInline('${safeId}', this.value)" onchange="setPhysicalInline('${safeId}', this.value)" class="w-14 text-center font-bold text-xs bg-transparent outline-none py-1.5" />
+                <button type="button" data-f="${safeId}-p" onclick="adjustPhysicalInline('${safeId}', 1)" class="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold">+</button>
+              </div>
+            </td>
+
+            <td class="py-3.5 px-3 text-center hidden md:table-cell">${varianceBadge}</td>
+            <td class="py-3.5 px-3 text-center hidden md:table-cell">${stockStatusBadge}</td>
+
+            <td class="py-3.5 px-4 text-right mt-2.5 pt-2.5 border-t border-slate-100 dark:border-slate-800 md:border-0 md:mt-0 md:pt-3.5">
+              <div class="flex md:inline-flex items-center gap-1.5">
+                <button type="button" onclick="toggleVerified('${safeId}')" class="md:hidden px-3 py-2 rounded-xl border text-xs font-bold inline-flex items-center gap-1 transition ${verifyBtnClass}">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  <span>${item.verified ? 'Tercek' : 'Cek'}</span>
+                </button>
+                <button type="button" onclick="openMutationModal('OUT', '${safeId}')" title="Distribusi Kegiatan" class="flex-1 md:flex-initial justify-center inline-flex items-center gap-1.5 px-3 py-2 md:p-2 rounded-xl md:rounded-lg border md:border-0 border-blue-200 dark:border-blue-900 bg-blue-50/50 md:bg-transparent hover:bg-blue-50 dark:hover:bg-blue-950 text-bi-blue dark:text-blue-400 font-semibold text-xs transition">
+                  <i data-lucide="send" class="w-4 h-4"></i>
+                  <span class="md:hidden">Distribusi</span>
+                </button>
+                <button type="button" onclick="openItemModal('${safeId}')" title="Edit Souvenir" class="p-2 rounded-xl md:rounded-lg border md:border-0 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition">
+                  <i data-lucide="pencil" class="w-4 h-4"></i>
+                </button>
+                <button type="button" onclick="confirmDeleteItem('${safeId}')" title="Hapus Item" class="p-2 rounded-xl md:rounded-lg border md:border-0 border-slate-200 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-rose-950 text-rose-600 transition">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      updateKPIs();
+      lucide.createIcons();
+    }
+
+    /**
+     * Inline Stock Opname & Verification Controls
+     */
+    function renderKeepFocus() {
+      const key = document.activeElement?.dataset?.f;
+      renderInventoryTable();
+      if (key) {
+        const el = document.querySelector(`[data-f="${key}"]`);
+        if (el) {
+          el.focus();
+          if (el.select) el.select();
+        }
+      }
+    }
+
+    function adjustPhysicalInline(id, delta) {
+      const item = appState.items.find(i => i.id === id);
+      if (!item) return;
+      item.physicalStock = Math.max(0, Number(item.physicalStock) + delta);
+      item.verified = true;
+      if (navigator.vibrate) navigator.vibrate(8);
+      StorageAdapter.save(appState);
+      renderKeepFocus();
+    }
+
+    function setPhysicalInline(id, value) {
+      const item = appState.items.find(i => i.id === id);
+      if (!item) return;
+      const parsed = parseInt(value, 10);
+      const safeVal = isNaN(parsed) || parsed < 0 ? 0 : parsed;
+      if (item.physicalStock === safeVal && item.verified) return;
+      item.physicalStock = safeVal;
+      item.verified = true;
+      StorageAdapter.save(appState);
+      setTimeout(renderKeepFocus, 0);
+    }
+
+    function toggleVerified(id) {
+      const item = appState.items.find(i => i.id === id);
+      if (!item) return;
+      item.verified = !item.verified;
+      if (navigator.vibrate) navigator.vibrate(8);
+      StorageAdapter.save(appState);
+      renderInventoryTable();
+    }
+
+    function markAllVerified(status) {
+      appState.items.forEach(i => { i.verified = status; });
+      StorageAdapter.save(appState);
+      renderInventoryTable();
+      showToast(status ? 'Semua item ditandai sudah dicek fisik.' : 'Status centang verifikasi di-reset.', 'info');
+    }
+
+    function syncAllPhysicalToSystem() {
+      appState.items.forEach(item => {
+        item.physicalStock = item.systemStock;
+      });
+      StorageAdapter.save(appState);
+      renderInventoryTable();
+      showToast('Seluruh stok fisik disamakan dengan saldo buku.', 'info');
+    }
+
+    /**
+     * Modals & Bottom Sheets
+     */
+    function syncBodyScrollLock() {
+      const anyModalOpen = ['itemModal', 'mutationModal', 'opnameModal', 'baPreviewModal', 'confirmModal']
+        .some(id => !document.getElementById(id).classList.contains('hidden'));
+      const sheetOpen = !document.getElementById('sheetOverlay').classList.contains('hidden');
+      document.body.classList.toggle('overflow-hidden', anyModalOpen || sheetOpen);
+    }
+
+    function openSheet(id) {
+      document.querySelectorAll('.sheet-panel').forEach(el => el.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      const overlay = document.getElementById('sheetOverlay');
+      overlay.classList.remove('hidden');
+      overlay.classList.add('flex');
+      syncBodyScrollLock();
+      lucide.createIcons();
+    }
+
+    function closeSheet() {
+      const overlay = document.getElementById('sheetOverlay');
+      overlay.classList.add('hidden');
+      overlay.classList.remove('flex');
+      syncBodyScrollLock();
+    }
+
+    function sheetGo(fn) {
+      closeSheet();
+      fn();
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      syncBodyScrollLock();
+      lucide.createIcons();
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      syncBodyScrollLock();
+    }
+
+    /**
+     * Master Item CRUD
+     */
+    function openItemModal(itemId = null) {
+      const form = document.getElementById('itemForm');
+      form.reset();
+      document.getElementById('editItemId').value = '';
+
+      if (itemId) {
+        const item = appState.items.find(i => i.id === itemId);
+        if (!item) return;
+        document.getElementById('itemModalTitle').innerHTML = `<i data-lucide="pencil" class="w-4 h-4 text-bi-gold"></i> Edit Master Souvenir`;
+        document.getElementById('editItemId').value = item.id;
+        document.getElementById('itemSku').value = item.sku;
+        document.getElementById('itemCategory').value = item.category;
+        document.getElementById('itemName').value = item.name;
+        document.getElementById('itemSystemStock').value = item.systemStock;
+        document.getElementById('itemMinStock').value = item.minStock;
+        document.getElementById('itemUnit').value = item.unit;
+        document.getElementById('itemLocation').value = item.location;
+      } else {
+        document.getElementById('itemModalTitle').innerHTML = `<i data-lucide="package-plus" class="w-4 h-4 text-bi-gold"></i> Tambah Item Souvenir Baru`;
+        const nextNum = String(appState.items.length + 1).padStart(3, '0');
+        document.getElementById('itemSku').value = `SVN-BI-${nextNum}`;
+      }
+
+      openModal('itemModal');
+    }
+
+    function saveItem(e) {
+      e.preventDefault();
+      const id = document.getElementById('editItemId').value;
+      const sku = document.getElementById('itemSku').value.trim().toUpperCase();
+      const category = document.getElementById('itemCategory').value;
+      const name = document.getElementById('itemName').value.trim();
+      const systemStock = Math.max(0, parseInt(document.getElementById('itemSystemStock').value, 10) || 0);
+      const minStock = Math.max(1, parseInt(document.getElementById('itemMinStock').value, 10) || 5);
+      const unit = document.getElementById('itemUnit').value.trim() || 'Pcs';
+      const location = document.getElementById('itemLocation').value.trim();
+
+      const isDuplicateSku = appState.items.some(i => i.sku.toUpperCase() === sku && i.id !== id);
+      if (isDuplicateSku) {
+        showToast(`Kode SKU "${sku}" sudah dipakai item lain.`, 'error');
+        return;
+      }
+
+      if (id) {
+        const item = appState.items.find(i => i.id === id);
+        if (item) {
+          Object.assign(item, { sku, category, name, systemStock, minStock, unit, location });
+        }
+        showToast('Data master souvenir berhasil diperbarui.');
+      } else {
+        appState.items.unshift({
+          id: 'itm-' + Date.now(),
+          sku,
+          name,
+          category,
+          systemStock,
+          physicalStock: systemStock,
+          minStock,
+          unit,
+          location,
+          verified: false
+        });
+        showToast('Souvenir baru berhasil ditambahkan.');
+      }
+
+      StorageAdapter.save(appState);
+      closeModal('itemModal');
+      renderInventoryTable();
+    }
+
+    function confirmDeleteItem(id) {
+      const item = appState.items.find(i => i.id === id);
+      if (!item) return;
+      showConfirmDialog(
+        'Hapus Master Souvenir',
+        `Hapus "${item.name}" (${item.sku}) dari daftar inventaris?`,
+        () => {
+          appState.items = appState.items.filter(i => i.id !== id);
+          StorageAdapter.save(appState);
+          renderInventoryTable();
+          showToast('Item souvenir telah dihapus.', 'info');
+        }
+      );
+    }
+
+    /**
+     * Mutation Modal & Live Stock Calculator
+     */
+    function openMutationModal(defaultType = 'OUT', preselectItemId = null) {
+      const select = document.getElementById('mutItemId');
+      if (appState.items.length === 0) {
+        showToast('Tambahkan item souvenir terlebih dahulu.', 'error');
+        return;
+      }
+
+      select.innerHTML = appState.items.map(i =>
+        `<option value="${escapeHtml(i.id)}">[${escapeHtml(i.sku)}] ${escapeHtml(i.name)} (Stok: ${i.systemStock} ${escapeHtml(i.unit)})</option>`
+      ).join('');
+
+      if (preselectItemId) select.value = preselectItemId;
+
+      const radio = document.querySelector(`input[name="mutType"][value="${defaultType}"]`);
+      if (radio) radio.checked = true;
+      document.getElementById('mutQty').value = '';
+      document.getElementById('mutDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('mutActivity').value = '';
+      document.getElementById('mutPic').value = '';
+      updateMutationPreview();
+
+      openModal('mutationModal');
+    }
+
+    function updateMutationPreview() {
+      const type = document.querySelector('input[name="mutType"]:checked').value;
+      const itemId = document.getElementById('mutItemId').value;
+      const qty = parseInt(document.getElementById('mutQty').value, 10) || 0;
+      const label = document.getElementById('mutActivityLabel');
+      const input = document.getElementById('mutActivity');
+      const previewBox = document.getElementById('mutStockPreview');
+      const submitBtn = document.getElementById('mutSubmitBtn');
+
+      if (type === 'OUT') {
+        label.textContent = 'Nama Kegiatan Sosialisasi / Keperluan *';
+        input.placeholder = 'Contoh: Sosialisasi Cinta Bangga Paham Rupiah';
+      } else {
+        label.textContent = 'Keterangan Penerimaan / Nomor PO *';
+        input.placeholder = 'Contoh: Penerimaan Pengadaan Vendor Batch III';
+      }
+
+      const item = appState.items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const projected = type === 'OUT' ? item.systemStock - qty : item.systemStock + qty;
+      const isInvalid = type === 'OUT' && qty > item.systemStock;
+
+      submitBtn.disabled = isInvalid;
+      if (isInvalid) {
+        previewBox.innerHTML = `
+          <span class="text-rose-600 font-bold flex items-center gap-1.5">
+            <i data-lucide="alert-circle" class="w-4 h-4"></i>
+            Stok tidak cukup! (Tersedia: ${item.systemStock} ${escapeHtml(item.unit)})
+          </span>
+        `;
+      } else {
+        previewBox.innerHTML = `
+          <span class="text-slate-500">Saldo saat ini: <strong>${item.systemStock} ${escapeHtml(item.unit)}</strong></span>
+          <span class="font-bold ${type === 'OUT' ? 'text-rose-600' : 'text-emerald-600'}">
+            Estimasi akhir: ${projected} ${escapeHtml(item.unit)}
+          </span>
+        `;
+      }
+      lucide.createIcons();
+    }
+
+    function saveMutation(e) {
+      e.preventDefault();
+      const type = document.querySelector('input[name="mutType"]:checked').value;
+      const itemId = document.getElementById('mutItemId').value;
+      const qty = parseInt(document.getElementById('mutQty').value, 10);
+      const date = document.getElementById('mutDate').value;
+      const activity = document.getElementById('mutActivity').value.trim();
+      const pic = document.getElementById('mutPic').value.trim();
+
+      if (!qty || qty <= 0) {
+        showToast('Jumlah unit harus lebih dari 0.', 'error');
+        return;
+      }
+
+      const item = appState.items.find(i => i.id === itemId);
+      if (!item) return;
+
+      if (type === 'OUT' && qty > item.systemStock) {
+        showToast(`Stok tidak mencukupi! Sisa stok hanya ${item.systemStock} ${item.unit}.`, 'error');
+        return;
+      }
+
+      if (type === 'OUT') {
+        item.systemStock -= qty;
+        item.physicalStock = Math.max(0, item.physicalStock - qty);
+      } else {
+        item.systemStock += qty;
+        item.physicalStock += qty;
+      }
+
+      appState.mutations.unshift({
+        id: 'mut-' + Date.now(),
+        date,
+        type,
+        itemId: item.id,
+        itemSku: item.sku,
+        itemName: item.name,
+        qty,
+        activity,
+        pic
+      });
+
+      StorageAdapter.save(appState);
+      closeModal('mutationModal');
+      renderInventoryTable();
+      renderMutationTable();
+      showToast(type === 'OUT' ? 'Distribusi souvenir kegiatan berhasil dicatat.' : 'Penerimaan pengadaan berhasil dicatat.');
+    }
+
+    function renderMutationTable() {
+      const tbody = document.getElementById('mutationTableBody');
+      const filter = document.getElementById('mutationTypeFilter').value;
+      const filtered = appState.mutations.filter(m => filter === 'ALL' || m.type === filter);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-slate-400">Belum ada riwayat mutasi pada kategori ini.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(m => {
+        let badge = '';
+        if (m.type === 'OUT') {
+          badge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">Keluar</span>`;
+        } else if (m.type === 'IN') {
+          badge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">Masuk</span>`;
+        } else {
+          badge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">Opname</span>`;
+        }
+
+        const isNegative = m.type === 'OUT' || String(m.qty).startsWith('-');
+        const prefix = m.type === 'OUT' ? '-' : (m.type === 'IN' ? '+' : '');
+
+        return `
+          <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+            <td class="py-3.5 px-4 font-mono text-[11px] text-slate-500 whitespace-nowrap">
+              <div class="flex items-center justify-between md:block">
+                <span>${escapeHtml(m.date)}</span>
+                <span class="md:hidden">${badge}</span>
+              </div>
+            </td>
+            <td class="py-3.5 px-3 hidden md:table-cell">${badge}</td>
+            <td class="py-3.5 px-3 mt-1.5 md:mt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="font-bold text-slate-900 dark:text-white">${escapeHtml(m.itemName)}</div>
+                  <div class="text-[11px] font-mono text-slate-500">${escapeHtml(m.itemSku)}</div>
+                </div>
+                <span class="md:hidden font-extrabold text-base ${isNegative ? 'text-rose-600' : 'text-emerald-600'}">
+                  ${prefix}${escapeHtml(m.qty)}
+                </span>
+              </div>
+            </td>
+            <td class="py-3.5 px-3 text-center font-bold hidden md:table-cell ${isNegative ? 'text-rose-600' : 'text-emerald-600'}">
+              ${prefix}${escapeHtml(m.qty)}
+            </td>
+            <td class="py-3.5 px-3 text-slate-700 dark:text-slate-300 mt-1.5 md:mt-0">${escapeHtml(m.activity)}</td>
+            <td class="py-3.5 px-4 font-semibold text-xs text-slate-500 dark:text-slate-400 mt-1 md:mt-0">
+              <span class="md:hidden text-slate-400 font-normal">PIC: </span>${escapeHtml(m.pic)}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    /**
+     * Berita Acara Stock Opname
+     */
+    function openFinalizeOpnameModal() {
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+        document.activeElement.blur();
+      }
+
+      const items = appState.items;
+      const variances = items.filter(i => i.physicalStock !== i.systemStock);
+      const unverified = items.filter(i => !i.verified).length;
+      const totalSystem = items.reduce((s, i) => s + i.systemStock, 0);
+      const totalPhysical = items.reduce((s, i) => s + i.physicalStock, 0);
+
+      document.getElementById('opnameSummaryBox').innerHTML = `
+        <div class="flex justify-between"><span>Total Item Diaudit:</span><strong>${items.length} SKU (${items.length - unverified} tercek)</strong></div>
+        <div class="flex justify-between"><span>Saldo Buku vs Stok Fisik:</span><strong>${totalSystem} unit vs ${totalPhysical} unit</strong></div>
+        <div class="flex justify-between">
+          <span>Item Memiliki Selisih:</span>
+          <strong class="${variances.length > 0 ? 'text-amber-600' : 'text-emerald-600'}">${variances.length} item</strong>
+        </div>
+      `;
+
+      openModal('opnameModal');
+    }
+
+    function finalizeStockOpname(e) {
+      e.preventDefault();
+      const auditor = document.getElementById('opnameAuditor').value.trim();
+      const unit = document.getElementById('opnameUnit').value.trim();
+      const notes = document.getElementById('opnameNotes').value.trim();
+      const shouldSync = document.getElementById('opnameSyncCheckbox').checked;
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      const romanMonths = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+      const seq = String(appState.reports.length + 1).padStart(3, '0');
+      const docNumber = `BA-SO/BI/${romanMonths[now.getMonth()]}/${now.getFullYear()}/${seq}`;
+
+      const snapshot = appState.items.map(i => ({
+        sku: i.sku,
+        name: i.name,
+        category: i.category,
+        unit: i.unit,
+        systemStock: i.systemStock,
+        physicalStock: i.physicalStock,
+        variance: i.physicalStock - i.systemStock
+      }));
+
+      const varianceItemsCount = snapshot.filter(s => s.variance !== 0).length;
+
+      if (shouldSync) {
+        appState.items.forEach((item, idx) => {
+          const diff = item.physicalStock - item.systemStock;
+          if (diff !== 0) {
+            appState.mutations.unshift({
+              id: `mut-${Date.now()}-${idx}-${Math.random().toString(16).slice(2, 6)}`,
+              date: today,
+              type: 'ADJ',
+              itemId: item.id,
+              itemSku: item.sku,
+              itemName: item.name,
+              qty: diff > 0 ? `+${diff}` : `${diff}`,
+              activity: `Penyesuaian ${docNumber} (${notes || 'Audit Rutin'})`,
+              pic: auditor
+            });
+            item.systemStock = item.physicalStock;
+          }
+        });
+      }
+
+      const report = {
+        id: docNumber,
+        date: today,
+        auditor,
+        unit,
+        notes: notes || 'Pelaksanaan stock opname rutin inventaris souvenir kegiatan sosialisasi.',
+        totalSku: snapshot.length,
+        varianceItemsCount,
+        synced: shouldSync,
+        details: snapshot
+      };
+
+      appState.reports.unshift(report);
+      StorageAdapter.save(appState);
+      closeModal('opnameModal');
+      renderInventoryTable();
+      renderReportsList();
+      switchTab('reports');
+      showToast(`Berita Acara ${report.id} berhasil disahkan!`);
+    }
+
+    function renderReportsList() {
+      const container = document.getElementById('opnameReportsList');
+      if (appState.reports.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-400 bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl">
+            <i data-lucide="file-check-2" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+            <p class="font-semibold text-sm">Belum ada Berita Acara Stock Opname yang disahkan.</p>
+            <p class="text-xs mt-1">Lakukan penghitungan fisik pada tab Stok, lalu klik "Finalisasi Berita Acara Opname".</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = appState.reports.map(rep => `
+        <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between gap-4">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-xs font-bold text-bi-navy dark:text-blue-400 bg-bi-light dark:bg-blue-950 px-2.5 py-1 rounded-lg">
+                ${escapeHtml(rep.id)}
+              </span>
+              <span class="text-xs text-slate-500 font-semibold">${escapeHtml(rep.date)}</span>
+            </div>
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white mt-3">${escapeHtml(rep.unit)}</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Petugas Pelaksana: <strong class="text-slate-700 dark:text-slate-200">${escapeHtml(rep.auditor)}</strong></p>
+            <p class="text-xs text-slate-600 dark:text-slate-300 mt-2 italic">"${escapeHtml(rep.notes)}"</p>
+          </div>
+
+          <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-3">
+              <span><strong>${rep.totalSku}</strong> SKU</span>
+              <span class="${rep.varianceItemsCount > 0 ? 'text-amber-600 font-bold' : 'text-emerald-600 font-bold'}">
+                ${rep.varianceItemsCount} Selisih
+              </span>
+            </div>
+            <button type="button" onclick="openBeritaAcaraPreview('${escapeHtml(rep.id)}')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-bi-navy hover:bg-bi-dark text-white font-semibold transition">
+              <i data-lucide="printer" class="w-3.5 h-3.5 text-bi-gold"></i>
+              Pratinjau & Cetak
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function buildBeritaAcaraHTML(rep) {
+      const totalSys = rep.details.reduce((s, d) => s + Number(d.systemStock), 0);
+      const totalPhy = rep.details.reduce((s, d) => s + Number(d.physicalStock), 0);
+      const totalVar = totalPhy - totalSys;
+
+      return `
+        <div style="font-family: Arial, Helvetica, sans-serif; color: #111827; min-width: 580px; max-width: 800px; margin: 0 auto;">
+          <div style="border-bottom: 3px solid #002F6C; padding-bottom: 12px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; gap: 16px;">
+            <div>
+              <h2 style="margin: 0; color: #002F6C; font-size: 18px; letter-spacing: 0.5px;">BANK INDONESIA</h2>
+              <p style="margin: 3px 0 0; font-size: 12px; color: #374151; font-weight: bold;">${escapeHtml(rep.unit)}</p>
+            </div>
+            <div style="text-align: right;">
+              <strong style="font-size: 13px; color: #002F6C;">BERITA ACARA STOCK OPNAME</strong>
+              <p style="margin: 3px 0 0; font-size: 11px; color: #4B5563;">Nomor: ${escapeHtml(rep.id)}</p>
+              <p style="margin: 2px 0 0; font-size: 11px; color: #4B5563;">Tanggal: ${escapeHtml(rep.date)}</p>
+            </div>
+          </div>
+
+          <p style="font-size: 12px; line-height: 1.6; margin-bottom: 14px;">
+            Pada hari ini tanggal <strong>${escapeHtml(rep.date)}</strong>, telah dilaksanakan pemeriksaan fisik (<em>Stock Opname</em>) persediaan souvenir kegiatan/sosialisasi pada <strong>${escapeHtml(rep.unit)}</strong> dengan rincian sebagai berikut:
+          </p>
+
+          <table class="ba-official-table" style="width: 100%; border-collapse: collapse; font-size: 11px; margin: 14px 0;">
+            <thead>
+              <tr style="background: #F1F5F9;">
+                <th style="border: 1px solid #CBD5E1; padding: 8px; text-align: center; width: 32px;">No</th>
+                <th style="border: 1px solid #CBD5E1; padding: 8px; text-align: left;">Kode SKU</th>
+                <th style="border: 1px solid #CBD5E1; padding: 8px; text-align: left;">Nama Souvenir</th>
+                <th style="border: 1px solid #CBD5E1; padding: 8px; text-align: center;">Saldo Buku</th>
+                <th style="border: 1px solid #CBD5E1; padding: 8px; text-align: center;">Stok Fisik</th>
+                <th style="border: 1px solid #CBD5E1; padding: 8px; text-align: center;">Selisih</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rep.details.map((d, idx) => `
+                <tr>
+                  <td style="border: 1px solid #CBD5E1; padding: 6px 8px; text-align: center;">${idx + 1}</td>
+                  <td style="border: 1px solid #CBD5E1; padding: 6px 8px; font-family: monospace;">${escapeHtml(d.sku)}</td>
+                  <td style="border: 1px solid #CBD5E1; padding: 6px 8px;">${escapeHtml(d.name)}</td>
+                  <td style="border: 1px solid #CBD5E1; padding: 6px 8px; text-align: center;">${d.systemStock} ${escapeHtml(d.unit)}</td>
+                  <td style="border: 1px solid #CBD5E1; padding: 6px 8px; text-align: center;">${d.physicalStock} ${escapeHtml(d.unit)}</td>
+                  <td style="border: 1px solid #CBD5E1; padding: 6px 8px; text-align: center; font-weight: bold;">${d.variance > 0 ? '+' + d.variance : d.variance}</td>
+                </tr>
+              `).join('')}
+              <tr style="background: #F8FAFC; font-weight: bold;">
+                <td colspan="3" style="border: 1px solid #CBD5E1; padding: 8px; text-align: right;">TOTAL KESELURUHAN (${rep.totalSku} SKU)</td>
+                <td style="border: 1px solid #CBD5E1; padding: 8px; text-align: center;">${totalSys}</td>
+                <td style="border: 1px solid #CBD5E1; padding: 8px; text-align: center;">${totalPhy}</td>
+                <td style="border: 1px solid #CBD5E1; padding: 8px; text-align: center;">${totalVar > 0 ? '+' + totalVar : totalVar}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p style="font-size: 12px; margin-top: 12px;"><strong>Catatan Audit:</strong> ${escapeHtml(rep.notes)}</p>
+
+          <div style="margin-top: 36px; display: flex; justify-content: space-between; font-size: 12px;">
+            <div style="text-align: center; width: 220px;">
+              <p>Petugas Pelaksana Opname,</p>
+              <div style="height: 56px;"></div>
+              <p style="font-weight: bold; text-decoration: underline;">${escapeHtml(rep.auditor)}</p>
+            </div>
+            <div style="text-align: center; width: 220px;">
+              <p>Mengetahui / Kepala Unit,</p>
+              <div style="height: 56px;"></div>
+              <p style="font-weight: bold;">( ........................................ )</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function openBeritaAcaraPreview(reportId) {
+      const rep = appState.reports.find(r => r.id === reportId);
+      if (!rep) return;
+
+      const htmlContent = buildBeritaAcaraHTML(rep);
+      document.getElementById('baPreviewContent').innerHTML = htmlContent;
+      document.getElementById('printArea').innerHTML = htmlContent;
+      openModal('baPreviewModal');
+    }
+
+    function triggerPrintBA() {
+      if (typeof window.print === 'function') {
+        window.print();
+      } else {
+        showToast('Perangkat ini tidak mendukung cetak langsung. Gunakan Export CSV.', 'info');
+      }
+    }
+
+    /**
+     * CSV Export, Backup & Restore
+     */
+    function exportToCSV() {
+      const headers = ['Kode SKU', 'Nama Souvenir', 'Kategori', 'Lokasi', 'Saldo Buku', 'Stok Fisik', 'Selisih', 'Batas Min', 'Satuan', 'Status Cek'];
+      const rows = appState.items.map(i => [
+        `"${i.sku}"`,
+        `"${i.name.replace(/"/g, '""')}"`,
+        `"${i.category}"`,
+        `"${i.location.replace(/"/g, '""')}"`,
+        i.systemStock,
+        i.physicalStock,
+        i.physicalStock - i.systemStock,
+        i.minStock,
+        `"${i.unit}"`,
+        `"${i.verified ? 'Tercek' : 'Belum'}"`
+      ]);
+
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Stock_Opname_Souvenir_BI_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Laporan Excel (.CSV) berhasil diunduh.');
+    }
+
+    function exportBackupJSON() {
+      const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Backup_SIM_Souvenir_BI_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Backup database (.JSON) berhasil diunduh.');
+    }
+
+    function importBackupJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!parsed || !Array.isArray(parsed.items)) throw new Error('Format tidak valid');
+          appState = sanitizeState(parsed);
+          StorageAdapter.save(appState);
+          renderInventoryTable();
+          renderMutationTable();
+          renderReportsList();
+          showToast('Database berhasil dipulihkan dari file backup.');
+        } catch (err) {
+          showToast('Gagal memulihkan file JSON. Pastikan format valid.', 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function confirmResetDemoData() {
+      showConfirmDialog(
+        'Reset ke Data Simulasi Awal',
+        'Seluruh perubahan stok, mutasi baru, dan berita acara akan dikembalikan ke data awal simulasi Bank Indonesia. Lanjutkan?',
+        () => {
+          appState = sanitizeState(DEFAULT_DATA);
+          StorageAdapter.save(appState);
+          renderInventoryTable();
+          renderMutationTable();
+          renderReportsList();
+          showToast('Data berhasil dikembalikan ke simulasi awal.', 'info');
+        }
+      );
+    }
+
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        document.getElementById('searchInput')?.focus();
+      }
+      if (e.key === 'Escape') {
+        closeSheet();
+        ['itemModal', 'mutationModal', 'opnameModal', 'baPreviewModal', 'confirmModal'].forEach(closeModal);
+      }
+    });
+
+    // Cek pembaruan otomatis tiap kali user kembali membuka APK dari background
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        checkAppUpdate(false);
+      }
+    });
+
+    // Bootstrap
+    window.addEventListener('DOMContentLoaded', () => {
+      const verLabel = document.getElementById('footerVersionLabel');
+      if (verLabel) verLabel.textContent = `v${getCurrentAppVersion()}`;
+
+      setupPWAManifest();
+      initTheme();
+      renderInventoryTable();
+      renderMutationTable();
+      renderReportsList();
+
+      StorageAdapter.syncFromCloud();
+      checkAppUpdate(false);
+      setInterval(() => checkAppUpdate(false), 5 * 60 * 1000);
+    });
+  </script>
+</body>
+</html>

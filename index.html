@@ -10,7 +10,7 @@
   <!-- =================================================================== -->
   <!-- KONFIGURASI AUTO-UPDATE APK (UBAH ANGKA VERSI TIAP EDIT KE GITHUB)  -->
   <!-- =================================================================== -->
-  <meta name="app-version" content="1.0.4" />
+  <meta name="app-version" content="1.0.5" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -128,15 +128,23 @@
       /* Header rapat & aman dari notch / status bar */
       header.app-header { padding-top: env(safe-area-inset-top); }
 
-      .responsive-modal { align-items: flex-end !important; padding: 0 !important; }
+      /* Modal di HP: tampil di tengah layar (proporsional), bukan menempel di bawah */
+      .responsive-modal {
+        align-items: center !important;
+        padding: 1rem !important;
+        padding-top: calc(1rem + env(safe-area-inset-top)) !important;
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
+      }
       .responsive-modal > div {
         max-width: 100% !important;
-        border-radius: 1.35rem 1.35rem 0 0 !important;
-        max-height: 92vh;
-        max-height: 92dvh;
+        border-radius: 1.35rem !important;
+        max-height: calc(100vh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         overflow-y: auto;
-        padding-bottom: env(safe-area-inset-bottom);
       }
+
+      /* Teks tanggal custom mengikuti ukuran input di HP */
+      .date-text { font-size: 16px; }
     }
 
     /* Official Print Layout */
@@ -632,14 +640,24 @@
           <select id="mutItemId" required onchange="updateMutationPreview()" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue"></select>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Jumlah Unit *</label>
             <input type="number" id="mutQty" min="1" required inputmode="numeric" oninput="updateMutationPreview()" placeholder="0" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue font-bold" />
           </div>
           <div>
             <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Tanggal *</label>
-            <input type="date" id="mutDate" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+            <div class="relative w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-within:border-bi-blue">
+              <div class="flex items-center justify-between gap-2 px-3 py-2.5 pointer-events-none">
+                <span id="mutDateText" class="date-text">Pilih tanggal</span>
+                <i data-lucide="calendar" class="w-4 h-4 shrink-0 text-slate-400"></i>
+              </div>
+              <input type="date" id="mutDate" required
+                onchange="updateMutDateDisplay()" oninput="updateMutDateDisplay()"
+                onclick="try { this.showPicker(); } catch (e) {}"
+                aria-label="Tanggal"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            </div>
           </div>
         </div>
 
@@ -1885,6 +1903,33 @@
     /**
      * Mutation Modal & Live Stock Calculator
      */
+    const BULAN_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    // "2026-11-15" -> "15 November 2026" (data tersimpan tetap format ISO)
+    function formatTanggalID(iso) {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+      if (!m) return iso ? String(iso) : '';
+      const month = parseInt(m[2], 10) - 1;
+      if (month < 0 || month > 11) return String(iso);
+      return `${parseInt(m[3], 10)} ${BULAN_ID[month]} ${m[1]}`;
+    }
+
+    // Tanggal hari ini menurut jam perangkat (toISOString memakai UTC sehingga pagi hari WIB bisa mundur 1 hari)
+    function todayLocalISO() {
+      const d = new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${d.getFullYear()}-${mm}-${dd}`;
+    }
+
+    function updateMutDateDisplay() {
+      const val = document.getElementById('mutDate').value;
+      const el = document.getElementById('mutDateText');
+      if (!el) return;
+      el.textContent = val ? formatTanggalID(val) : 'Pilih tanggal';
+      el.classList.toggle('text-slate-400', !val);
+    }
+
     function openMutationModal(defaultType = 'OUT', preselectItemId = null) {
       const select = document.getElementById('mutItemId');
       if (appState.items.length === 0) {
@@ -1901,7 +1946,8 @@
       const radio = document.querySelector(`input[name="mutType"][value="${defaultType}"]`);
       if (radio) radio.checked = true;
       document.getElementById('mutQty').value = '';
-      document.getElementById('mutDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('mutDate').value = todayLocalISO();
+      updateMutDateDisplay();
       document.getElementById('mutActivity').value = '';
       document.getElementById('mutPic').value = '';
       updateMutationPreview();
@@ -2027,7 +2073,7 @@
           <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
             <td class="py-3.5 px-4 font-mono text-[11px] text-slate-500 whitespace-nowrap">
               <div class="flex items-center justify-between md:block">
-                <span>${escapeHtml(m.date)}</span>
+                <span>${escapeHtml(formatTanggalID(m.date))}</span>
                 <span class="md:hidden">${badge}</span>
               </div>
             </td>
@@ -2088,7 +2134,7 @@
       const notes = document.getElementById('opnameNotes').value.trim();
       const shouldSync = document.getElementById('opnameSyncCheckbox').checked;
       const now = new Date();
-      const today = now.toISOString().split('T')[0];
+      const today = todayLocalISO();
       const romanMonths = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
       const seq = String(appState.reports.length + 1).padStart(3, '0');
       const docNumber = `BA-SO/BI/${romanMonths[now.getMonth()]}/${now.getFullYear()}/${seq}`;
@@ -2167,7 +2213,7 @@
               <span class="font-mono text-xs font-bold text-bi-navy dark:text-blue-400 bg-bi-light dark:bg-blue-950 px-2.5 py-1 rounded-lg">
                 ${escapeHtml(rep.id)}
               </span>
-              <span class="text-xs text-slate-500 font-semibold">${escapeHtml(rep.date)}</span>
+              <span class="text-xs text-slate-500 font-semibold">${escapeHtml(formatTanggalID(rep.date))}</span>
             </div>
             <h4 class="font-bold text-sm text-slate-900 dark:text-white mt-3">${escapeHtml(rep.unit)}</h4>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Petugas Pelaksana: <strong class="text-slate-700 dark:text-slate-200">${escapeHtml(rep.auditor)}</strong></p>
@@ -2207,12 +2253,12 @@
             <div style="text-align: right;">
               <strong style="font-size: 13px; color: #002F6C;">BERITA ACARA STOCK OPNAME</strong>
               <p style="margin: 3px 0 0; font-size: 11px; color: #4B5563;">Nomor: ${escapeHtml(rep.id)}</p>
-              <p style="margin: 2px 0 0; font-size: 11px; color: #4B5563;">Tanggal: ${escapeHtml(rep.date)}</p>
+              <p style="margin: 2px 0 0; font-size: 11px; color: #4B5563;">Tanggal: ${escapeHtml(formatTanggalID(rep.date))}</p>
             </div>
           </div>
 
           <p style="font-size: 12px; line-height: 1.6; margin-bottom: 14px;">
-            Pada hari ini tanggal <strong>${escapeHtml(rep.date)}</strong>, telah dilaksanakan pemeriksaan fisik (<em>Stock Opname</em>) persediaan souvenir kegiatan/sosialisasi pada <strong>${escapeHtml(rep.unit)}</strong> dengan rincian sebagai berikut:
+            Pada hari ini tanggal <strong>${escapeHtml(formatTanggalID(rep.date))}</strong>, telah dilaksanakan pemeriksaan fisik (<em>Stock Opname</em>) persediaan souvenir kegiatan/sosialisasi pada <strong>${escapeHtml(rep.unit)}</strong> dengan rincian sebagai berikut:
           </p>
 
           <table class="ba-official-table" style="width: 100%; border-collapse: collapse; font-size: 11px; margin: 14px 0;">

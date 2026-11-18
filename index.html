@@ -39,12 +39,28 @@
           colors: {
             bi: {
               navy: '#002F6C',
+              navyDark: '#0F294A',
+              deep: '#001F4D',
               dark: '#001B40',
               blue: '#005596',
+              accentDark: '#38BDF8',
               light: '#E6F0FA',
               gold: '#C59B27',
+              goldHover: '#B58D20',
+              goldDark: '#D4AF37',
               goldLight: '#FBF6E8'
+            },
+            surface: {
+              canvas: '#F8FAFC',
+              canvasDark: '#090D16',
+              cardDark: '#111827',
+              wellDark: '#1E293B'
             }
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.02)',
+            cardHover: '0 4px 12px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03)',
+            fab: '0 8px 20px -4px rgba(197, 155, 39, 0.45), 0 2px 6px rgba(0, 27, 64, 0.15)'
           }
         }
       }
@@ -55,7 +71,12 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* Custom Scrollbar */
+    /* Base Anti-Aliasing & Scrollbar */
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
@@ -63,20 +84,51 @@
     .no-scrollbar { scrollbar-width: none; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
 
-    /* Bottom Navigation Pill & Tactile Feedback */
-    .bn-btn.active { color: #002F6C; font-weight: 700; }
-    .dark .bn-btn.active { color: #ffffff; }
-    .bn-btn svg { padding: 4px 14px; box-sizing: content-box; border-radius: 9999px; transition: background 0.2s ease; }
-    .bn-btn.active svg { background: #dbeafe; }
-    .dark .bn-btn.active svg { background: #1e3a5f; }
+    /* Remove native number input spinners for crisp inline steppers */
+    input.stepper-input::-webkit-outer-spin-button,
+    input.stepper-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input.stepper-input {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
 
+    /* Bottom Navigation Pill & Tactile Feedback */
+    .bn-btn {
+      transition: color 0.18s ease;
+    }
+    .bn-btn.active { color: #002F6C; font-weight: 700; }
+    .dark .bn-btn.active { color: #38BDF8; }
+    .bn-btn svg {
+      padding: 4px 14px;
+      box-sizing: content-box;
+      border-radius: 9999px;
+      transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease;
+    }
+    .bn-btn.active svg { background: #E6F0FA; }
+    .dark .bn-btn.active svg { background: rgba(56, 189, 248, 0.14); }
+
+    /* Smooth Sheet & Modal Entrance Animations */
     @keyframes sheetSlideUp {
-      from { transform: translateY(35%); opacity: 0; }
+      from { transform: translateY(28%); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-    .sheet-panel:not(.hidden) { animation: sheetSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes modalScaleIn {
+      from { transform: scale(0.96) translateY(8px); opacity: 0; }
+      to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .sheet-panel:not(.hidden) {
+      animation: sheetSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @media (min-width: 768px) {
+      .modal-surface {
+        animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+    }
 
-    /* Scoped Mobile Card Transformation */
+    /* Scoped Mobile Card Transformation (< 768px) */
     @media (max-width: 767px) {
       input, select, textarea { font-size: 16px !important; }
       button:active { transform: scale(0.97); }
@@ -89,21 +141,38 @@
         display: block;
         position: relative;
         background: #ffffff;
-        border: 1px solid #e2e8f0;
+        border: 1px solid rgba(226, 232, 240, 0.85);
         border-radius: 1rem;
-        padding: 0.75rem;
-        margin-bottom: 0.625rem;
-        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.02);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
       }
       .dark .mobile-card-table tbody tr {
-        background: #0f172a;
-        border-color: #1e293b;
+        background: #111827;
+        border-color: rgba(30, 41, 59, 0.85);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
       }
-      /* Penanda status di sisi kiri kartu */
-      .mobile-card-table tbody tr.row-low { box-shadow: inset 4px 0 0 #f59e0b, 0 1px 2px rgba(15, 23, 42, 0.04); }
-      .mobile-card-table tbody tr.row-empty { box-shadow: inset 4px 0 0 #e11d48, 0 1px 2px rgba(15, 23, 42, 0.04); }
-      .mobile-card-table tbody tr.row-verified { border-color: #86efac; }
-      .dark .mobile-card-table tbody tr.row-verified { border-color: #166534; }
+
+      /* Subtle status indicators on mobile cards */
+      .mobile-card-table tbody tr.row-verified {
+        border-color: #6ee7b7;
+      }
+      .dark .mobile-card-table tbody tr.row-verified {
+        border-color: rgba(52, 211, 153, 0.45);
+      }
+      .mobile-card-table tbody tr.row-low {
+        box-shadow: inset 3.5px 0 0 #d97706, 0 1px 3px rgba(15, 23, 42, 0.03);
+      }
+      .dark .mobile-card-table tbody tr.row-low {
+        box-shadow: inset 3.5px 0 0 #fbbf24, 0 1px 3px rgba(0, 0, 0, 0.22);
+      }
+      .mobile-card-table tbody tr.row-empty {
+        box-shadow: inset 3.5px 0 0 #e11d48, 0 1px 3px rgba(15, 23, 42, 0.03);
+      }
+      .dark .mobile-card-table tbody tr.row-empty {
+        box-shadow: inset 3.5px 0 0 #fb7185, 0 1px 3px rgba(0, 0, 0, 0.22);
+      }
 
       .mobile-card-table tbody td {
         display: block;
@@ -113,38 +182,28 @@
 
       .mobile-card-table tbody td.hidden { display: none; }
 
-      /* Baris aksi ringkas di bagian bawah kartu */
       .mobile-card-table tbody td.cell-actions {
-        margin-top: 0.5rem;
-        padding-top: 0.5rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
       }
 
-      /* Pesan "tidak ada data" tetap di tengah */
       .mobile-card-table tbody td[colspan] {
         text-align: center !important;
-        padding: 1.75rem 0;
+        padding: 2rem 0.5rem;
       }
 
-      /* Header rapat & aman dari notch / status bar */
       header.app-header { padding-top: env(safe-area-inset-top); }
 
-      /* Modal di HP: tampil di tengah layar (proporsional), bukan menempel di bawah */
-      .responsive-modal {
-        align-items: center !important;
-        padding: 1rem !important;
-        padding-top: calc(1rem + env(safe-area-inset-top)) !important;
-        padding-bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
-      }
+      .responsive-modal { align-items: flex-end !important; padding: 0 !important; }
       .responsive-modal > div {
         max-width: 100% !important;
-        border-radius: 1.35rem !important;
-        max-height: calc(100vh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-        max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        border-radius: 1.35rem 1.35rem 0 0 !important;
+        max-height: 92vh;
+        max-height: 92dvh;
         overflow-y: auto;
+        padding-bottom: env(safe-area-inset-bottom);
+        animation: sheetSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1);
       }
-
-      /* Teks tanggal custom mengikuti ukuran input di HP */
-      .date-text { font-size: 16px; }
     }
 
     /* Official Print Layout */
@@ -165,61 +224,65 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200 min-h-screen flex flex-col">
+<body class="bg-[#F8FAFC] text-slate-800 dark:bg-[#090D16] dark:text-slate-100 transition-colors duration-200 min-h-screen flex flex-col">
 
   <!-- ===================================================================== -->
   <!-- HEADER INSTITUSIONAL BANK INDONESIA                                   -->
   <!-- ===================================================================== -->
-  <header class="app-header sticky top-0 z-30 bg-gradient-to-r from-bi-dark via-bi-navy to-bi-blue text-white shadow-lg border-b border-white/10">
+  <header class="app-header sticky top-0 z-30 bg-gradient-to-r from-[#001F4D] to-[#002F6C] dark:from-[#0A192F] dark:to-[#0F294A] text-white border-b border-white/10 shadow-[0_1px_3px_rgba(0,27,64,0.14)]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-14 md:h-16 gap-3">
+      <div class="flex items-center justify-between h-[60px] md:h-[68px] gap-3">
         <!-- Brand & Identitas Satker -->
         <div class="flex items-center gap-3 min-w-0">
-          <div class="w-9 h-9 md:w-11 md:h-11 shrink-0 rounded-xl bg-white/10 border border-white/20 p-1.5 flex items-center justify-center shadow-inner backdrop-blur-sm overflow-hidden">
+          <div class="w-9 h-9 md:w-11 md:h-11 shrink-0 rounded-xl bg-white/10 border border-white/15 p-1.5 flex items-center justify-center backdrop-blur-sm overflow-hidden">
             <img
               src="logo-bi.png"
               alt="Logo Bank Indonesia"
               class="w-full h-full object-contain grayscale invert contrast-200 mix-blend-screen opacity-95"
               onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.classList.remove('hidden');"
             />
-            <i data-lucide="landmark" class="hidden w-5 h-5 text-bi-gold"></i>
+            <i data-lucide="landmark" class="hidden w-5 h-5 text-bi-gold dark:text-bi-goldDark"></i>
           </div>
           <div class="min-w-0">
-            <div class="flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:gap-2">
-              <h1 class="font-extrabold text-base md:text-lg tracking-tight leading-none whitespace-nowrap">SIM-SOUVENIR</h1>
-              <span class="whitespace-nowrap text-[9px] leading-none tracking-[0.18em] font-bold uppercase text-blue-100/80 sm:px-2.5 sm:py-0.5 sm:text-[10px] sm:tracking-wider sm:text-white sm:bg-white/10 sm:border sm:border-white/20 sm:rounded-md sm:backdrop-blur-sm">
+            <div class="flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:gap-2.5">
+              <h1 class="font-extrabold text-[17px] md:text-lg tracking-tight leading-none whitespace-nowrap">SIM-SOUVENIR</h1>
+              <span class="whitespace-nowrap text-[9.5px] leading-none tracking-[0.18em] font-bold uppercase text-blue-100/80 sm:px-2 sm:py-0.5 sm:text-[10px] sm:tracking-[0.12em] sm:text-bi-goldLight sm:bg-white/10 sm:border sm:border-white/15 sm:rounded-full">
                 BANK INDONESIA
               </span>
             </div>
-            <p class="hidden sm:block text-xs text-blue-100/90 mt-1 truncate">
-              Sistem Monitoring Inventaris & Stock Opname Souvenir
+            <p class="hidden sm:block text-[11.5px] text-blue-100/75 mt-1 truncate font-medium">
+              Monitoring Inventaris & Stock Opname Souvenir
             </p>
           </div>
         </div>
 
         <!-- Quick Actions & Theme Switcher -->
-        <div class="flex items-center gap-2 shrink-0">
-          <span id="syncStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 text-[11px] font-semibold text-blue-100 border border-white/15">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span id="syncStatusText">Siap</span>
+        <div class="flex items-center gap-1.5 md:gap-2 shrink-0">
+          <span id="syncStatusBadge" title="Status sinkronisasi" class="inline-flex items-center justify-center gap-1.5 h-8 px-2 sm:px-2.5 rounded-full bg-white/10 text-[11px] font-semibold text-blue-100 border border-white/15">
+            <span class="sync-dot w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+            <span id="syncStatusText" class="hidden sm:inline">Siap</span>
           </span>
-          <button type="button" onclick="openMutationModal('OUT')" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition border border-white/15">
-            <i data-lucide="send" class="w-3.5 h-3.5 text-bi-gold"></i>
+
+          <button type="button" onclick="openMutationModal('OUT')" class="hidden md:inline-flex items-center gap-1.5 px-3.5 h-9 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-white transition border border-white/15">
+            <i data-lucide="send" class="w-3.5 h-3.5 text-bi-gold dark:text-bi-goldDark"></i>
             Distribusi Kegiatan
           </button>
-          <button type="button" onclick="openItemModal()" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-bi-gold hover:bg-amber-400 text-xs font-extrabold text-bi-dark transition shadow-sm">
-            <i data-lucide="plus" class="w-4 h-4"></i>
+
+          <button type="button" onclick="openItemModal()" class="hidden md:inline-flex items-center gap-1.5 px-4 h-9 rounded-xl bg-[#C59B27] hover:bg-[#B58D20] text-xs font-extrabold text-[#001B40] transition shadow-sm">
+            <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i>
             Tambah Souvenir
           </button>
-          <div class="hidden md:block h-5 w-px bg-white/20 mx-1"></div>
-          <button type="button" onclick="openSheet('helpSheet')" title="Panduan cara pakai" aria-label="Panduan cara pakai" class="p-2 md:p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition text-blue-100">
-            <i data-lucide="circle-help" class="w-4 h-4"></i>
+
+          <div class="hidden md:block h-5 w-px bg-white/15 mx-0.5"></div>
+
+          <button type="button" onclick="openSheet('helpSheet')" title="Panduan cara pakai" aria-label="Panduan cara pakai" class="w-9 h-9 rounded-xl hover:bg-white/10 active:bg-white/15 flex items-center justify-center transition text-blue-100/90 hover:text-white">
+            <i data-lucide="circle-help" class="w-[18px] h-[18px]"></i>
           </button>
-          <button type="button" onclick="checkAppUpdate(true)" title="Cek Pembaruan Aplikasi" class="hidden md:block p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition text-blue-100">
-            <i data-lucide="refresh-cw" id="updateIcon" class="w-4 h-4"></i>
+          <button type="button" onclick="checkAppUpdate(true)" title="Cek Pembaruan Aplikasi" aria-label="Cek Pembaruan Aplikasi" class="hidden md:flex w-9 h-9 rounded-xl hover:bg-white/10 active:bg-white/15 items-center justify-center transition text-blue-100/90 hover:text-white">
+            <i data-lucide="refresh-cw" id="updateIcon" class="w-[17px] h-[17px]"></i>
           </button>
-          <button type="button" onclick="toggleTheme()" title="Ubah Tema Gelap / Terang" class="p-2 md:p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition text-blue-100">
-            <i data-lucide="moon" id="themeIcon" class="w-4 h-4"></i>
+          <button type="button" onclick="toggleTheme()" title="Ubah Tema Gelap / Terang" aria-label="Ubah Tema Gelap atau Terang" class="w-9 h-9 rounded-xl hover:bg-white/10 active:bg-white/15 flex items-center justify-center transition text-blue-100/90 hover:text-white">
+            <i data-lucide="moon" id="themeIcon" class="w-[18px] h-[18px]"></i>
           </button>
         </div>
       </div>
@@ -229,143 +292,141 @@
   <!-- ===================================================================== -->
   <!-- MAIN DASHBOARD CONTAINER                                              -->
   <!-- ===================================================================== -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-6 pb-28 md:pb-8 space-y-3 md:space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6 pb-28 md:pb-10 space-y-4 md:space-y-6">
 
-    <!-- 0. Mobile Combined Summary & Audit Progress Card -->
-    <section class="md:hidden bg-white dark:bg-slate-900 rounded-2xl p-3.5 border border-slate-200/80 dark:border-slate-800 shadow-sm">
-      <div class="flex items-center justify-between gap-2">
+    <!-- 0. Mobile Combined Summary & Audit Progress Hero Card -->
+    <section class="md:hidden relative overflow-hidden bg-white dark:bg-[#111827] rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800/80 shadow-card">
+      <div class="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#002F6C] via-[#005596] to-[#C59B27] dark:from-[#0F294A] dark:via-[#38BDF8] dark:to-[#D4AF37]"></div>
+
+      <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
-          <div class="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-400">
-            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-bi-blue dark:text-blue-400 shrink-0"></i>
+          <div class="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-[#005596] dark:text-[#38BDF8] shrink-0"></i>
             <span>Progres Cek Fisik</span>
           </div>
-          <div class="mt-0.5 flex items-baseline gap-2">
-            <span id="mobAuditProgressText" class="font-mono text-sm font-extrabold text-slate-900 dark:text-white">0/0 SKU</span>
-            <span id="mobAuditPctBadge" class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-bi-light text-bi-navy dark:bg-blue-950 dark:text-blue-300">0%</span>
+          <div class="mt-1 flex items-center gap-2">
+            <span id="mobAuditProgressText" class="text-lg font-extrabold tabular-nums tracking-tight text-slate-900 dark:text-white leading-none">0 / 0 SKU</span>
+            <span id="mobAuditPctBadge" class="px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums bg-[#E6F0FA] text-[#002F6C] dark:bg-sky-950/70 dark:text-[#38BDF8]">0%</span>
+          </div>
+          <div class="mt-2 inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-800/80 text-[11px] font-medium text-slate-600 dark:text-slate-300 tabular-nums">
+            <span>Fisik: <strong id="mobTotalPhysical" class="font-bold text-slate-900 dark:text-white">0</strong></span>
+            <span class="text-slate-300 dark:text-slate-600">|</span>
+            <span>Buku: <strong id="mobTotalSystem" class="font-bold text-slate-700 dark:text-slate-200">0</strong></span>
           </div>
         </div>
 
-        <div class="flex items-center gap-2.5 shrink-0">
-          <div class="text-right">
-            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Stok Fisik / Buku</div>
-            <div class="text-xs font-extrabold text-slate-900 dark:text-white mt-0.5">
-              <span id="mobTotalPhysical">0</span>
-              <span class="font-normal text-slate-400">/ <span id="mobTotalSystem">0</span></span>
-            </div>
-          </div>
-          <button type="button" onclick="openSheet('opnameOptionsSheet')" aria-label="Opsi Audit & Opname" class="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
-            <i data-lucide="more-vertical" class="w-4 h-4"></i>
-          </button>
-        </div>
+        <button type="button" onclick="openSheet('opnameOptionsSheet')" aria-label="Opsi Audit & Opname" class="w-10 h-10 shrink-0 rounded-xl bg-slate-100/80 dark:bg-slate-800 hover:bg-slate-200/70 dark:hover:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 transition">
+          <i data-lucide="more-vertical" class="w-[18px] h-[18px]"></i>
+        </button>
       </div>
 
-      <div class="mt-2.5 w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-        <div id="mobAuditProgressBar" class="h-full bg-gradient-to-r from-bi-navy via-bi-blue to-emerald-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+      <div class="mt-3.5 w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+        <div id="mobAuditProgressBar" class="h-full bg-gradient-to-r from-[#002F6C] via-[#005596] to-[#059669] dark:from-[#0F294A] dark:via-[#38BDF8] dark:to-[#34D399] rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
       </div>
     </section>
 
     <!-- 1. Desktop Executive KPI Strip -->
-    <section class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm">
-        <div class="flex items-center justify-between">
+    <section class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-card hover:shadow-cardHover transition-shadow">
+        <div class="flex items-center justify-between gap-2">
           <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Jenis Souvenir</span>
-          <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-bi-navy dark:text-blue-400 flex items-center justify-center">
-            <i data-lucide="package" class="w-4 h-4"></i>
+          <div class="w-10 h-10 rounded-xl bg-[#E6F0FA] dark:bg-sky-950/60 text-[#002F6C] dark:text-[#38BDF8] flex items-center justify-center shrink-0">
+            <i data-lucide="package" class="w-[18px] h-[18px]"></i>
           </div>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <h2 id="kpiTotalSku" class="text-2xl font-extrabold text-slate-900 dark:text-white">0</h2>
-          <span class="text-xs text-slate-500 dark:text-slate-400">SKU</span>
+        <div class="mt-3.5 flex items-baseline gap-2">
+          <h2 id="kpiTotalSku" class="text-[28px] font-extrabold tabular-nums tracking-tight leading-none text-slate-900 dark:text-white">0</h2>
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">SKU</span>
         </div>
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400" id="kpiTotalCategories">0 kategori aktif</p>
+        <p class="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400" id="kpiTotalCategories">0 kategori aktif</p>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm">
-        <div class="flex items-center justify-between">
+      <div class="bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-card hover:shadow-cardHover transition-shadow">
+        <div class="flex items-center justify-between gap-2">
           <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Stok Fisik</span>
-          <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-            <i data-lucide="layers" class="w-4 h-4"></i>
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-[#059669] dark:text-[#34D399] flex items-center justify-center shrink-0">
+            <i data-lucide="layers" class="w-[18px] h-[18px]"></i>
           </div>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <h2 id="kpiTotalPhysical" class="text-2xl font-extrabold text-slate-900 dark:text-white">0</h2>
-          <span class="text-xs text-slate-500 dark:text-slate-400">unit</span>
+        <div class="mt-3.5 flex items-baseline gap-2">
+          <h2 id="kpiTotalPhysical" class="text-[28px] font-extrabold tabular-nums tracking-tight leading-none text-slate-900 dark:text-white">0</h2>
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">unit</span>
         </div>
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Buku: <span id="kpiTotalSystem" class="font-semibold text-slate-700 dark:text-slate-200">0</span> unit</p>
+        <p class="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">Saldo buku: <span id="kpiTotalSystem" class="font-bold tabular-nums text-slate-700 dark:text-slate-200">0</span> unit</p>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm">
-        <div class="flex items-center justify-between">
+      <div class="bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-card hover:shadow-cardHover transition-shadow">
+        <div class="flex items-center justify-between gap-2">
           <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Stok Kritis</span>
-          <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+          <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-[#D97706] dark:text-[#FBBF24] flex items-center justify-center shrink-0">
+            <i data-lucide="alert-triangle" class="w-[18px] h-[18px]"></i>
           </div>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <h2 id="kpiLowStock" class="text-2xl font-extrabold text-amber-600 dark:text-amber-400">0</h2>
-          <span class="text-xs text-slate-500 dark:text-slate-400">item</span>
+        <div class="mt-3.5 flex items-baseline gap-2">
+          <h2 id="kpiLowStock" class="text-[28px] font-extrabold tabular-nums tracking-tight leading-none text-[#D97706] dark:text-[#FBBF24]">0</h2>
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">item</span>
         </div>
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400"><span id="kpiOutStock" class="font-bold text-rose-500">0</span> stok kosong</p>
+        <p class="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400"><span id="kpiOutStock" class="font-bold tabular-nums text-[#E11D48] dark:text-[#FB7185]">0</span> stok kosong</p>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm">
-        <div class="flex items-center justify-between">
+      <div class="bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-card hover:shadow-cardHover transition-shadow">
+        <div class="flex items-center justify-between gap-2">
           <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Selisih Opname</span>
-          <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-            <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+          <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+            <i data-lucide="clipboard-check" class="w-[18px] h-[18px]"></i>
           </div>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <h2 id="kpiVarianceCount" class="text-2xl font-extrabold text-slate-900 dark:text-white">0</h2>
-          <span class="text-xs text-slate-500 dark:text-slate-400">item</span>
+        <div class="mt-3.5 flex items-baseline gap-2">
+          <h2 id="kpiVarianceCount" class="text-[28px] font-extrabold tabular-nums tracking-tight leading-none text-slate-900 dark:text-white">0</h2>
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">item</span>
         </div>
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate" id="kpiLastOpname">Belum ada BA</p>
+        <p class="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400 truncate" id="kpiLastOpname">Belum ada BA</p>
       </div>
     </section>
 
     <!-- 2. Desktop Audit Progress Bar -->
-    <section class="hidden md:block bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-sm">
-      <div class="flex items-center justify-between gap-2 mb-2">
-        <div class="flex items-center gap-2 text-xs">
-          <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-bi-light dark:bg-blue-950 text-bi-navy dark:text-blue-300">
-            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+    <section class="hidden md:block bg-white dark:bg-[#111827] rounded-2xl px-5 py-4 border border-slate-200/80 dark:border-slate-800/80 shadow-card">
+      <div class="flex items-center justify-between gap-3 mb-2.5">
+        <div class="flex items-center gap-2.5 text-xs">
+          <span class="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-[#E6F0FA] dark:bg-sky-950/60 text-[#002F6C] dark:text-[#38BDF8]">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
           </span>
-          <span class="font-bold text-slate-800 dark:text-slate-100">Progres Pengecekan Fisik Gudang:</span>
-          <span id="auditProgressText" class="font-mono font-bold text-bi-blue dark:text-blue-400">0/0 SKU (0%)</span>
+          <span class="font-bold text-slate-800 dark:text-slate-100">Progres Pengecekan Fisik Gudang</span>
+          <span id="auditProgressText" class="font-mono tabular-nums font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[#005596] dark:text-[#38BDF8]">0/0 SKU (0%)</span>
         </div>
-        <div class="flex items-center gap-3 text-[11px]">
-          <button type="button" onclick="confirmMarkAll(true)" class="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">Tandai Semua Tercek</button>
-          <span class="text-slate-300 dark:text-slate-700">|</span>
-          <button type="button" onclick="confirmMarkAll(false)" class="font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:underline">Reset Centang Audit</button>
+        <div class="flex items-center gap-2 text-xs">
+          <button type="button" onclick="confirmMarkAll(true)" class="px-3 py-1.5 rounded-lg font-semibold text-[#059669] dark:text-[#34D399] hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition">Tandai Semua Tercek</button>
+          <span class="text-slate-200 dark:text-slate-700">|</span>
+          <button type="button" onclick="confirmMarkAll(false)" class="px-3 py-1.5 rounded-lg font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Reset Centang</button>
         </div>
       </div>
-      <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-        <div id="auditProgressBar" class="h-full bg-gradient-to-r from-bi-navy via-bi-blue to-emerald-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+      <div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+        <div id="auditProgressBar" class="h-full bg-gradient-to-r from-[#002F6C] via-[#005596] to-[#059669] dark:from-[#0F294A] dark:via-[#38BDF8] dark:to-[#34D399] rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
       </div>
     </section>
 
     <!-- 3. Main Workspace Card -->
-    <section class="md:bg-white md:dark:bg-slate-900 md:rounded-2xl md:border md:border-slate-200/80 md:dark:border-slate-800 md:shadow-sm md:overflow-hidden">
+    <section class="md:bg-white md:dark:bg-[#111827] md:rounded-2xl md:border md:border-slate-200/80 md:dark:border-slate-800/80 md:shadow-card">
 
       <!-- Desktop Tab Header -->
-      <div class="hidden md:flex items-center justify-between gap-3 px-6 py-3.5 border-b border-slate-200 dark:border-slate-800">
-        <nav class="flex gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl" role="tablist">
-          <button type="button" onclick="switchTab('opname')" id="tab-btn-opname" class="tab-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-white dark:bg-slate-900 text-bi-navy dark:text-white shadow-sm">
+      <div class="hidden md:flex items-center justify-between gap-3 px-6 py-4 border-b border-slate-200/80 dark:border-slate-800/80">
+        <nav class="flex gap-1 bg-slate-100 dark:bg-[#1E293B] p-1 rounded-xl" role="tablist">
+          <button type="button" onclick="switchTab('opname')" id="tab-btn-opname" class="tab-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-white dark:bg-[#111827] text-[#002F6C] dark:text-white shadow-[0_1px_2px_rgba(15,23,42,0.06)]">
             <i data-lucide="clipboard-list" class="w-4 h-4"></i>
             Master & Stock Opname
           </button>
-          <button type="button" onclick="switchTab('mutations')" id="tab-btn-mutations" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+          <button type="button" onclick="switchTab('mutations')" id="tab-btn-mutations" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
             <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
             Log Mutasi Kegiatan
           </button>
-          <button type="button" onclick="switchTab('reports')" id="tab-btn-reports" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+          <button type="button" onclick="switchTab('reports')" id="tab-btn-reports" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
             <i data-lucide="file-check-2" class="w-4 h-4"></i>
             Berita Acara Opname
           </button>
         </nav>
 
-        <button type="button" onclick="openSheet('dataSheet')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 transition">
-          <i data-lucide="database" class="w-3.5 h-3.5 text-bi-blue"></i>
+        <button type="button" onclick="openSheet('dataSheet')" class="inline-flex items-center gap-2 px-3.5 h-9 rounded-xl border border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 transition">
+          <i data-lucide="database" class="w-3.5 h-3.5 text-[#005596] dark:text-[#38BDF8]"></i>
           Export & Backup
         </button>
       </div>
@@ -373,23 +434,32 @@
       <!-- ================================================================= -->
       <!-- TAB 1: MASTER & STOCK OPNAME                                      -->
       <!-- ================================================================= -->
-      <div id="view-opname" class="p-0 md:p-6 space-y-2.5 md:space-y-4">
-        <!-- Search & Filter Toolbar (1 Baris Sejajar di Mobile) -->
-        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
+      <div id="view-opname" class="p-0 md:p-6 space-y-3 md:space-y-4">
+        <!-- Search & Filter Toolbar -->
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5 md:gap-3">
           <div class="grid grid-cols-12 sm:flex gap-2 flex-1">
             <div class="relative col-span-7 sm:flex-1 max-w-md">
-              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
               <input
                 type="text"
                 id="searchInput"
                 oninput="renderInventoryTable()"
                 placeholder="Cari SKU, nama, rak..."
-                class="w-full h-10 md:h-9 pl-9 pr-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 focus:ring-2 focus:ring-bi-blue/30 focus:border-bi-blue outline-none transition"
+                class="w-full h-11 md:h-10 pl-10 pr-9 text-xs font-medium rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white md:bg-slate-100/75 dark:bg-[#111827] md:dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-[#005596]/20 dark:focus:ring-[#38BDF8]/20 focus:border-[#005596] dark:focus:border-[#38BDF8] outline-none transition"
               />
+              <button
+                type="button"
+                id="clearSearchBtn"
+                onclick="clearSearch()"
+                aria-label="Hapus kata kunci pencarian"
+                class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-slate-200/90 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200 flex items-center justify-center transition"
+              >
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              </button>
             </div>
 
-            <select id="categoryFilter" onchange="renderInventoryTable()" class="col-span-5 sm:w-auto h-10 md:h-9 px-2.5 md:px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 outline-none focus:border-bi-blue">
-              <option value="ALL">Kategori</option>
+            <select id="categoryFilter" onchange="renderInventoryTable()" class="col-span-5 sm:w-auto h-11 md:h-10 px-3 text-xs font-medium rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white md:bg-slate-100/75 dark:bg-[#111827] md:dark:bg-[#1E293B] text-slate-700 dark:text-slate-200 outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition">
+              <option value="ALL">Semua Kategori</option>
               <option value="VIP & Eksekutif">VIP & Eksekutif</option>
               <option value="Sosialisasi CBP Rupiah">Sosialisasi CBP Rupiah</option>
               <option value="Edukasi QRIS & Digital">Edukasi QRIS & Digital</option>
@@ -397,7 +467,7 @@
               <option value="Umum & Kunjungan">Umum & Kunjungan</option>
             </select>
 
-            <select id="statusFilter" onchange="renderInventoryTable()" class="hidden md:block h-9 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 outline-none focus:border-bi-blue">
+            <select id="statusFilter" onchange="renderInventoryTable()" class="hidden md:block h-10 px-3 text-xs font-medium rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-100/75 dark:bg-[#1E293B] text-slate-700 dark:text-slate-200 outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition">
               <option value="ALL">Semua Status</option>
               <option value="UNVERIFIED">Belum Dicek Fisik</option>
               <option value="LOW">Stok Menipis / Habis</option>
@@ -407,62 +477,64 @@
           </div>
 
           <!-- Desktop Action Buttons -->
-          <div class="hidden md:flex items-center gap-2">
-            <button type="button" onclick="openMutationModal('IN')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold border border-emerald-200 dark:border-emerald-800 transition">
+          <div class="hidden md:flex items-center gap-2.5 shrink-0">
+            <button type="button" onclick="openMutationModal('IN')" class="inline-flex items-center gap-1.5 px-3.5 h-10 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/50 text-[#059669] dark:text-[#34D399] text-xs font-semibold border border-emerald-200/70 dark:border-emerald-800/60 transition">
               <i data-lucide="package-plus" class="w-4 h-4"></i>
               Terima Pengadaan
             </button>
-            <button type="button" onclick="openFinalizeOpnameModal()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-bi-navy hover:bg-bi-dark text-white text-xs font-bold shadow-sm transition">
-              <i data-lucide="file-check-2" class="w-4 h-4 text-bi-gold"></i>
+            <button type="button" onclick="openFinalizeOpnameModal()" class="inline-flex items-center gap-2 px-4 h-10 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white text-xs font-bold border border-transparent dark:border-sky-400/20 shadow-card transition">
+              <i data-lucide="file-check-2" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
               Finalisasi Berita Acara Opname
             </button>
           </div>
         </div>
 
         <!-- Filter Cepat (Khusus HP) -->
-        <div id="statusChips" class="md:hidden flex gap-1.5 overflow-x-auto no-scrollbar -mx-4 px-4" role="group" aria-label="Filter status item">
+        <div id="statusChips" class="md:hidden flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 py-0.5" role="group" aria-label="Filter status item">
           <button type="button" data-s="ALL" onclick="setStatusChip('ALL')"><span>Semua</span><span class="chip-count">0</span></button>
-          <button type="button" data-s="UNVERIFIED" onclick="setStatusChip('UNVERIFIED')"><span>Belum dicek</span><span class="chip-count">0</span></button>
-          <button type="button" data-s="VARIANCE" onclick="setStatusChip('VARIANCE')"><span>Ada selisih</span><span class="chip-count">0</span></button>
-          <button type="button" data-s="LOW" onclick="setStatusChip('LOW')"><span>Menipis / habis</span><span class="chip-count">0</span></button>
+          <button type="button" data-s="UNVERIFIED" onclick="setStatusChip('UNVERIFIED')"><span>Belum Dicek</span><span class="chip-count">0</span></button>
+          <button type="button" data-s="VARIANCE" onclick="setStatusChip('VARIANCE')"><span>Ada Selisih</span><span class="chip-count">0</span></button>
+          <button type="button" data-s="LOW" onclick="setStatusChip('LOW')"><span>Menipis / Habis</span><span class="chip-count">0</span></button>
         </div>
 
-        <!-- Banner Hitung Cepat (Khusus Desktop saja agar layar HP lebih lega) -->
-        <div class="hidden md:flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-xl bg-bi-light/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/50 text-xs text-bi-navy dark:text-blue-200">
-          <div class="flex items-center gap-2 min-w-0">
-            <i data-lucide="sparkles" class="w-4 h-4 text-bi-blue shrink-0"></i>
+        <!-- Banner Hitung Cepat (Desktop) -->
+        <div class="hidden md:flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-slate-50/90 dark:bg-[#1E293B]/60 border border-slate-200/70 dark:border-slate-700/60 text-xs text-slate-600 dark:text-slate-300">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="w-6 h-6 rounded-lg bg-[#E6F0FA] dark:bg-sky-950/70 text-[#005596] dark:text-[#38BDF8] flex items-center justify-center shrink-0">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            </span>
             <span class="leading-snug">
-              <strong>Hitung Cepat:</strong> Sesuaikan angka <strong>Stok Fisik</strong> lalu tekan <span class="font-bold text-emerald-700 dark:text-emerald-400">✓ Cek</span> untuk menandai item selesai diaudit.
+              <strong class="text-slate-800 dark:text-white">Hitung Cepat:</strong> Sesuaikan angka <strong class="text-slate-800 dark:text-white">Stok Fisik</strong> lalu tekan tombol <span class="font-bold text-[#059669] dark:text-[#34D399]">✓ Cek</span> untuk menandai item selesai diaudit.
             </span>
           </div>
-          <button type="button" onclick="confirmSyncAll()" class="shrink-0 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-blue-50 font-bold text-bi-blue dark:text-blue-300 border border-blue-200 dark:border-blue-800 transition text-[11px]">
-            Fisik = Sistem
+          <button type="button" onclick="confirmSyncAll()" class="shrink-0 px-3 py-1.5 rounded-lg bg-white dark:bg-[#111827] hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-[#005596] dark:text-[#38BDF8] border border-slate-200/80 dark:border-slate-700/80 transition text-[11px]">
+            Samakan Fisik = Sistem
           </button>
         </div>
 
         <!-- Tabel / Kartu Inventaris -->
-        <div class="md:overflow-x-auto md:rounded-xl md:border md:border-slate-200 md:dark:border-slate-800">
+        <div class="md:overflow-x-auto lg:overflow-x-visible md:rounded-xl md:border md:border-slate-200/80 md:dark:border-slate-800/80">
           <table class="mobile-card-table w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-100/90 dark:bg-slate-800/90 text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
-                <th class="py-3 px-4 w-10 text-center">Cek</th>
-                <th class="py-3 px-3">Kode & Nama Souvenir</th>
-                <th class="py-3 px-3">Kategori & Lokasi</th>
-                <th class="py-3 px-3 text-center">Saldo Buku</th>
-                <th class="py-3 px-3 text-center w-40">Stok Fisik (Opname)</th>
-                <th class="py-3 px-3 text-center">Selisih</th>
-                <th class="py-3 px-3 text-center">Status Stok</th>
-                <th class="py-3 px-4 text-right">Aksi</th>
+              <tr class="bg-slate-50/95 dark:bg-[#111827]/95 backdrop-blur-sm text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200/80 dark:border-slate-800/80">
+                <th class="sticky top-[68px] z-10 bg-slate-50/95 dark:bg-[#111827]/95 backdrop-blur-sm py-3.5 px-4 w-14 text-center md:first:rounded-tl-xl">Cek</th>
+                <th class="sticky top-[68px] z-10 bg-slate-50/95 dark:bg-[#111827]/95 backdrop-blur-sm py-3.5 px-4">Kode & Nama Souvenir</th>
+                <th class="sticky top-[68px] z-10 bg-slate-50/95 dark:bg-[#111827]/95 backdrop-blur-sm py-3.5 px-4">Kategori & Lokasi</th>
+                <th class="sticky top-[68px] z-10 bg-slate-50/95 dark:bg-[#111827]/95 backdrop-blur-sm py-3.5 px-4 text-center">Saldo Buku</th>
+                <th class="sticky top-[68px] z-10 bg-slate-50/95 dark:bg-[#111827]/95 backdrop-blur-sm py-3.5 px-4 text-center w-44">Stok Fisik</th>
+                <th class="sticky top-[68px] z-10 bg-slate-50/95 dark:bg-[#111827]/95 backdrop-blur-sm py-3.5 px-4 text-center">Selisih</th>
+                <th class="sticky top-[68px] z-10 bg-slate-50/95 dark:bg-[#111827]/95 backdrop-blur-sm py-3.5 px-4 text-center">Status</th>
+                <th class="sticky top-[68px] z-10 bg-slate-50/95 dark:bg-[#111827]/95 backdrop-blur-sm py-3.5 px-4 text-right md:last:rounded-tr-xl">Aksi</th>
               </tr>
             </thead>
-            <tbody id="inventoryTableBody" class="md:divide-y md:divide-slate-200 md:dark:divide-slate-800 text-[13px]"></tbody>
+            <tbody id="inventoryTableBody" class="md:divide-y md:divide-slate-100 md:dark:divide-slate-800/80 text-[13px]"></tbody>
           </table>
         </div>
 
         <!-- Tombol Finalisasi di Bawah Daftar (Khusus Mobile) -->
         <div id="mobileFinalizeBox" class="md:hidden pt-1">
-          <button type="button" id="mobileFinalizeBtn" onclick="openFinalizeOpnameModal()" class="w-full justify-center inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-bi-navy hover:bg-bi-dark text-white text-xs font-bold shadow-md transition">
-            <i data-lucide="file-check-2" class="w-4 h-4 text-bi-gold"></i>
+          <button type="button" id="mobileFinalizeBtn" onclick="openFinalizeOpnameModal()" class="w-full min-h-[48px] justify-center inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] text-white text-xs font-bold shadow-card transition">
+            <i data-lucide="file-check-2" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
             <span id="mobileFinalizeLabel">Finalisasi Berita Acara Opname</span>
           </button>
         </div>
@@ -474,36 +546,36 @@
       <div id="view-mutations" class="hidden p-0 md:p-6 space-y-3 md:space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Riwayat Distribusi & Penerimaan Souvenir</h3>
-            <p class="hidden sm:block text-xs text-slate-500 dark:text-slate-400">Jejak audit penggunaan souvenir untuk kegiatan sosialisasi/edukasi, pengadaan baru, dan penyesuaian opname.</p>
+            <h3 class="font-bold text-[15px] text-slate-900 dark:text-white tracking-tight">Riwayat Distribusi & Penerimaan Souvenir</h3>
+            <p class="hidden sm:block text-xs text-slate-500 dark:text-slate-400 mt-0.5">Jejak audit penggunaan souvenir untuk kegiatan sosialisasi/edukasi, pengadaan baru, dan penyesuaian opname.</p>
           </div>
-          <div class="flex items-center gap-2">
-            <select id="mutationTypeFilter" onchange="renderMutationTable()" class="w-full sm:w-auto h-10 md:h-9 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 outline-none">
+          <div class="flex items-center gap-2.5">
+            <select id="mutationTypeFilter" onchange="renderMutationTable()" class="w-full sm:w-auto h-11 md:h-10 px-3 text-xs font-medium rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white md:bg-slate-100/75 dark:bg-[#111827] md:dark:bg-[#1E293B] text-slate-700 dark:text-slate-200 outline-none focus:border-[#005596] dark:focus:border-[#38BDF8]">
               <option value="ALL">Semua Jenis Mutasi</option>
               <option value="OUT">Keluar (Distribusi Kegiatan)</option>
               <option value="IN">Masuk (Pengadaan / Restock)</option>
               <option value="ADJ">Penyesuaian Opname</option>
             </select>
-            <button type="button" onclick="openMutationModal('OUT')" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-bi-navy hover:bg-bi-dark text-white text-xs font-bold transition">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <button type="button" onclick="openMutationModal('OUT')" class="hidden md:inline-flex items-center gap-1.5 px-4 h-10 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] text-white text-xs font-bold transition shrink-0">
+              <i data-lucide="plus-circle" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
               Catat Mutasi Baru
             </button>
           </div>
         </div>
 
-        <div class="md:overflow-x-auto md:rounded-xl md:border md:border-slate-200 md:dark:border-slate-800">
+        <div class="md:overflow-x-auto md:rounded-xl md:border md:border-slate-200/80 md:dark:border-slate-800/80">
           <table class="mobile-card-table w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-100/90 dark:bg-slate-800/90 text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
-                <th class="py-3 px-4">Tanggal</th>
-                <th class="py-3 px-3">Jenis</th>
-                <th class="py-3 px-3">Souvenir & SKU</th>
-                <th class="py-3 px-3 text-center">Jumlah</th>
-                <th class="py-3 px-3">Kegiatan / Keterangan</th>
-                <th class="py-3 px-4">Unit / PIC</th>
+              <tr class="bg-slate-50/95 dark:bg-[#111827]/95 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200/80 dark:border-slate-800/80">
+                <th class="py-3.5 px-4">Tanggal</th>
+                <th class="py-3.5 px-4">Jenis</th>
+                <th class="py-3.5 px-4">Souvenir & SKU</th>
+                <th class="py-3.5 px-4 text-center">Jumlah</th>
+                <th class="py-3.5 px-4">Kegiatan / Keterangan</th>
+                <th class="py-3.5 px-4">Unit / PIC</th>
               </tr>
             </thead>
-            <tbody id="mutationTableBody" class="md:divide-y md:divide-slate-200 md:dark:divide-slate-800 text-[13px]"></tbody>
+            <tbody id="mutationTableBody" class="md:divide-y md:divide-slate-100 md:dark:divide-slate-800/80 text-[13px]"></tbody>
           </table>
         </div>
       </div>
@@ -514,11 +586,11 @@
       <div id="view-reports" class="hidden p-0 md:p-6 space-y-3 md:space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Arsip Berita Acara Stock Opname</h3>
-            <p class="hidden sm:block text-xs text-slate-500 dark:text-slate-400">Dokumen hasil pemeriksaan fisik berkala yang telah disahkan dan siap cetak resmi.</p>
+            <h3 class="font-bold text-[15px] text-slate-900 dark:text-white tracking-tight">Arsip Berita Acara Stock Opname</h3>
+            <p class="hidden sm:block text-xs text-slate-500 dark:text-slate-400 mt-0.5">Dokumen hasil pemeriksaan fisik berkala yang telah disahkan dan siap cetak resmi.</p>
           </div>
-          <button type="button" onclick="openFinalizeOpnameModal()" class="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-4 py-2.5 md:py-2 rounded-xl bg-bi-navy hover:bg-bi-dark text-white text-xs font-bold transition">
-            <i data-lucide="file-plus-2" class="w-4 h-4 text-bi-gold"></i>
+          <button type="button" onclick="openFinalizeOpnameModal()" class="w-full sm:w-auto min-h-[44px] md:min-h-0 justify-center inline-flex items-center gap-2 px-4 md:h-10 py-2.5 md:py-0 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] text-white text-xs font-bold transition shadow-card">
+            <i data-lucide="file-plus-2" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
             Buat Berita Acara Baru
           </button>
         </div>
@@ -530,24 +602,27 @@
   </main>
 
   <!-- Desktop Footer -->
-  <footer class="hidden md:block border-t border-slate-200 dark:border-slate-800 py-4 px-6 text-xs text-slate-500 dark:text-slate-400">
+  <footer class="hidden md:block border-t border-slate-200/80 dark:border-slate-800/80 py-4 px-6 text-xs text-slate-500 dark:text-slate-400">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <span>SIM-SOUVENIR BI <span id="footerVersionLabel" class="font-mono text-[11px] opacity-75">v1.0.4</span> &bull; Tata Kelola Inventaris & Stock Opname Kegiatan Sosialisasi</span>
-      <button type="button" onclick="confirmResetDemoData()" class="hover:text-rose-600 underline transition">Reset ke Data Simulasi Awal</button>
+      <span>SIM-SOUVENIR BI <span id="footerVersionLabel" class="font-mono text-[11px] opacity-80">v1.0.5</span> &bull; Tata Kelola Inventaris & Stock Opname Kegiatan Sosialisasi</span>
+      <button type="button" onclick="confirmResetDemoData()" class="hover:text-[#E11D48] dark:hover:text-[#FB7185] underline underline-offset-2 transition">Reset ke Data Simulasi Awal</button>
     </div>
   </footer>
 
   <!-- ===================================================================== -->
   <!-- MODAL 1: TAMBAH / EDIT MASTER SOUVENIR                                -->
   <!-- ===================================================================== -->
-  <div id="itemModal" onclick="if(event.target===this) closeModal('itemModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
-      <div class="px-6 py-4 bg-bi-navy text-white flex items-center justify-between">
+  <div id="itemModal" onclick="if(event.target===this) closeModal('itemModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] rounded-2xl max-w-lg w-full border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden">
+      <div class="md:hidden pt-2.5 pb-1 bg-[#002F6C] dark:bg-[#0F294A] flex justify-center">
+        <div class="w-10 h-1 rounded-full bg-white/30"></div>
+      </div>
+      <div class="px-6 py-4 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between">
         <h3 id="itemModalTitle" class="font-bold text-sm flex items-center gap-2">
-          <i data-lucide="package-plus" class="w-4 h-4 text-bi-gold"></i>
+          <i data-lucide="package-plus" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
           Tambah Item Souvenir Baru
         </h3>
-        <button type="button" onclick="closeModal('itemModal')" class="text-white/70 hover:text-white p-1">
+        <button type="button" onclick="closeModal('itemModal')" aria-label="Tutup modal" class="w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white flex items-center justify-center transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -555,12 +630,12 @@
         <input type="hidden" id="editItemId" />
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Kode SKU *</label>
-            <input type="text" id="itemSku" required placeholder="SVN-BI-001" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 uppercase font-mono outline-none focus:border-bi-blue" />
+            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Kode SKU *</label>
+            <input type="text" id="itemSku" required placeholder="SVN-BI-001" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] uppercase font-mono outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] focus:ring-2 focus:ring-[#005596]/15 transition" />
           </div>
           <div>
-            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Kategori Kegiatan *</label>
-            <select id="itemCategory" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue">
+            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Kategori Kegiatan *</label>
+            <select id="itemCategory" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition">
               <option value="VIP & Eksekutif">VIP & Eksekutif</option>
               <option value="Sosialisasi CBP Rupiah">Sosialisasi CBP Rupiah</option>
               <option value="Edukasi QRIS & Digital">Edukasi QRIS & Digital</option>
@@ -571,33 +646,33 @@
         </div>
 
         <div>
-          <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Nama Barang / Souvenir *</label>
-          <input type="text" id="itemName" required placeholder="Contoh: Plakat Kristal Gedung Bank Indonesia" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+          <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Nama Barang / Souvenir *</label>
+          <input type="text" id="itemName" required placeholder="Contoh: Plakat Kristal Gedung Bank Indonesia" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] focus:ring-2 focus:ring-[#005596]/15 transition" />
         </div>
 
         <div class="grid grid-cols-3 gap-3">
           <div>
-            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Saldo Buku *</label>
-            <input type="number" id="itemSystemStock" min="0" required value="0" inputmode="numeric" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Saldo Buku *</label>
+            <input type="number" id="itemSystemStock" min="0" required value="0" inputmode="numeric" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] tabular-nums font-semibold outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
           <div>
-            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Batas Min *</label>
-            <input type="number" id="itemMinStock" min="1" required value="10" inputmode="numeric" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Batas Min *</label>
+            <input type="number" id="itemMinStock" min="1" required value="10" inputmode="numeric" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] tabular-nums font-semibold outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
           <div>
-            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Satuan *</label>
-            <input type="text" id="itemUnit" required value="Pcs" placeholder="Pcs / Box" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Satuan *</label>
+            <input type="text" id="itemUnit" required value="Pcs" placeholder="Pcs / Box" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
         </div>
 
         <div>
-          <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Lokasi Penyimpanan / Rak *</label>
-          <input type="text" id="itemLocation" required placeholder="Contoh: Lemari Souvenir A1 - Ruang Humas" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+          <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Lokasi Penyimpanan / Rak *</label>
+          <input type="text" id="itemLocation" required placeholder="Contoh: Lemari Souvenir A1 - Ruang Humas" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] focus:ring-2 focus:ring-[#005596]/15 transition" />
         </div>
 
-        <div class="pt-3 flex justify-end gap-2 border-t border-slate-200 dark:border-slate-800">
-          <button type="button" onclick="closeModal('itemModal')" class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">Batal</button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-bi-navy hover:bg-bi-dark text-white font-bold shadow-sm">Simpan Souvenir</button>
+        <div class="pt-3 flex justify-end gap-2.5 border-t border-slate-200/80 dark:border-slate-800">
+          <button type="button" onclick="closeModal('itemModal')" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white font-bold shadow-card transition">Simpan Souvenir</button>
         </div>
       </form>
     </div>
@@ -606,14 +681,17 @@
   <!-- ===================================================================== -->
   <!-- MODAL 2: CATAT MUTASI (DISTRIBUSI KEGIATAN / PENGADAAN)               -->
   <!-- ===================================================================== -->
-  <div id="mutationModal" onclick="if(event.target===this) closeModal('mutationModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
-      <div class="px-6 py-4 bg-bi-navy text-white flex items-center justify-between">
+  <div id="mutationModal" onclick="if(event.target===this) closeModal('mutationModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] rounded-2xl max-w-lg w-full border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden">
+      <div class="md:hidden pt-2.5 pb-1 bg-[#002F6C] dark:bg-[#0F294A] flex justify-center">
+        <div class="w-10 h-1 rounded-full bg-white/30"></div>
+      </div>
+      <div class="px-6 py-4 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between">
         <h3 class="font-bold text-sm flex items-center gap-2">
-          <i data-lucide="arrow-left-right" class="w-4 h-4 text-bi-gold"></i>
+          <i data-lucide="arrow-left-right" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
           Catat Mutasi Souvenir
         </h3>
-        <button type="button" onclick="closeModal('mutationModal')" class="text-white/70 hover:text-white p-1">
+        <button type="button" onclick="closeModal('mutationModal')" aria-label="Tutup modal" class="w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white flex items-center justify-center transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -621,61 +699,51 @@
         <div class="grid grid-cols-2 gap-3">
           <label class="cursor-pointer">
             <input type="radio" name="mutType" value="OUT" checked class="peer hidden" onchange="updateMutationPreview()" />
-            <div class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-rose-500 peer-checked:bg-rose-50/60 dark:peer-checked:bg-rose-950/30 text-center font-bold transition">
-              <i data-lucide="send" class="w-4 h-4 mx-auto mb-1 text-rose-600"></i>
+            <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 peer-checked:border-[#E11D48] dark:peer-checked:border-[#FB7185] peer-checked:bg-rose-50/70 dark:peer-checked:bg-rose-950/30 peer-checked:ring-2 peer-checked:ring-rose-500/15 text-center font-bold transition">
+              <i data-lucide="arrow-up-right" class="w-4 h-4 mx-auto mb-1 text-[#E11D48] dark:text-[#FB7185]"></i>
               Keluar (Kegiatan)
             </div>
           </label>
           <label class="cursor-pointer">
             <input type="radio" name="mutType" value="IN" class="peer hidden" onchange="updateMutationPreview()" />
-            <div class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-50/60 dark:peer-checked:bg-emerald-950/30 text-center font-bold transition">
-              <i data-lucide="package-plus" class="w-4 h-4 mx-auto mb-1 text-emerald-600"></i>
+            <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 peer-checked:border-[#059669] dark:peer-checked:border-[#34D399] peer-checked:bg-emerald-50/70 dark:peer-checked:bg-emerald-950/30 peer-checked:ring-2 peer-checked:ring-emerald-500/15 text-center font-bold transition">
+              <i data-lucide="arrow-down-left" class="w-4 h-4 mx-auto mb-1 text-[#059669] dark:text-[#34D399]"></i>
               Masuk (Pengadaan)
             </div>
           </label>
         </div>
 
         <div>
-          <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Pilih Souvenir *</label>
-          <select id="mutItemId" required onchange="updateMutationPreview()" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue"></select>
+          <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Pilih Souvenir *</label>
+          <select id="mutItemId" required onchange="updateMutationPreview()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition"></select>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Jumlah Unit *</label>
-            <input type="number" id="mutQty" min="1" required inputmode="numeric" oninput="updateMutationPreview()" placeholder="0" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue font-bold" />
+            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Jumlah Unit *</label>
+            <input type="number" id="mutQty" min="1" required inputmode="numeric" oninput="updateMutationPreview()" placeholder="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] font-bold tabular-nums transition" />
           </div>
           <div>
-            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Tanggal *</label>
-            <div class="relative w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-within:border-bi-blue">
-              <div class="flex items-center justify-between gap-2 px-3 py-2.5 pointer-events-none">
-                <span id="mutDateText" class="date-text">Pilih tanggal</span>
-                <i data-lucide="calendar" class="w-4 h-4 shrink-0 text-slate-400"></i>
-              </div>
-              <input type="date" id="mutDate" required
-                onchange="updateMutDateDisplay()" oninput="updateMutDateDisplay()"
-                onclick="try { this.showPicker(); } catch (e) {}"
-                aria-label="Tanggal"
-                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-            </div>
+            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Tanggal *</label>
+            <input type="date" id="mutDate" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
         </div>
 
-        <div id="mutStockPreview" class="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs flex items-center justify-between"></div>
+        <div id="mutStockPreview" class="px-3.5 py-2.5 rounded-xl bg-slate-100/90 dark:bg-[#1E293B] text-xs flex items-center justify-between gap-2 tabular-nums"></div>
 
         <div>
-          <label id="mutActivityLabel" class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Nama Kegiatan Sosialisasi / Keperluan *</label>
-          <input type="text" id="mutActivity" required placeholder="Contoh: Sosialisasi Cinta Bangga Paham Rupiah" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+          <label id="mutActivityLabel" class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Nama Kegiatan Sosialisasi / Keperluan *</label>
+          <input type="text" id="mutActivity" required placeholder="Contoh: Sosialisasi Cinta Bangga Paham Rupiah" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
         </div>
 
         <div>
-          <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Fungsi / Unit Pemohon / PIC *</label>
-          <input type="text" id="mutPic" required placeholder="Contoh: Unit Kehumasan / SPPUR / UMKM" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+          <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Fungsi / Unit Pemohon / PIC *</label>
+          <input type="text" id="mutPic" required placeholder="Contoh: Unit Kehumasan / SPPUR / UMKM" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
         </div>
 
-        <div class="pt-3 flex justify-end gap-2 border-t border-slate-200 dark:border-slate-800">
-          <button type="button" onclick="closeModal('mutationModal')" class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">Batal</button>
-          <button type="submit" id="mutSubmitBtn" class="px-5 py-2.5 rounded-xl bg-bi-navy hover:bg-bi-dark text-white font-bold shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">Simpan Mutasi</button>
+        <div class="pt-3 flex justify-end gap-2.5 border-t border-slate-200/80 dark:border-slate-800">
+          <button type="button" onclick="closeModal('mutationModal')" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
+          <button type="submit" id="mutSubmitBtn" class="px-5 py-2.5 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white font-bold shadow-card disabled:opacity-40 disabled:cursor-not-allowed transition">Simpan Mutasi</button>
         </div>
       </form>
     </div>
@@ -684,46 +752,49 @@
   <!-- ===================================================================== -->
   <!-- MODAL 3: FINALISASI BERITA ACARA STOCK OPNAME                         -->
   <!-- ===================================================================== -->
-  <div id="opnameModal" onclick="if(event.target===this) closeModal('opnameModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
-      <div class="px-6 py-4 bg-bi-navy text-white flex items-center justify-between">
+  <div id="opnameModal" onclick="if(event.target===this) closeModal('opnameModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] rounded-2xl max-w-lg w-full border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden">
+      <div class="md:hidden pt-2.5 pb-1 bg-[#002F6C] dark:bg-[#0F294A] flex justify-center">
+        <div class="w-10 h-1 rounded-full bg-white/30"></div>
+      </div>
+      <div class="px-6 py-4 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between">
         <h3 class="font-bold text-sm flex items-center gap-2">
-          <i data-lucide="file-check-2" class="w-4 h-4 text-bi-gold"></i>
+          <i data-lucide="file-check-2" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
           Pengesahan Berita Acara Stock Opname
         </h3>
-        <button type="button" onclick="closeModal('opnameModal')" class="text-white/70 hover:text-white p-1">
+        <button type="button" onclick="closeModal('opnameModal')" aria-label="Tutup modal" class="w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white flex items-center justify-center transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
       <form onsubmit="finalizeStockOpname(event)" class="p-6 space-y-4 text-xs">
-        <div id="opnameSummaryBox" class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 space-y-1.5 border border-slate-200 dark:border-slate-700"></div>
+        <div id="opnameSummaryBox" class="p-4 rounded-xl bg-slate-100/90 dark:bg-[#1E293B] space-y-2 border border-slate-200/70 dark:border-slate-700/70 tabular-nums"></div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Petugas Pelaksana *</label>
-            <input type="text" id="opnameAuditor" required placeholder="Nama Pegawai / PIC" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Petugas Pelaksana *</label>
+            <input type="text" id="opnameAuditor" required placeholder="Nama Pegawai / PIC" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
           <div>
-            <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Satuan Kerja / Unit *</label>
-            <input type="text" id="opnameUnit" required value="KPWBI Prov. Jawa Tengah" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue" />
+            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Satuan Kerja / Unit *</label>
+            <input type="text" id="opnameUnit" required value="KPWBI Prov. Jawa Tengah" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
         </div>
 
         <div>
-          <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Catatan / Penjelasan Selisih Audit</label>
-          <textarea id="opnameNotes" rows="2" placeholder="Contoh: Stock opname rutin bulanan. Selisih telah dikonfirmasi dengan PIC kegiatan." class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-bi-blue"></textarea>
+          <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Catatan / Penjelasan Selisih Audit</label>
+          <textarea id="opnameNotes" rows="2" placeholder="Contoh: Stock opname rutin bulanan. Selisih telah dikonfirmasi dengan PIC kegiatan." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition"></textarea>
         </div>
 
-        <label class="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 cursor-pointer">
-          <input type="checkbox" id="opnameSyncCheckbox" checked class="mt-0.5 rounded text-bi-navy focus:ring-bi-blue" />
+        <label class="flex items-start gap-2.5 p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 cursor-pointer">
+          <input type="checkbox" id="opnameSyncCheckbox" checked class="mt-0.5 rounded text-[#002F6C] focus:ring-[#005596]" />
           <span class="text-slate-700 dark:text-slate-300 leading-relaxed">
             <strong>Rekonsiliasi Otomatis:</strong> Sesuaikan Saldo Buku mengikuti Stok Fisik dan catat selisihnya ke <em>Log Mutasi</em>.
           </span>
         </label>
 
-        <div class="pt-3 flex justify-end gap-2 border-t border-slate-200 dark:border-slate-800">
-          <button type="button" onclick="closeModal('opnameModal')" class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">Batal</button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-bi-navy hover:bg-bi-dark text-white font-bold shadow-sm">Sahkan Berita Acara</button>
+        <div class="pt-3 flex justify-end gap-2.5 border-t border-slate-200/80 dark:border-slate-800">
+          <button type="button" onclick="closeModal('opnameModal')" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white font-bold shadow-card transition">Sahkan Berita Acara</button>
         </div>
       </form>
     </div>
@@ -732,22 +803,22 @@
   <!-- ===================================================================== -->
   <!-- MODAL 4: PRATINJAU & CETAK BERITA ACARA RESMI                         -->
   <!-- ===================================================================== -->
-  <div id="baPreviewModal" onclick="if(event.target===this) closeModal('baPreviewModal')" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
-      <div class="px-5 py-3.5 bg-bi-navy text-white flex items-center justify-between shrink-0">
+  <div id="baPreviewModal" onclick="if(event.target===this) closeModal('baPreviewModal')" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-2 sm:p-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden">
+      <div class="px-5 py-3.5 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between shrink-0">
         <h3 class="font-bold text-sm flex items-center gap-2">
-          <i data-lucide="file-text" class="w-4 h-4 text-bi-gold"></i>
+          <i data-lucide="file-text" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
           Pratinjau Dokumen Resmi Berita Acara
         </h3>
-        <button type="button" onclick="closeModal('baPreviewModal')" class="text-white/70 hover:text-white p-1">
+        <button type="button" onclick="closeModal('baPreviewModal')" aria-label="Tutup pratinjau" class="w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white flex items-center justify-center transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
       <div id="baPreviewContent" class="p-4 sm:p-6 overflow-y-auto overflow-x-auto bg-white text-slate-900 flex-1"></div>
-      <div class="px-5 py-3 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2 shrink-0">
-        <button type="button" onclick="closeModal('baPreviewModal')" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-700">Tutup</button>
-        <button type="button" onclick="triggerPrintBA()" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-bi-navy hover:bg-bi-dark text-white text-xs font-bold shadow-sm">
-          <i data-lucide="printer" class="w-4 h-4 text-bi-gold"></i>
+      <div class="px-5 py-3.5 bg-slate-50 dark:bg-[#1E293B]/80 border-t border-slate-200/80 dark:border-slate-800 flex justify-end gap-2.5 shrink-0" style="padding-bottom: calc(0.875rem + env(safe-area-inset-bottom))">
+        <button type="button" onclick="closeModal('baPreviewModal')" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Tutup</button>
+        <button type="button" onclick="triggerPrintBA()" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] text-white text-xs font-bold shadow-card transition">
+          <i data-lucide="printer" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
           Cetak / Simpan PDF
         </button>
       </div>
@@ -757,11 +828,11 @@
   <!-- ===================================================================== -->
   <!-- MODAL 5: CUSTOM CONFIRMATION DIALOG                                   -->
   <!-- ===================================================================== -->
-  <div id="confirmModal" onclick="if(event.target===this) closeModal('confirmModal')" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+  <div id="confirmModal" onclick="if(event.target===this) closeModal('confirmModal')" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] rounded-2xl max-w-md w-full border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden">
       <div class="p-6 space-y-4">
         <div class="flex items-start gap-3.5">
-          <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-[#E11D48] dark:text-[#FB7185] flex items-center justify-center shrink-0">
             <i data-lucide="alert-triangle" class="w-5 h-5"></i>
           </div>
           <div>
@@ -769,9 +840,9 @@
             <p id="confirmMessage" class="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed"></p>
           </div>
         </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeModal('confirmModal')" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">Batal</button>
-          <button type="button" id="confirmActionBtn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm">Ya, Lanjutkan</button>
+        <div class="flex justify-end gap-2.5 pt-2">
+          <button type="button" onclick="closeModal('confirmModal')" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
+          <button type="button" id="confirmActionBtn" class="px-4 py-2.5 rounded-xl bg-[#E11D48] hover:bg-rose-700 text-white text-xs font-bold shadow-card transition">Ya, Lanjutkan</button>
         </div>
       </div>
     </div>
@@ -780,116 +851,116 @@
   <!-- ===================================================================== -->
   <!-- MOBILE BOTTOM NAVIGATION BAR & ACTION SHEETS                          -->
   <!-- ===================================================================== -->
-  <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 grid grid-cols-5 items-end bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400" style="padding-bottom: env(safe-area-inset-bottom)">
-    <button type="button" class="bn-btn active flex flex-col items-center gap-0.5 py-2 text-[11px]" data-t="opname" onclick="switchTab('opname')">
+  <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 grid grid-cols-5 items-end bg-white/90 dark:bg-[#111827]/90 backdrop-blur-lg border-t border-slate-200/80 dark:border-slate-800/80 text-slate-500 dark:text-slate-400" style="padding-bottom: env(safe-area-inset-bottom)">
+    <button type="button" class="bn-btn active flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium" data-t="opname" onclick="switchTab('opname')">
       <i data-lucide="clipboard-list" class="w-5 h-5"></i>
       <span>Stok</span>
     </button>
-    <button type="button" class="bn-btn flex flex-col items-center gap-0.5 py-2 text-[11px]" data-t="mutations" onclick="switchTab('mutations')">
+    <button type="button" class="bn-btn flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium" data-t="mutations" onclick="switchTab('mutations')">
       <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
       <span>Mutasi</span>
     </button>
     <div class="flex justify-center">
-      <button type="button" onclick="openSheet('addSheet')" aria-label="Aksi Cepat" class="-mt-6 w-14 h-14 rounded-full bg-bi-gold text-bi-dark shadow-lg ring-4 ring-slate-50 dark:ring-slate-950 flex items-center justify-center">
+      <button type="button" onclick="openSheet('addSheet')" aria-label="Aksi Cepat" class="-mt-6 w-14 h-14 rounded-full bg-[#C59B27] hover:bg-[#B58D20] dark:bg-[#D4AF37] text-[#001B40] shadow-fab ring-4 ring-[#F8FAFC] dark:ring-[#090D16] flex items-center justify-center active:scale-95 transition-transform">
         <i data-lucide="plus" class="w-6 h-6 stroke-[2.5]"></i>
       </button>
     </div>
-    <button type="button" class="bn-btn flex flex-col items-center gap-0.5 py-2 text-[11px]" data-t="reports" onclick="switchTab('reports')">
+    <button type="button" class="bn-btn flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium" data-t="reports" onclick="switchTab('reports')">
       <i data-lucide="file-check-2" class="w-5 h-5"></i>
       <span>Berita Acara</span>
     </button>
-    <button type="button" class="bn-btn flex flex-col items-center gap-0.5 py-2 text-[11px]" onclick="openSheet('dataSheet')">
+    <button type="button" class="bn-btn flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium" onclick="openSheet('dataSheet')">
       <i data-lucide="database" class="w-5 h-5"></i>
       <span>Data</span>
     </button>
   </nav>
 
   <!-- Action Sheet Overlay -->
-  <div id="sheetOverlay" class="fixed inset-0 z-40 hidden items-end md:items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0 md:p-4" onclick="if(event.target===this) closeSheet()">
-    <!-- Opname Batch Options Sheet (Dari tombol titik tiga kartu ringkasan) -->
-    <div id="opnameOptionsSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-slate-900 rounded-t-2xl md:rounded-2xl p-5 space-y-2.5 border-t md:border border-slate-200 dark:border-slate-800" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
+  <div id="sheetOverlay" class="fixed inset-0 z-40 hidden items-end md:items-center justify-center bg-slate-950/60 backdrop-blur-sm p-0 md:p-4" onclick="if(event.target===this) closeSheet()">
+    <!-- Opname Batch Options Sheet -->
+    <div id="opnameOptionsSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 space-y-2.5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
       <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
-      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Opsi Audit & Penghitungan</h4>
-      <button type="button" onclick="sheetGo(() => confirmMarkAll(true))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
-        <span class="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center"><i data-lucide="check-check" class="w-4 h-4"></i></span>
+      <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">Opsi Audit & Penghitungan</h4>
+      <button type="button" onclick="sheetGo(() => confirmMarkAll(true))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-left transition">
+        <span class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-[#059669] dark:text-[#34D399] flex items-center justify-center shrink-0"><i data-lucide="check-check" class="w-4 h-4"></i></span>
         <div>
-          <div>Tandai Semua Tercek</div>
-          <div class="text-[11px] font-normal text-slate-500">Centang selesai audit untuk seluruh item</div>
+          <div class="text-slate-900 dark:text-white">Tandai Semua Tercek</div>
+          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Centang selesai audit untuk seluruh item</div>
         </div>
       </button>
-      <button type="button" onclick="sheetGo(() => confirmSyncAll())" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
-        <span class="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-bi-blue flex items-center justify-center"><i data-lucide="equal" class="w-4 h-4"></i></span>
+      <button type="button" onclick="sheetGo(() => confirmSyncAll())" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-left transition">
+        <span class="w-10 h-10 rounded-xl bg-[#E6F0FA] dark:bg-sky-950/60 text-[#005596] dark:text-[#38BDF8] flex items-center justify-center shrink-0"><i data-lucide="equal" class="w-4 h-4"></i></span>
         <div>
-          <div>Samakan Fisik = Sistem</div>
-          <div class="text-[11px] font-normal text-slate-500">Isi semua stok fisik mengikuti saldo buku</div>
+          <div class="text-slate-900 dark:text-white">Samakan Fisik = Sistem</div>
+          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Isi semua stok fisik mengikuti saldo buku</div>
         </div>
       </button>
-      <button type="button" onclick="sheetGo(() => confirmMarkAll(false))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
-        <span class="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></span>
+      <button type="button" onclick="sheetGo(() => confirmMarkAll(false))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-left transition">
+        <span class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></span>
         <div>
-          <div>Reset Centang Audit</div>
-          <div class="text-[11px] font-normal text-slate-500">Hapus tanda cek tanpa mengubah angka stok</div>
+          <div class="text-slate-900 dark:text-white">Reset Centang Audit</div>
+          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Hapus tanda cek tanpa mengubah angka stok</div>
         </div>
       </button>
     </div>
 
     <!-- Quick Add Sheet -->
-    <div id="addSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-slate-900 rounded-t-2xl md:rounded-2xl p-5 space-y-2.5 border-t md:border border-slate-200 dark:border-slate-800" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
+    <div id="addSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 space-y-2.5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
       <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
-      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Pilih Tindakan Cepat</h4>
-      <button type="button" onclick="sheetGo(() => openMutationModal('OUT'))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
-        <span class="w-9 h-9 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center"><i data-lucide="send" class="w-4 h-4"></i></span>
+      <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">Pilih Tindakan Cepat</h4>
+      <button type="button" onclick="sheetGo(() => openMutationModal('OUT'))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-left transition">
+        <span class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-[#E11D48] dark:text-[#FB7185] flex items-center justify-center shrink-0"><i data-lucide="send" class="w-4 h-4"></i></span>
         <div>
-          <div>Distribusi ke Kegiatan</div>
-          <div class="text-[11px] font-normal text-slate-500">Catat pengambilan souvenir sosialisasi/rapat</div>
+          <div class="text-slate-900 dark:text-white">Distribusi ke Kegiatan</div>
+          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Catat pengambilan souvenir sosialisasi/rapat</div>
         </div>
       </button>
-      <button type="button" onclick="sheetGo(() => openMutationModal('IN'))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
-        <span class="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center"><i data-lucide="package-plus" class="w-4 h-4"></i></span>
+      <button type="button" onclick="sheetGo(() => openMutationModal('IN'))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-left transition">
+        <span class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-[#059669] dark:text-[#34D399] flex items-center justify-center shrink-0"><i data-lucide="package-plus" class="w-4 h-4"></i></span>
         <div>
-          <div>Terima Pengadaan Baru</div>
-          <div class="text-[11px] font-normal text-slate-500">Tambah stok masuk dari vendor/logistik</div>
+          <div class="text-slate-900 dark:text-white">Terima Pengadaan Baru</div>
+          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Tambah stok masuk dari vendor/logistik</div>
         </div>
       </button>
-      <button type="button" onclick="sheetGo(() => openItemModal())" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
-        <span class="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-bi-gold flex items-center justify-center"><i data-lucide="plus" class="w-4 h-4"></i></span>
+      <button type="button" onclick="sheetGo(() => openItemModal())" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-left transition">
+        <span class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-[#C59B27] dark:text-[#D4AF37] flex items-center justify-center shrink-0"><i data-lucide="plus" class="w-4 h-4"></i></span>
         <div>
-          <div>Tambah Master Souvenir</div>
-          <div class="text-[11px] font-normal text-slate-500">Daftarkan jenis/SKU souvenir baru</div>
+          <div class="text-slate-900 dark:text-white">Tambah Master Souvenir</div>
+          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Daftarkan jenis/SKU souvenir baru</div>
         </div>
       </button>
     </div>
 
     <!-- Panduan Cara Pakai -->
-    <div id="helpSheet" class="sheet-panel hidden w-full md:max-w-md max-h-[88vh] overflow-y-auto bg-white dark:bg-slate-900 rounded-t-2xl md:rounded-2xl p-5 border-t md:border border-slate-200 dark:border-slate-800" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
+    <div id="helpSheet" class="sheet-panel hidden w-full md:max-w-md max-h-[88vh] overflow-y-auto bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
       <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
-      <h4 class="text-base font-extrabold text-slate-900 dark:text-white">Cara Pakai Stock Opname</h4>
+      <h4 class="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">Cara Pakai Stock Opname</h4>
       <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Ikuti langkah ini saat menghitung souvenir di gudang.</p>
 
       <ol class="mt-4 space-y-3.5 text-sm">
         <li class="flex gap-3">
-          <span class="shrink-0 w-7 h-7 rounded-full bg-bi-navy text-white text-xs font-bold flex items-center justify-center">1</span>
+          <span class="shrink-0 w-7 h-7 rounded-full bg-[#002F6C] dark:bg-[#0F294A] text-white text-xs font-bold flex items-center justify-center tabular-nums">1</span>
           <div><div class="font-bold text-slate-900 dark:text-white">Hitung barang di gudang</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Hitung jumlah souvenir yang benar-benar ada di rak.</div></div>
         </li>
         <li class="flex gap-3">
-          <span class="shrink-0 w-7 h-7 rounded-full bg-bi-navy text-white text-xs font-bold flex items-center justify-center">2</span>
+          <span class="shrink-0 w-7 h-7 rounded-full bg-[#002F6C] dark:bg-[#0F294A] text-white text-xs font-bold flex items-center justify-center tabular-nums">2</span>
           <div><div class="font-bold text-slate-900 dark:text-white">Isi Stok Fisik</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Ketuk <b>−</b> atau <b>+</b>, atau ketuk angkanya lalu ketik jumlahnya.</div></div>
         </li>
         <li class="flex gap-3">
-          <span class="shrink-0 w-7 h-7 rounded-full bg-bi-navy text-white text-xs font-bold flex items-center justify-center">3</span>
+          <span class="shrink-0 w-7 h-7 rounded-full bg-[#002F6C] dark:bg-[#0F294A] text-white text-xs font-bold flex items-center justify-center tabular-nums">3</span>
           <div><div class="font-bold text-slate-900 dark:text-white">Lihat Selisih</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Hijau <b>Sesuai</b> berarti cocok dengan catatan. Merah berarti kurang, biru berarti lebih.</div></div>
         </li>
         <li class="flex gap-3">
-          <span class="shrink-0 w-7 h-7 rounded-full bg-bi-navy text-white text-xs font-bold flex items-center justify-center">4</span>
-          <div><div class="font-bold text-slate-900 dark:text-white">Ketuk ✓ Cek</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Menandai item sudah selesai dihitung. Otomatis tercentang saat angka diubah.</div></div>
+          <span class="shrink-0 w-7 h-7 rounded-full bg-[#002F6C] dark:bg-[#0F294A] text-white text-xs font-bold flex items-center justify-center tabular-nums">4</span>
+          <div><div class="font-bold text-slate-900 dark:text-white">Ketuk ✓ Tandai Tercek</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Menandai item sudah selesai dihitung. Otomatis tercentang saat angka diubah.</div></div>
         </li>
         <li class="flex gap-3">
-          <span class="shrink-0 w-7 h-7 rounded-full bg-bi-navy text-white text-xs font-bold flex items-center justify-center">5</span>
+          <span class="shrink-0 w-7 h-7 rounded-full bg-[#002F6C] dark:bg-[#0F294A] text-white text-xs font-bold flex items-center justify-center tabular-nums">5</span>
           <div><div class="font-bold text-slate-900 dark:text-white">Finalisasi</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Setelah semua item dicek, tekan <b>Finalisasi Berita Acara Opname</b> di bagian bawah daftar untuk mengesahkan dan mencetak hasilnya.</div></div>
         </li>
       </ol>
 
-      <div class="mt-5 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1.5 text-slate-700 dark:text-slate-300">
+      <div class="mt-5 p-3.5 rounded-xl bg-slate-50 dark:bg-[#1E293B]/80 border border-slate-200/80 dark:border-slate-700/70 text-xs space-y-1.5 text-slate-700 dark:text-slate-300">
         <div class="font-bold text-slate-900 dark:text-white mb-1">Arti istilah & tombol</div>
         <div><b>Saldo Buku</b>: jumlah menurut catatan aplikasi.</div>
         <div><b>Stok Fisik</b>: jumlah hasil hitung langsung di gudang.</div>
@@ -898,35 +969,35 @@
         <div><b>Menu ⋮ di pojok kartu item</b>: edit data souvenir atau hapus item.</div>
       </div>
 
-      <button type="button" onclick="closeSheet()" class="mt-5 w-full py-3 rounded-xl bg-bi-navy hover:bg-bi-dark text-white text-sm font-bold transition">Mengerti</button>
+      <button type="button" onclick="closeSheet()" class="mt-5 w-full min-h-[44px] py-3 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] text-white text-sm font-bold transition">Mengerti</button>
     </div>
 
     <!-- Data & Backup Sheet -->
-    <div id="dataSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-slate-900 rounded-t-2xl md:rounded-2xl p-5 space-y-2.5 border-t md:border border-slate-200 dark:border-slate-800" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
+    <div id="dataSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 space-y-2.5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
       <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
-      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Manajemen Data & Aplikasi</h4>
-      <button type="button" onclick="sheetGo(() => openSheet('helpSheet'))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
-        <i data-lucide="circle-help" class="w-5 h-5 text-bi-blue"></i>
+      <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">Manajemen Data & Aplikasi</h4>
+      <button type="button" onclick="sheetGo(() => openSheet('helpSheet'))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-slate-800 dark:text-slate-100 text-left transition">
+        <i data-lucide="circle-help" class="w-5 h-5 text-[#005596] dark:text-[#38BDF8]"></i>
         <span>Panduan Cara Pakai</span>
       </button>
-      <button type="button" onclick="sheetGo(exportToCSV)" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
-        <i data-lucide="file-spreadsheet" class="w-5 h-5 text-emerald-600"></i>
+      <button type="button" onclick="sheetGo(exportToCSV)" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-slate-800 dark:text-slate-100 text-left transition">
+        <i data-lucide="file-spreadsheet" class="w-5 h-5 text-[#059669] dark:text-[#34D399]"></i>
         <span>Export Laporan Excel (.CSV)</span>
       </button>
-      <button type="button" onclick="sheetGo(exportBackupJSON)" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
-        <i data-lucide="download" class="w-5 h-5 text-blue-600"></i>
+      <button type="button" onclick="sheetGo(exportBackupJSON)" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-slate-800 dark:text-slate-100 text-left transition">
+        <i data-lucide="download" class="w-5 h-5 text-[#005596] dark:text-[#38BDF8]"></i>
         <span>Backup Database (.JSON)</span>
       </button>
-      <label class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition cursor-pointer">
-        <i data-lucide="upload" class="w-5 h-5 text-amber-600"></i>
+      <label class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-slate-800 dark:text-slate-100 text-left transition cursor-pointer">
+        <i data-lucide="upload" class="w-5 h-5 text-[#D97706] dark:text-[#FBBF24]"></i>
         <span>Restore Database (.JSON)</span>
         <input type="file" accept=".json" onchange="closeSheet(); importBackupJSON(event)" class="hidden" />
       </label>
-      <button type="button" onclick="sheetGo(() => checkAppUpdate(true))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-left transition">
-        <i data-lucide="refresh-cw" class="w-5 h-5 text-bi-blue"></i>
+      <button type="button" onclick="sheetGo(() => checkAppUpdate(true))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-slate-800 dark:text-slate-100 text-left transition">
+        <i data-lucide="refresh-cw" class="w-5 h-5 text-[#005596] dark:text-[#38BDF8]"></i>
         <span>Cek Pembaruan Versi App</span>
       </button>
-      <button type="button" onclick="sheetGo(confirmResetDemoData)" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-sm font-bold text-rose-600 text-left transition">
+      <button type="button" onclick="sheetGo(confirmResetDemoData)" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-rose-200/80 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-sm font-bold text-[#E11D48] dark:text-[#FB7185] text-left transition">
         <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
         <span>Reset ke Data Simulasi Awal</span>
       </button>
@@ -1091,8 +1162,10 @@
       const badgeEl = document.getElementById('syncStatusBadge');
       if (!textEl || !badgeEl) return;
       textEl.textContent = label;
-      const dot = badgeEl.querySelector('span');
-      if (dot) dot.className = `w-2 h-2 rounded-full ${colorClass}`;
+      badgeEl.title = `Status sinkronisasi: ${label}`;
+      const isBusy = String(label).includes('...');
+      const dot = badgeEl.querySelector('.sync-dot') || badgeEl.querySelector('span');
+      if (dot) dot.className = `sync-dot w-2 h-2 rounded-full shrink-0 ${colorClass}${isBusy ? ' animate-pulse' : ''}`;
     }
 
     const StorageAdapter = {
@@ -1249,10 +1322,16 @@
     /**
      * Theme Switcher
      */
+    function syncThemeMeta(isDark) {
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
+      if (themeMeta) themeMeta.setAttribute('content', isDark ? '#0A192F' : '#002F6C');
+    }
+
     function initTheme() {
       const saved = localStorage.getItem('bi_theme_mode') || 'light';
       const isDark = saved === 'dark';
       document.documentElement.classList.toggle('dark', isDark);
+      syncThemeMeta(isDark);
       const icon = document.getElementById('themeIcon');
       if (icon) icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
       lucide.createIcons();
@@ -1261,6 +1340,7 @@
     function toggleTheme() {
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('bi_theme_mode', isDark ? 'dark' : 'light');
+      syncThemeMeta(isDark);
       const icon = document.getElementById('themeIcon');
       if (icon) icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
       lucide.createIcons();
@@ -1274,13 +1354,13 @@
       if (!container) return;
       const toast = document.createElement('div');
       const styles = {
-        success: 'bg-emerald-600 text-white',
-        error: 'bg-rose-600 text-white',
-        info: 'bg-bi-navy text-white'
+        success: 'bg-[#059669] text-white border border-emerald-400/20',
+        error: 'bg-[#E11D48] text-white border border-rose-400/20',
+        info: 'bg-[#002F6C] text-white border border-white/15'
       };
       toast.className = `${styles[type] || styles.info} px-4 py-3 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2.5 transform transition-all duration-300 translate-y-2 opacity-0`;
       toast.innerHTML = `
-        <i data-lucide="${type === 'error' ? 'alert-circle' : 'check-circle'}" class="w-4 h-4 shrink-0"></i>
+        <i data-lucide="${type === 'error' ? 'alert-circle' : (type === 'info' ? 'info' : 'check-circle-2')}" class="w-4 h-4 shrink-0"></i>
         <span>${escapeHtml(message)}</span>
       `;
       container.appendChild(toast);
@@ -1316,14 +1396,14 @@
         document.getElementById(`view-${t}`).classList.add('hidden');
         const btn = document.getElementById(`tab-btn-${t}`);
         if (btn) {
-          btn.className = 'tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+          btn.className = 'tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
         }
       });
 
       document.getElementById(`view-${tabName}`).classList.remove('hidden');
       const activeBtn = document.getElementById(`tab-btn-${tabName}`);
       if (activeBtn) {
-        activeBtn.className = 'tab-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-white dark:bg-slate-900 text-bi-navy dark:text-white shadow-sm';
+        activeBtn.className = 'tab-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-white dark:bg-[#111827] text-[#002F6C] dark:text-white shadow-[0_1px_2px_rgba(15,23,42,0.06)]';
       }
 
       document.querySelectorAll('.bn-btn[data-t]').forEach(b => b.classList.toggle('active', b.dataset.t === tabName));
@@ -1371,12 +1451,12 @@
       const mobTotalPhysical = document.getElementById('mobTotalPhysical');
       const mobTotalSystem = document.getElementById('mobTotalSystem');
 
-      if (mobProgressText) mobProgressText.textContent = `${verifiedCount}/${totalSku} SKU`;
+      if (mobProgressText) mobProgressText.textContent = `${verifiedCount} / ${totalSku} SKU`;
       if (mobPctBadge) {
         mobPctBadge.textContent = `${pct}%`;
         mobPctBadge.className = pct === 100 && totalSku > 0
-          ? 'px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-          : 'px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-bi-light text-bi-navy dark:bg-blue-950 dark:text-blue-300';
+          ? 'px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums bg-emerald-50 text-[#059669] dark:bg-emerald-950/60 dark:text-[#34D399]'
+          : 'px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums bg-[#E6F0FA] text-[#002F6C] dark:bg-sky-950/70 dark:text-[#38BDF8]';
       }
       if (mobProgressBar) mobProgressBar.style.width = `${pct}%`;
       if (mobTotalPhysical) mobTotalPhysical.textContent = totalPhysical.toLocaleString('id-ID');
@@ -1387,10 +1467,10 @@
       const mobFinLabel = document.getElementById('mobileFinalizeLabel');
       if (mobFinBtn && mobFinLabel) {
         if (totalSku > 0 && verifiedCount === totalSku) {
-          mobFinBtn.className = 'w-full justify-center inline-flex items-center gap-2 px-4 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-lg transition';
+          mobFinBtn.className = 'w-full min-h-[48px] justify-center inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#059669] hover:bg-emerald-700 text-white text-xs font-extrabold shadow-card transition';
           mobFinLabel.textContent = 'Semua Tercek • Sahkan Berita Acara';
         } else {
-          mobFinBtn.className = 'w-full justify-center inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-bi-navy hover:bg-bi-dark text-white text-xs font-bold shadow-md transition';
+          mobFinBtn.className = 'w-full min-h-[48px] justify-center inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] text-white text-xs font-bold shadow-card transition';
           mobFinLabel.textContent = 'Finalisasi Berita Acara Opname';
         }
       }
@@ -1415,12 +1495,27 @@
 
     document.addEventListener('click', closeAllCardMenus);
 
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      renderInventoryTable();
+    }
+
     /**
      * Render Master Inventory & Inline Opname Table
      */
     function renderInventoryTable() {
       const tbody = document.getElementById('inventoryTableBody');
-      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const searchInputEl = document.getElementById('searchInput');
+      const search = searchInputEl ? searchInputEl.value.toLowerCase().trim() : '';
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', search.length === 0);
+      }
+
       const catFilter = document.getElementById('categoryFilter').value;
       const statusFilter = document.getElementById('statusFilter').value;
       updateStatusChips();
@@ -1451,7 +1546,7 @@
           <tr>
             <td colspan="8" class="py-12 text-center text-slate-400">
               <i data-lucide="${allChecked ? 'circle-check-big' : 'package-search'}" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
-              <p class="font-semibold">${emptyMsg}</p>
+              <p class="font-semibold text-sm text-slate-500 dark:text-slate-400">${emptyMsg}</p>
             </td>
           </tr>
         `;
@@ -1463,132 +1558,155 @@
       tbody.innerHTML = filtered.map(item => {
         const variance = item.physicalStock - item.systemStock;
         const safeId = escapeHtml(item.id);
-        const rowClass = item.physicalStock === 0
-          ? 'row-empty'
-          : (item.physicalStock <= item.minStock ? 'row-low' : (item.verified ? 'row-verified' : ''));
+        const rowClass = [
+          item.physicalStock === 0 ? 'row-empty' : (item.physicalStock <= item.minStock ? 'row-low' : ''),
+          item.verified ? 'row-verified' : ''
+        ].filter(Boolean).join(' ');
 
         let varianceBadge = '';
         if (variance === 0) {
-          varianceBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"><i data-lucide="check" class="w-3 h-3"></i> Sesuai</span>`;
+          varianceBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums bg-emerald-50 text-[#059669] dark:bg-emerald-950/60 dark:text-[#34D399]"><i data-lucide="check" class="w-3 h-3"></i> Sesuai</span>`;
         } else if (variance < 0) {
-          varianceBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">${variance} ${escapeHtml(item.unit)}</span>`;
+          varianceBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums bg-rose-50 text-[#E11D48] dark:bg-rose-950/60 dark:text-[#FB7185]">${variance} ${escapeHtml(item.unit)}</span>`;
         } else {
-          varianceBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">+${variance} ${escapeHtml(item.unit)}</span>`;
+          varianceBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums bg-sky-50 text-[#005596] dark:bg-sky-950/60 dark:text-[#38BDF8]">+${variance} ${escapeHtml(item.unit)}</span>`;
         }
 
         let stockStatusBadge = '';
         if (item.physicalStock === 0) {
-          stockStatusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] md:text-[11px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200">Habis</span>`;
+          stockStatusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-[#E11D48] dark:bg-rose-950/60 dark:text-[#FB7185] border border-rose-200/70 dark:border-rose-800/50">Habis</span>`;
         } else if (item.physicalStock <= item.minStock) {
-          stockStatusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] md:text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">Menipis</span>`;
+          stockStatusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-[#D97706] dark:bg-amber-950/60 dark:text-[#FBBF24] border border-amber-200/70 dark:border-amber-800/50">Menipis</span>`;
         } else {
-          stockStatusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] md:text-[11px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">Aman</span>`;
+          stockStatusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50/70 text-[#059669] dark:bg-emerald-950/40 dark:text-[#34D399] border border-emerald-200/60 dark:border-emerald-800/40">Aman</span>`;
         }
 
-        const verifyBtnClass = item.verified
-          ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-          : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600';
+        const desktopVerifyBtnClass = item.verified
+          ? 'bg-[#059669] text-white border-[#059669] shadow-sm'
+          : 'bg-white dark:bg-[#1E293B] text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-700 hover:border-[#059669] hover:text-[#059669] dark:hover:border-[#34D399] dark:hover:text-[#34D399]';
+
+        const mobileVerifyBtnClass = item.verified
+          ? 'bg-[#059669] hover:bg-emerald-700 text-white border-[#059669] shadow-sm'
+          : 'bg-white dark:bg-[#1E293B] text-slate-700 dark:text-slate-200 border-slate-200/90 dark:border-slate-700 hover:border-[#059669] hover:text-[#059669]';
+
+        const stepperWrapClass = variance !== 0
+          ? 'border-amber-400/90 dark:border-amber-500/70 bg-amber-50/50 dark:bg-amber-950/25 ring-2 ring-amber-400/15'
+          : 'border-slate-200/90 dark:border-slate-700 bg-white dark:bg-[#111827]';
 
         return `
-          <tr class="${rowClass} hover:bg-slate-50/90 dark:hover:bg-slate-800/40 transition">
-            <td class="py-3.5 px-4 text-center hidden md:table-cell">
-              <button type="button" onclick="toggleVerified('${safeId}')" title="${item.verified ? 'Sudah dicek fisik' : 'Tandai sudah dicek fisik'}" class="w-7 h-7 rounded-lg border inline-flex items-center justify-center transition ${verifyBtnClass}">
+          <tr class="${rowClass} md:hover:bg-blue-50/30 md:dark:hover:bg-slate-800/40 transition-colors">
+            <!-- Desktop Verify Checkbox Column -->
+            <td class="py-4 px-4 text-center hidden md:table-cell">
+              <button type="button" onclick="toggleVerified('${safeId}')" title="${item.verified ? 'Sudah dicek fisik' : 'Tandai sudah dicek fisik'}" aria-label="${item.verified ? 'Sudah dicek fisik' : 'Tandai sudah dicek fisik'}" class="w-8 h-8 rounded-xl border inline-flex items-center justify-center transition ${desktopVerifyBtnClass}">
                 <i data-lucide="check" class="w-4 h-4 stroke-[2.5]"></i>
               </button>
             </td>
 
-            <td class="py-3.5 px-3">
-              <div class="flex items-start justify-between gap-2">
-                <div class="min-w-0">
-                  <div class="flex items-center gap-1.5">
-                    <span class="font-mono text-[11px] font-bold text-bi-blue dark:text-blue-400">${escapeHtml(item.sku)}</span>
-                  </div>
-                  <div class="font-bold text-slate-900 dark:text-white mt-0.5 leading-snug">${escapeHtml(item.name)}</div>
+            <!-- Zona Atas (Mobile) / Kode & Nama Souvenir (Desktop) -->
+            <td class="py-4 px-4">
+              <!-- Baris 1 Mobile: SKU + Status Badge + Menu Titik Tiga -->
+              <div class="flex items-center justify-between gap-2 md:block">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="font-mono text-xs md:text-[11.5px] font-bold text-[#005596] dark:text-[#38BDF8] truncate">${escapeHtml(item.sku)}</span>
+                  <span class="md:hidden shrink-0">${stockStatusBadge}</span>
                 </div>
 
-                <!-- Mobile Status Badge + Menu Titik Tiga (Edit & Hapus) -->
-                <div class="md:hidden shrink-0 flex items-center gap-1 relative">
-                  ${stockStatusBadge}
-                  <button type="button" onclick="toggleCardMenu(event, '${safeId}')" aria-label="Opsi item ${escapeHtml(item.name)}" class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
-                    <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                <!-- Mobile Menu Titik Tiga (Edit & Hapus) -->
+                <div class="md:hidden shrink-0 relative -mr-1">
+                  <button type="button" onclick="toggleCardMenu(event, '${safeId}')" aria-label="Opsi item ${escapeHtml(item.name)}" class="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i data-lucide="more-vertical" class="w-[18px] h-[18px]"></i>
                   </button>
-                  <div id="card-menu-${safeId}" onclick="event.stopPropagation()" class="card-dropdown-menu hidden absolute right-0 top-8 z-20 w-40 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl py-1 text-xs">
-                    <button type="button" onclick="closeAllCardMenus(); openItemModal('${safeId}')" class="w-full px-3.5 py-2.5 text-left font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/70 flex items-center gap-2">
-                      <i data-lucide="pencil" class="w-3.5 h-3.5 text-bi-blue"></i>
+                  <div id="card-menu-${safeId}" onclick="event.stopPropagation()" class="card-dropdown-menu hidden absolute right-0 top-10 z-20 w-44 rounded-xl bg-white dark:bg-[#1E293B] border border-slate-200/90 dark:border-slate-700 shadow-xl py-1.5 text-xs">
+                    <button type="button" onclick="closeAllCardMenus(); openItemModal('${safeId}')" class="w-full px-3.5 py-2.5 text-left font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/70 flex items-center gap-2.5">
+                      <i data-lucide="pencil" class="w-3.5 h-3.5 text-[#005596] dark:text-[#38BDF8]"></i>
                       Edit Souvenir
                     </button>
-                    <button type="button" onclick="closeAllCardMenus(); confirmDeleteItem('${safeId}')" class="w-full px-3.5 py-2.5 text-left font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-2">
+                    <button type="button" onclick="closeAllCardMenus(); confirmDeleteItem('${safeId}')" class="w-full px-3.5 py-2.5 text-left font-semibold text-[#E11D48] dark:text-[#FB7185] hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-2.5">
                       <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                       Hapus Item
                     </button>
                   </div>
                 </div>
               </div>
+
+              <!-- Baris 2: Nama Souvenir -->
+              <div class="font-bold text-[15px] md:text-[14px] text-slate-900 dark:text-white mt-1 leading-snug">
+                ${escapeHtml(item.name)}
+              </div>
             </td>
 
-            <td class="py-3.5 px-3 mt-1 md:mt-0">
-              <div class="flex flex-wrap items-center gap-1.5 md:block">
-                <span class="inline-block px-2 py-0.5 rounded-md text-[10px] md:text-[11px] font-semibold bg-bi-light text-bi-navy dark:bg-blue-950 dark:text-blue-200">
+            <!-- Metadata Kategori & Lokasi -->
+            <td class="py-4 px-4 mt-1.5 md:mt-0">
+              <div class="flex flex-wrap items-center gap-x-2 gap-y-1 md:block">
+                <span class="inline-block px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#E6F0FA] text-[#002F6C] dark:bg-sky-950/60 dark:text-sky-200">
                   ${escapeHtml(item.category)}
                 </span>
-                <div class="text-[11px] text-slate-500 dark:text-slate-400 md:mt-1 flex items-center gap-1">
-                  <i data-lucide="map-pin" class="w-3 h-3 shrink-0"></i>
+                <div class="text-[11.5px] font-medium text-slate-500 dark:text-slate-400 md:mt-1.5 flex items-center gap-1 min-w-0">
+                  <i data-lucide="map-pin" class="w-3.5 h-3.5 shrink-0 text-slate-400"></i>
                   <span class="truncate">${escapeHtml(item.location)}</span>
                 </div>
               </div>
             </td>
 
-            <td class="py-3.5 px-3 text-center hidden md:table-cell">
-              <span class="font-bold text-sm text-slate-700 dark:text-slate-200">${item.systemStock}</span>
-              <span class="text-[11px] text-slate-400 block">${escapeHtml(item.unit)}</span>
+            <!-- Desktop Saldo Buku -->
+            <td class="py-4 px-4 text-center hidden md:table-cell">
+              <span class="font-bold tabular-nums text-sm text-slate-800 dark:text-slate-100">${item.systemStock}</span>
+              <span class="text-[11px] font-medium text-slate-400 block">${escapeHtml(item.unit)}</span>
             </td>
 
-            <td class="py-3.5 px-3 text-center mt-2 md:mt-0">
-              <!-- Mobile Compact Metric Strip -->
-              <div class="grid md:hidden grid-cols-[auto_1fr_auto] items-center gap-x-2 px-2.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/70">
-                <div class="text-left">
-                  <span class="block text-[10px] uppercase font-bold text-slate-400 leading-none mb-1 whitespace-nowrap">Buku</span>
-                  <span class="font-bold text-sm whitespace-nowrap">${item.systemStock} <span class="text-[11px] font-normal text-slate-500">${escapeHtml(item.unit)}</span></span>
+            <!-- Zona Tengah (Mobile Hitung Fisik) & Desktop Stepper -->
+            <td class="py-4 px-4 text-center mt-3 md:mt-0">
+              <!-- Mobile Warehouse Ergonomic Counting Well -->
+              <div class="flex md:hidden items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-[#1E293B]/70 border border-slate-200/70 dark:border-slate-700/60">
+                <!-- Kiri: Saldo Buku & Selisih -->
+                <div class="text-left min-w-0 space-y-1.5">
+                  <div>
+                    <span class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-none">Saldo Buku</span>
+                    <div class="mt-1 font-extrabold tabular-nums text-[15px] text-slate-900 dark:text-white leading-tight whitespace-nowrap">
+                      ${item.systemStock} <span class="text-xs font-medium text-slate-500 dark:text-slate-400">${escapeHtml(item.unit)}</span>
+                    </div>
+                  </div>
+                  <div class="pt-0.5">${varianceBadge}</div>
                 </div>
-                <div class="flex flex-col items-center">
-                  <span class="block text-[10px] uppercase font-bold text-slate-400 leading-none mb-1 whitespace-nowrap">Stok Fisik</span>
-                  <div class="inline-flex items-center rounded-xl border ${variance !== 0 ? 'border-amber-400 bg-amber-50/60 dark:bg-amber-950/30' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'} overflow-hidden">
-                    <button type="button" aria-label="Kurangi stok fisik" data-f="${safeId}-m-mob" onclick="adjustPhysicalInline('${safeId}', -1)" class="px-3.5 py-2 text-base leading-none font-bold text-slate-600 dark:text-slate-300">-</button>
-                    <input type="number" min="0" value="${item.physicalStock}" aria-label="Stok fisik ${escapeHtml(item.name)}" data-f="${safeId}-i-mob" inputmode="numeric" onfocus="this.select()" onblur="setPhysicalInline('${safeId}', this.value)" onchange="setPhysicalInline('${safeId}', this.value)" class="w-11 text-center font-extrabold text-sm bg-transparent outline-none" />
-                    <button type="button" aria-label="Tambah stok fisik" data-f="${safeId}-p-mob" onclick="adjustPhysicalInline('${safeId}', 1)" class="px-3.5 py-2 text-base leading-none font-bold text-slate-600 dark:text-slate-300">+</button>
+
+                <!-- Kanan: Kontrol Stok Fisik (>= 44x44px touch targets) -->
+                <div class="flex flex-col items-end shrink-0">
+                  <span class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-none mb-1.5">Stok Fisik</span>
+                  <div class="inline-flex items-center rounded-xl border ${stepperWrapClass} overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+                    <button type="button" aria-label="Kurangi stok fisik ${escapeHtml(item.name)}" data-f="${safeId}-m-mob" onclick="adjustPhysicalInline('${safeId}', -1)" class="min-w-[44px] h-[44px] flex items-center justify-center text-lg font-bold text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 active:bg-slate-200/70 dark:active:bg-slate-700 transition">−</button>
+                    <input type="number" min="0" value="${item.physicalStock}" aria-label="Stok fisik ${escapeHtml(item.name)}" data-f="${safeId}-i-mob" inputmode="numeric" onfocus="this.select()" onblur="setPhysicalInline('${safeId}', this.value)" onchange="setPhysicalInline('${safeId}', this.value)" class="stepper-input w-[52px] h-[44px] text-center font-extrabold text-base tabular-nums text-slate-900 dark:text-white bg-transparent outline-none" />
+                    <button type="button" aria-label="Tambah stok fisik ${escapeHtml(item.name)}" data-f="${safeId}-p-mob" onclick="adjustPhysicalInline('${safeId}', 1)" class="min-w-[44px] h-[44px] flex items-center justify-center text-lg font-bold text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 active:bg-slate-200/70 dark:active:bg-slate-700 transition">+</button>
                   </div>
                 </div>
-                <div class="flex flex-col items-end">
-                  <span class="block text-[10px] uppercase font-bold text-slate-400 leading-none mb-1 whitespace-nowrap">Selisih</span>
-                  <div>${varianceBadge}</div>
-                </div>
               </div>
 
-              <!-- Desktop Stepper -->
-              <div class="hidden md:inline-flex items-center rounded-xl border ${variance !== 0 ? 'border-amber-400 bg-amber-50/40 dark:bg-amber-950/20' : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800'} overflow-hidden">
-                <button type="button" data-f="${safeId}-m" onclick="adjustPhysicalInline('${safeId}', -1)" class="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold">-</button>
-                <input type="number" min="0" value="${item.physicalStock}" data-f="${safeId}-i" inputmode="numeric" onfocus="this.select()" onblur="setPhysicalInline('${safeId}', this.value)" onchange="setPhysicalInline('${safeId}', this.value)" class="w-14 text-center font-bold text-xs bg-transparent outline-none py-1.5" />
-                <button type="button" data-f="${safeId}-p" onclick="adjustPhysicalInline('${safeId}', 1)" class="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold">+</button>
+              <!-- Desktop Integrated Pill Stepper -->
+              <div class="hidden md:inline-flex items-center rounded-xl border ${stepperWrapClass} overflow-hidden transition">
+                <button type="button" aria-label="Kurangi stok fisik" data-f="${safeId}-m" onclick="adjustPhysicalInline('${safeId}', -1)" class="w-8 h-9 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-sm transition">−</button>
+                <input type="number" min="0" value="${item.physicalStock}" aria-label="Stok fisik ${escapeHtml(item.name)}" data-f="${safeId}-i" inputmode="numeric" onfocus="this.select()" onblur="setPhysicalInline('${safeId}', this.value)" onchange="setPhysicalInline('${safeId}', this.value)" class="stepper-input w-14 h-9 text-center font-bold tabular-nums text-[13px] text-slate-900 dark:text-white bg-transparent outline-none" />
+                <button type="button" aria-label="Tambah stok fisik" data-f="${safeId}-p" onclick="adjustPhysicalInline('${safeId}', 1)" class="w-8 h-9 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-sm transition">+</button>
               </div>
             </td>
 
-            <td class="py-3.5 px-3 text-center hidden md:table-cell">${varianceBadge}</td>
-            <td class="py-3.5 px-3 text-center hidden md:table-cell">${stockStatusBadge}</td>
+            <!-- Desktop Selisih & Status -->
+            <td class="py-4 px-4 text-center hidden md:table-cell">${varianceBadge}</td>
+            <td class="py-4 px-4 text-center hidden md:table-cell">${stockStatusBadge}</td>
 
-            <td class="cell-actions py-3.5 px-4 text-right border-t border-slate-100 dark:border-slate-800 md:border-0 md:mt-0 md:pt-3.5">
-              <div class="flex md:inline-flex items-center gap-1.5">
-                <button type="button" onclick="toggleVerified('${safeId}')" class="md:hidden px-3 py-1.5 rounded-xl border text-xs font-bold inline-flex items-center gap-1 transition ${verifyBtnClass}">
-                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                  <span>${item.verified ? 'Tercek' : 'Cek'}</span>
+            <!-- Zona Bawah (Mobile Aksi 1-Ketuk) & Desktop Actions -->
+            <td class="cell-actions py-4 px-4 text-right border-t border-slate-100 dark:border-slate-800/80 md:border-0 md:mt-0 md:pt-4">
+              <div class="flex md:inline-flex items-center gap-2 md:gap-1">
+                <button type="button" onclick="toggleVerified('${safeId}')" class="md:hidden flex-[1.35] min-h-[44px] justify-center px-3.5 py-2.5 rounded-xl border text-xs font-bold inline-flex items-center gap-1.5 transition ${mobileVerifyBtnClass}">
+                  <i data-lucide="check" class="w-4 h-4 stroke-[2.5]"></i>
+                  <span>${item.verified ? 'Sudah Tercek' : 'Tandai Tercek'}</span>
                 </button>
-                <button type="button" onclick="openMutationModal('OUT', '${safeId}')" title="Distribusi Kegiatan" class="flex-1 md:flex-initial justify-center inline-flex items-center gap-1.5 px-3 py-1.5 md:p-2 rounded-xl md:rounded-lg border md:border-0 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/50 md:bg-transparent md:dark:bg-transparent hover:bg-blue-100 dark:hover:bg-blue-950 text-bi-blue dark:text-blue-300 md:dark:text-blue-400 font-semibold text-xs transition">
+                <button type="button" onclick="openMutationModal('OUT', '${safeId}')" title="Distribusi Kegiatan" class="flex-1 md:flex-initial min-h-[44px] md:min-h-0 justify-center inline-flex items-center gap-1.5 px-3.5 py-2.5 md:p-2 rounded-xl md:rounded-lg bg-slate-100 hover:bg-slate-200/80 dark:bg-[#1E293B] dark:hover:bg-slate-700 md:bg-transparent md:dark:bg-transparent md:hover:bg-[#E6F0FA] md:dark:hover:bg-sky-950/60 text-[#002F6C] dark:text-[#38BDF8] font-semibold text-xs transition">
                   <i data-lucide="send" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                   <span class="md:hidden">Distribusi</span>
                 </button>
-                <button type="button" onclick="openItemModal('${safeId}')" title="Edit Souvenir" class="hidden md:inline-flex p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition">
+                <button type="button" onclick="openItemModal('${safeId}')" title="Edit Souvenir" class="hidden md:inline-flex p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 transition">
                   <i data-lucide="pencil" class="w-4 h-4"></i>
                 </button>
-                <button type="button" onclick="confirmDeleteItem('${safeId}')" title="Hapus Item" class="hidden md:inline-flex p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950 text-rose-600 transition">
+                <button type="button" onclick="confirmDeleteItem('${safeId}')" title="Hapus Item" class="hidden md:inline-flex p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/60 text-slate-400 hover:text-[#E11D48] dark:hover:text-[#FB7185] transition">
                   <i data-lucide="trash-2" class="w-4 h-4"></i>
                 </button>
               </div>
@@ -1664,19 +1782,19 @@
         LOW: items.filter(i => i.physicalStock <= i.minStock).length
       };
       const current = document.getElementById('statusFilter').value;
-      const base = 'shrink-0 inline-flex items-center gap-1.5 pl-3 pr-2 h-8 rounded-full border text-xs font-semibold whitespace-nowrap transition';
+      const base = 'shrink-0 inline-flex items-center gap-1.5 pl-3.5 pr-2 h-9 rounded-full border text-xs font-semibold whitespace-nowrap transition';
       wrap.querySelectorAll('button[data-s]').forEach(btn => {
         const key = btn.dataset.s;
         const active = key === current;
         btn.className = base + (active
-          ? ' bg-bi-navy text-white border-bi-navy dark:bg-blue-600 dark:border-blue-600'
-          : ' bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700');
+          ? ' bg-[#002F6C] text-white border-[#002F6C] dark:bg-[#0F294A] dark:border-[#38BDF8]/40 shadow-card'
+          : ' bg-white dark:bg-[#111827] text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-slate-800/80');
         btn.setAttribute('aria-pressed', active ? 'true' : 'false');
         const badge = btn.querySelector('.chip-count');
         badge.textContent = counts[key];
-        badge.className = 'chip-count min-w-[1.2rem] px-1.5 py-0.5 rounded-full text-[10px] font-bold text-center ' + (active
+        badge.className = 'chip-count min-w-[1.3rem] px-1.5 py-0.5 rounded-full text-[10.5px] font-bold tabular-nums text-center ' + (active
           ? 'bg-white/20 text-white'
-          : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200');
+          : 'bg-slate-100 dark:bg-[#1E293B] text-slate-600 dark:text-slate-300');
       });
     }
 
@@ -1823,7 +1941,7 @@
       if (itemId) {
         const item = appState.items.find(i => i.id === itemId);
         if (!item) return;
-        document.getElementById('itemModalTitle').innerHTML = `<i data-lucide="pencil" class="w-4 h-4 text-bi-gold"></i> Edit Master Souvenir`;
+        document.getElementById('itemModalTitle').innerHTML = `<i data-lucide="pencil" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i> Edit Master Souvenir`;
         document.getElementById('editItemId').value = item.id;
         document.getElementById('itemSku').value = item.sku;
         document.getElementById('itemCategory').value = item.category;
@@ -1833,7 +1951,7 @@
         document.getElementById('itemUnit').value = item.unit;
         document.getElementById('itemLocation').value = item.location;
       } else {
-        document.getElementById('itemModalTitle').innerHTML = `<i data-lucide="package-plus" class="w-4 h-4 text-bi-gold"></i> Tambah Item Souvenir Baru`;
+        document.getElementById('itemModalTitle').innerHTML = `<i data-lucide="package-plus" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i> Tambah Item Souvenir Baru`;
         const nextNum = String(appState.items.length + 1).padStart(3, '0');
         document.getElementById('itemSku').value = `SVN-BI-${nextNum}`;
       }
@@ -1903,33 +2021,6 @@
     /**
      * Mutation Modal & Live Stock Calculator
      */
-    const BULAN_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-
-    // "2026-11-15" -> "15 November 2026" (data tersimpan tetap format ISO)
-    function formatTanggalID(iso) {
-      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
-      if (!m) return iso ? String(iso) : '';
-      const month = parseInt(m[2], 10) - 1;
-      if (month < 0 || month > 11) return String(iso);
-      return `${parseInt(m[3], 10)} ${BULAN_ID[month]} ${m[1]}`;
-    }
-
-    // Tanggal hari ini menurut jam perangkat (toISOString memakai UTC sehingga pagi hari WIB bisa mundur 1 hari)
-    function todayLocalISO() {
-      const d = new Date();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${d.getFullYear()}-${mm}-${dd}`;
-    }
-
-    function updateMutDateDisplay() {
-      const val = document.getElementById('mutDate').value;
-      const el = document.getElementById('mutDateText');
-      if (!el) return;
-      el.textContent = val ? formatTanggalID(val) : 'Pilih tanggal';
-      el.classList.toggle('text-slate-400', !val);
-    }
-
     function openMutationModal(defaultType = 'OUT', preselectItemId = null) {
       const select = document.getElementById('mutItemId');
       if (appState.items.length === 0) {
@@ -1946,8 +2037,7 @@
       const radio = document.querySelector(`input[name="mutType"][value="${defaultType}"]`);
       if (radio) radio.checked = true;
       document.getElementById('mutQty').value = '';
-      document.getElementById('mutDate').value = todayLocalISO();
-      updateMutDateDisplay();
+      document.getElementById('mutDate').value = new Date().toISOString().split('T')[0];
       document.getElementById('mutActivity').value = '';
       document.getElementById('mutPic').value = '';
       updateMutationPreview();
@@ -1981,15 +2071,15 @@
       submitBtn.disabled = isInvalid;
       if (isInvalid) {
         previewBox.innerHTML = `
-          <span class="text-rose-600 font-bold flex items-center gap-1.5">
-            <i data-lucide="alert-circle" class="w-4 h-4"></i>
+          <span class="text-[#E11D48] dark:text-[#FB7185] font-bold flex items-center gap-1.5">
+            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
             Stok tidak cukup! (Tersedia: ${item.systemStock} ${escapeHtml(item.unit)})
           </span>
         `;
       } else {
         previewBox.innerHTML = `
-          <span class="text-slate-500">Saldo saat ini: <strong>${item.systemStock} ${escapeHtml(item.unit)}</strong></span>
-          <span class="font-bold ${type === 'OUT' ? 'text-rose-600' : 'text-emerald-600'}">
+          <span class="text-slate-500 dark:text-slate-400">Saldo saat ini: <strong class="text-slate-800 dark:text-slate-100">${item.systemStock} ${escapeHtml(item.unit)}</strong></span>
+          <span class="font-bold ${type === 'OUT' ? 'text-[#E11D48] dark:text-[#FB7185]' : 'text-[#059669] dark:text-[#34D399]'}">
             Estimasi akhir: ${projected} ${escapeHtml(item.unit)}
           </span>
         `;
@@ -2059,46 +2149,49 @@
       tbody.innerHTML = filtered.map(m => {
         let badge = '';
         if (m.type === 'OUT') {
-          badge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">Keluar</span>`;
+          badge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-[#E11D48] dark:bg-rose-950/60 dark:text-[#FB7185] border border-rose-200/70 dark:border-rose-800/50"><i data-lucide="arrow-up-right" class="w-3 h-3"></i> Keluar</span>`;
         } else if (m.type === 'IN') {
-          badge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">Masuk</span>`;
+          badge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-[#059669] dark:bg-emerald-950/60 dark:text-[#34D399] border border-emerald-200/70 dark:border-emerald-800/50"><i data-lucide="arrow-down-left" class="w-3 h-3"></i> Masuk</span>`;
         } else {
-          badge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">Opname</span>`;
+          badge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200/70 dark:border-purple-800/50"><i data-lucide="sliders-horizontal" class="w-3 h-3"></i> Opname</span>`;
         }
 
         const isNegative = m.type === 'OUT' || String(m.qty).startsWith('-');
         const prefix = m.type === 'OUT' ? '-' : (m.type === 'IN' ? '+' : '');
+        const qtyColor = isNegative ? 'text-[#E11D48] dark:text-[#FB7185]' : 'text-[#059669] dark:text-[#34D399]';
 
         return `
-          <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
-            <td class="py-3.5 px-4 font-mono text-[11px] text-slate-500 whitespace-nowrap">
+          <tr class="md:hover:bg-blue-50/30 md:dark:hover:bg-slate-800/40 transition-colors">
+            <td class="py-4 px-4 font-mono tabular-nums text-[11.5px] font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
               <div class="flex items-center justify-between md:block">
-                <span>${escapeHtml(formatTanggalID(m.date))}</span>
+                <span>${escapeHtml(m.date)}</span>
                 <span class="md:hidden">${badge}</span>
               </div>
             </td>
-            <td class="py-3.5 px-3 hidden md:table-cell">${badge}</td>
-            <td class="py-3.5 px-3 mt-1.5 md:mt-0">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <div class="font-bold text-slate-900 dark:text-white">${escapeHtml(m.itemName)}</div>
-                  <div class="text-[11px] font-mono text-slate-500">${escapeHtml(m.itemSku)}</div>
+            <td class="py-4 px-4 hidden md:table-cell">${badge}</td>
+            <td class="py-4 px-4 mt-2 md:mt-0">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="font-bold text-[14.5px] md:text-[13.5px] text-slate-900 dark:text-white leading-snug">${escapeHtml(m.itemName)}</div>
+                  <div class="text-[11px] font-mono font-semibold text-[#005596] dark:text-[#38BDF8] mt-0.5">${escapeHtml(m.itemSku)}</div>
                 </div>
-                <span class="md:hidden font-extrabold text-base ${isNegative ? 'text-rose-600' : 'text-emerald-600'}">
+                <span class="md:hidden font-extrabold tabular-nums text-base shrink-0 ${qtyColor}">
                   ${prefix}${escapeHtml(m.qty)}
                 </span>
               </div>
             </td>
-            <td class="py-3.5 px-3 text-center font-bold hidden md:table-cell ${isNegative ? 'text-rose-600' : 'text-emerald-600'}">
+            <td class="py-4 px-4 text-center font-extrabold tabular-nums hidden md:table-cell ${qtyColor}">
               ${prefix}${escapeHtml(m.qty)}
             </td>
-            <td class="py-3.5 px-3 text-slate-700 dark:text-slate-300 mt-1.5 md:mt-0">${escapeHtml(m.activity)}</td>
-            <td class="py-3.5 px-4 font-semibold text-xs text-slate-500 dark:text-slate-400 mt-1 md:mt-0">
-              <span class="md:hidden text-slate-400 font-normal">PIC: </span>${escapeHtml(m.pic)}
+            <td class="py-4 px-4 text-slate-700 dark:text-slate-300 mt-2 md:mt-0 leading-relaxed">${escapeHtml(m.activity)}</td>
+            <td class="py-4 px-4 font-semibold text-xs text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 md:border-0 md:mt-0 md:pt-4">
+              <span class="md:hidden text-slate-400 font-medium">Unit / PIC: </span>${escapeHtml(m.pic)}
             </td>
           </tr>
         `;
       }).join('');
+
+      lucide.createIcons();
     }
 
     /**
@@ -2116,11 +2209,11 @@
       const totalPhysical = items.reduce((s, i) => s + i.physicalStock, 0);
 
       document.getElementById('opnameSummaryBox').innerHTML = `
-        <div class="flex justify-between"><span>Total Item Diaudit:</span><strong>${items.length} SKU (${items.length - unverified} tercek)</strong></div>
-        <div class="flex justify-between"><span>Saldo Buku vs Stok Fisik:</span><strong>${totalSystem} unit vs ${totalPhysical} unit</strong></div>
-        <div class="flex justify-between">
-          <span>Item Memiliki Selisih:</span>
-          <strong class="${variances.length > 0 ? 'text-amber-600' : 'text-emerald-600'}">${variances.length} item</strong>
+        <div class="flex justify-between gap-2"><span class="text-slate-500 dark:text-slate-400">Total Item Diaudit</span><strong class="text-slate-900 dark:text-white">${items.length} SKU (${items.length - unverified} tercek)</strong></div>
+        <div class="flex justify-between gap-2"><span class="text-slate-500 dark:text-slate-400">Saldo Buku vs Stok Fisik</span><strong class="text-slate-900 dark:text-white">${totalSystem.toLocaleString('id-ID')} vs ${totalPhysical.toLocaleString('id-ID')} unit</strong></div>
+        <div class="flex justify-between gap-2">
+          <span class="text-slate-500 dark:text-slate-400">Item Memiliki Selisih</span>
+          <strong class="${variances.length > 0 ? 'text-[#D97706] dark:text-[#FBBF24]' : 'text-[#059669] dark:text-[#34D399]'}">${variances.length} item</strong>
         </div>
       `;
 
@@ -2134,7 +2227,7 @@
       const notes = document.getElementById('opnameNotes').value.trim();
       const shouldSync = document.getElementById('opnameSyncCheckbox').checked;
       const now = new Date();
-      const today = todayLocalISO();
+      const today = now.toISOString().split('T')[0];
       const romanMonths = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
       const seq = String(appState.reports.length + 1).padStart(3, '0');
       const docNumber = `BA-SO/BI/${romanMonths[now.getMonth()]}/${now.getFullYear()}/${seq}`;
@@ -2196,10 +2289,10 @@
       const container = document.getElementById('opnameReportsList');
       if (appState.reports.length === 0) {
         container.innerHTML = `
-          <div class="col-span-full py-12 text-center text-slate-400 bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl">
-            <i data-lucide="file-check-2" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
-            <p class="font-semibold text-sm">Belum ada Berita Acara Stock Opname yang disahkan.</p>
-            <p class="text-xs mt-1">Lakukan penghitungan fisik pada tab Stok, lalu klik "Finalisasi Berita Acara Opname".</p>
+          <div class="col-span-full py-12 px-4 text-center text-slate-400 bg-white dark:bg-[#111827] border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl">
+            <i data-lucide="file-check-2" class="w-10 h-10 mx-auto mb-2.5 opacity-50"></i>
+            <p class="font-bold text-sm text-slate-600 dark:text-slate-300">Belum ada Berita Acara Stock Opname yang disahkan.</p>
+            <p class="text-xs mt-1 text-slate-500 dark:text-slate-400">Lakukan penghitungan fisik pada tab Stok, lalu klik "Finalisasi Berita Acara Opname".</p>
           </div>
         `;
         lucide.createIcons();
@@ -2207,28 +2300,28 @@
       }
 
       container.innerHTML = appState.reports.map(rep => `
-        <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between gap-4">
+        <div class="p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#111827] shadow-card hover:shadow-cardHover transition-shadow flex flex-col justify-between gap-4">
           <div>
             <div class="flex items-center justify-between gap-2">
-              <span class="font-mono text-xs font-bold text-bi-navy dark:text-blue-400 bg-bi-light dark:bg-blue-950 px-2.5 py-1 rounded-lg">
+              <span class="font-mono text-xs font-bold text-[#002F6C] dark:text-[#38BDF8] bg-[#E6F0FA] dark:bg-sky-950/60 px-2.5 py-1 rounded-lg">
                 ${escapeHtml(rep.id)}
               </span>
-              <span class="text-xs text-slate-500 font-semibold">${escapeHtml(formatTanggalID(rep.date))}</span>
+              <span class="text-xs font-mono tabular-nums text-slate-500 dark:text-slate-400 font-semibold">${escapeHtml(rep.date)}</span>
             </div>
-            <h4 class="font-bold text-sm text-slate-900 dark:text-white mt-3">${escapeHtml(rep.unit)}</h4>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Petugas Pelaksana: <strong class="text-slate-700 dark:text-slate-200">${escapeHtml(rep.auditor)}</strong></p>
-            <p class="text-xs text-slate-600 dark:text-slate-300 mt-2 italic">"${escapeHtml(rep.notes)}"</p>
+            <h4 class="font-bold text-[15px] text-slate-900 dark:text-white mt-3 leading-snug">${escapeHtml(rep.unit)}</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Petugas Pelaksana: <strong class="text-slate-800 dark:text-slate-200">${escapeHtml(rep.auditor)}</strong></p>
+            <p class="text-xs text-slate-600 dark:text-slate-300 mt-2.5 italic leading-relaxed">"${escapeHtml(rep.notes)}"</p>
           </div>
 
-          <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div class="flex items-center gap-3">
-              <span><strong>${rep.totalSku}</strong> SKU</span>
-              <span class="${rep.varianceItemsCount > 0 ? 'text-amber-600 font-bold' : 'text-emerald-600 font-bold'}">
+          <div class="pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-2.5 tabular-nums">
+              <span class="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-[#1E293B] text-slate-700 dark:text-slate-200 font-semibold"><strong>${rep.totalSku}</strong> SKU</span>
+              <span class="px-2.5 py-1 rounded-full font-bold ${rep.varianceItemsCount > 0 ? 'bg-amber-50 text-[#D97706] dark:bg-amber-950/50 dark:text-[#FBBF24]' : 'bg-emerald-50 text-[#059669] dark:bg-emerald-950/50 dark:text-[#34D399]'}">
                 ${rep.varianceItemsCount} Selisih
               </span>
             </div>
-            <button type="button" onclick="openBeritaAcaraPreview('${escapeHtml(rep.id)}')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-bi-navy hover:bg-bi-dark text-white font-semibold transition">
-              <i data-lucide="printer" class="w-3.5 h-3.5 text-bi-gold"></i>
+            <button type="button" onclick="openBeritaAcaraPreview('${escapeHtml(rep.id)}')" class="min-h-[40px] inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white font-semibold transition">
+              <i data-lucide="printer" class="w-3.5 h-3.5 text-bi-gold dark:text-bi-goldDark"></i>
               Pratinjau & Cetak
             </button>
           </div>
@@ -2253,15 +2346,15 @@
             <div style="text-align: right;">
               <strong style="font-size: 13px; color: #002F6C;">BERITA ACARA STOCK OPNAME</strong>
               <p style="margin: 3px 0 0; font-size: 11px; color: #4B5563;">Nomor: ${escapeHtml(rep.id)}</p>
-              <p style="margin: 2px 0 0; font-size: 11px; color: #4B5563;">Tanggal: ${escapeHtml(formatTanggalID(rep.date))}</p>
+              <p style="margin: 2px 0 0; font-size: 11px; color: #4B5563;">Tanggal: ${escapeHtml(rep.date)}</p>
             </div>
           </div>
 
           <p style="font-size: 12px; line-height: 1.6; margin-bottom: 14px;">
-            Pada hari ini tanggal <strong>${escapeHtml(formatTanggalID(rep.date))}</strong>, telah dilaksanakan pemeriksaan fisik (<em>Stock Opname</em>) persediaan souvenir kegiatan/sosialisasi pada <strong>${escapeHtml(rep.unit)}</strong> dengan rincian sebagai berikut:
+            Pada hari ini tanggal <strong>${escapeHtml(rep.date)}</strong>, telah dilaksanakan pemeriksaan fisik (<em>Stock Opname</em>) persediaan souvenir kegiatan/sosialisasi pada <strong>${escapeHtml(rep.unit)}</strong> dengan rincian sebagai berikut:
           </p>
 
-          <table class="ba-official-table" style="width: 100%; border-collapse: collapse; font-size: 11px; margin: 14px 0;">
+          <table class="ba-official-table" style="width: 100%; border-collapse: collapse; font-size: 11px; margin: 14px 0; font-variant-numeric: tabular-nums;">
             <thead>
               <tr style="background: #F1F5F9;">
                 <th style="border: 1px solid #CBD5E1; padding: 8px; text-align: center; width: 32px;">No</th>

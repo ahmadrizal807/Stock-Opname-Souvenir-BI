@@ -10,12 +10,12 @@
   <!-- =================================================================== -->
   <!-- KONFIGURASI AUTO-UPDATE APK (UBAH ANGKA VERSI TIAP EDIT KE GITHUB)  -->
   <!-- =================================================================== -->
-  <meta name="app-version" content="1.0.7" />
+  <meta name="app-version" content="2.0.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
-  <title>SIM-SOUVENIR BI | Monitoring & Stock Opname Souvenir</title>
+  <title>SIM-SOUVENIR BI | Multi-Unit Monitoring & Stock Opname Souvenir</title>
 
   <!-- Dynamic PWA Manifest -->
   <link rel="manifest" id="pwaManifest" />
@@ -192,6 +192,7 @@
 
       header.app-header { padding-top: env(safe-area-inset-top); }
 
+      /* Floating Centered Modal Dialogs on Mobile */
       .responsive-modal {
         align-items: center !important;
         justify-content: center !important;
@@ -249,11 +250,11 @@
             <div class="flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:gap-2.5">
               <h1 class="font-extrabold text-[17px] md:text-lg tracking-tight leading-none whitespace-nowrap">SIM-SOUVENIR</h1>
               <span class="whitespace-nowrap text-[9.5px] leading-none tracking-[0.18em] font-bold uppercase text-blue-100/80 sm:px-2 sm:py-0.5 sm:text-[10px] sm:tracking-[0.12em] sm:text-bi-goldLight sm:bg-white/10 sm:border sm:border-white/15 sm:rounded-full">
-                BANK INDONESIA
+                KPwBI JATENG
               </span>
             </div>
             <p class="hidden sm:block text-[11.5px] text-blue-100/75 mt-1 truncate font-medium">
-              Monitoring Inventaris & Stock Opname Souvenir
+              Monitoring Inventaris & Stock Opname Souvenir Multi-Unit
             </p>
           </div>
         </div>
@@ -290,6 +291,42 @@
       </div>
     </div>
   </header>
+
+  <!-- ===================================================================== -->
+  <!-- ACTIVE WORKSPACE SWITCHER BAR (TEPAT DI BAWAH HEADER)                 -->
+  <!-- ===================================================================== -->
+  <div id="workspaceBar" class="bg-white/95 dark:bg-[#111827]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+      <button
+        type="button"
+        onclick="openUnitSwitcherModal()"
+        aria-label="Ganti Lantai dan Unit Kerja"
+        class="w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl bg-slate-50/90 hover:bg-[#E6F0FA]/60 dark:bg-[#1E293B]/75 dark:hover:bg-[#1E293B] border border-slate-200/80 dark:border-slate-700/70 transition text-left group"
+      >
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-8 h-8 rounded-lg bg-[#002F6C] dark:bg-[#0F294A] text-bi-gold dark:text-bi-goldDark flex items-center justify-center shrink-0 shadow-sm">
+            <i data-lucide="building-2" class="w-4 h-4"></i>
+          </span>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span id="wsFloorBadge" class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-[#002F6C] text-white dark:bg-[#38BDF8]/15 dark:text-[#38BDF8] shrink-0">LT 5</span>
+              <span id="wsUnitTitle" class="font-extrabold text-xs sm:text-[13px] text-slate-900 dark:text-white truncate">HUMAS</span>
+              <span id="wsUnitSubtitle" class="hidden sm:inline text-xs font-medium text-slate-500 dark:text-slate-400 truncate">• Kehumasan</span>
+            </div>
+            <p id="wsMobileSubtitle" class="sm:hidden text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Kehumasan</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="wsSkuCountBadge" class="px-2.5 py-1 rounded-full text-[11px] font-bold tabular-nums bg-[#E6F0FA] text-[#002F6C] dark:bg-sky-950/70 dark:text-[#38BDF8]">0 SKU</span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-[#111827] border border-slate-200/90 dark:border-slate-700 text-[11px] font-bold text-[#002F6C] dark:text-[#38BDF8] group-hover:border-[#005596] dark:group-hover:border-[#38BDF8] transition">
+            <span>Ganti Unit</span>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+          </span>
+        </div>
+      </button>
+    </div>
+  </div>
 
   <!-- ===================================================================== -->
   <!-- MAIN DASHBOARD CONTAINER                                              -->
@@ -439,8 +476,8 @@
       <div id="view-opname" class="p-0 md:p-6 space-y-3 md:space-y-4">
         <!-- Search & Filter Toolbar -->
         <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5 md:gap-3">
-          <div class="grid grid-cols-12 sm:flex gap-2 flex-1">
-            <div class="relative col-span-7 sm:flex-1 max-w-md">
+          <div class="grid grid-cols-12 sm:flex sm:flex-wrap gap-2 flex-1">
+            <div class="relative col-span-7 sm:flex-1 min-w-[160px] max-w-md">
               <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
               <input
                 type="text"
@@ -467,6 +504,11 @@
               <option value="Edukasi QRIS & Digital">Edukasi QRIS & Digital</option>
               <option value="Seminar & Rakor">Seminar & Rakor</option>
               <option value="Umum & Kunjungan">Umum & Kunjungan</option>
+            </select>
+
+            <!-- Filter Lantai / Unit (Khusus Mode ALL / Rekap Kantor) -->
+            <select id="unitFilter" onchange="renderInventoryTable()" class="hidden col-span-12 sm:w-auto h-11 md:h-10 px-3 text-xs font-semibold rounded-xl border border-[#005596]/30 dark:border-[#38BDF8]/30 bg-[#E6F0FA]/60 md:bg-[#E6F0FA]/50 dark:bg-sky-950/40 text-[#002F6C] dark:text-[#38BDF8] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition">
+              <option value="ALL">Semua Lantai & Unit</option>
             </select>
 
             <select id="statusFilter" onchange="renderInventoryTable()" class="hidden md:block h-10 px-3 text-xs font-medium rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-100/75 dark:bg-[#1E293B] text-slate-700 dark:text-slate-200 outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition">
@@ -606,10 +648,48 @@
   <!-- Desktop Footer -->
   <footer class="hidden md:block border-t border-slate-200/80 dark:border-slate-800/80 py-4 px-6 text-xs text-slate-500 dark:text-slate-400">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <span>SIM-SOUVENIR BI <span id="footerVersionLabel" class="font-mono text-[11px] opacity-80">v1.0.7</span> &bull; Tata Kelola Inventaris & Stock Opname Kegiatan Sosialisasi</span>
+      <span>SIM-SOUVENIR BI <span id="footerVersionLabel" class="font-mono text-[11px] opacity-80">v2.0.0</span> &bull; Multi-Unit Workspace Edition &bull; KPwBI Provinsi Jawa Tengah</span>
       <button type="button" onclick="confirmResetDemoData()" class="hover:text-[#E11D48] dark:hover:text-[#FB7185] underline underline-offset-2 transition">Reset ke Data Simulasi Awal</button>
     </div>
   </footer>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 0A: FIRST-TIME UNIT ONBOARDING                                  -->
+  <!-- ===================================================================== -->
+  <div id="unitOnboardingModal" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4 pb-12 md:pb-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] w-full max-w-md md:max-w-lg rounded-2xl max-h-[82dvh] overflow-y-auto border border-slate-200/80 dark:border-slate-800 shadow-2xl">
+      <div class="px-4 py-3.5 md:px-6 md:py-4 bg-gradient-to-r from-[#001F4D] to-[#002F6C] dark:from-[#0A192F] dark:to-[#0F294A] text-white">
+        <div class="flex items-center gap-2.5">
+          <span class="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
+            <i data-lucide="building-2" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
+          </span>
+          <div class="min-w-0">
+            <h3 class="font-extrabold text-sm md:text-[15px] leading-tight">Pilih Lantai & Unit Kerja Anda</h3>
+            <p class="text-[11px] text-blue-100/80 mt-0.5">KPwBI Provinsi Jawa Tengah • Tersimpan otomatis di perangkat ini</p>
+          </div>
+        </div>
+      </div>
+      <div id="onboardingUnitsContainer" class="p-4 md:p-5 space-y-3.5"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 0B: WORKSPACE UNIT SWITCHER                                     -->
+  <!-- ===================================================================== -->
+  <div id="unitSwitcherModal" onclick="if(event.target===this) closeModal('unitSwitcherModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 pb-12 md:pb-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] w-full max-w-md md:max-w-lg rounded-2xl max-h-[82dvh] overflow-y-auto border border-slate-200/80 dark:border-slate-800 shadow-2xl">
+      <div class="px-4 py-3 md:px-6 md:py-4 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between sticky top-0 z-10">
+        <h3 class="font-bold text-sm flex items-center gap-2">
+          <i data-lucide="layers" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
+          Ganti Workspace Unit Kerja
+        </h3>
+        <button type="button" onclick="closeModal('unitSwitcherModal')" aria-label="Tutup modal" class="w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white flex items-center justify-center transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="switcherUnitsContainer" class="p-4 md:p-5 space-y-3.5"></div>
+    </div>
+  </div>
 
   <!-- ===================================================================== -->
   <!-- MODAL 1: TAMBAH / EDIT MASTER SOUVENIR                                -->
@@ -627,10 +707,25 @@
       </div>
       <form id="itemForm" onsubmit="saveItem(event)" class="p-4 md:p-6 space-y-2.5 md:space-y-4 text-xs">
         <input type="hidden" id="editItemId" />
+
+        <!-- Info Unit Pemilik (Workspace Unit Tunggal) -->
+        <div id="itemUnitInfoBadge" class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-[#E6F0FA]/70 dark:bg-sky-950/50 border border-blue-200/70 dark:border-sky-800/50 text-[11px] font-semibold text-[#002F6C] dark:text-[#38BDF8]">
+          <span class="flex items-center gap-1.5 min-w-0">
+            <i data-lucide="building-2" class="w-3.5 h-3.5 shrink-0"></i>
+            <span id="itemUnitInfoText" class="truncate">Unit Pemilik: LT 5 • HUMAS</span>
+          </span>
+        </div>
+
+        <!-- Dropdown Lantai & Unit Pemilik (Khusus Mode ALL) -->
+        <div id="itemUnitSelectWrap" class="hidden">
+          <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Lantai & Unit Pemilik *</label>
+          <select id="itemUnitOwner" onchange="onItemUnitOwnerChange()" class="w-full h-10 py-2 px-3 pr-8 truncate rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition"></select>
+        </div>
+
         <div class="grid grid-cols-2 gap-2.5 md:gap-4">
           <div>
             <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Kode SKU *</label>
-            <input type="text" id="itemSku" required placeholder="SVN-BI-001" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] uppercase font-mono outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] focus:ring-2 focus:ring-[#005596]/15 transition" />
+            <input type="text" id="itemSku" required placeholder="SVN-HMS-001" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] uppercase font-mono outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] focus:ring-2 focus:ring-[#005596]/15 transition" />
           </div>
           <div>
             <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Kategori Kegiatan *</label>
@@ -773,7 +868,7 @@
           </div>
           <div>
             <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Satuan Kerja / Unit *</label>
-            <input type="text" id="opnameUnit" required value="KPWBI Prov. Jawa Tengah" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
+            <input type="text" id="opnameUnit" required value="KPwBI Prov. Jawa Tengah" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
         </div>
 
@@ -882,21 +977,21 @@
         <span class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-[#059669] dark:text-[#34D399] flex items-center justify-center shrink-0"><i data-lucide="check-check" class="w-4 h-4"></i></span>
         <div>
           <div class="text-slate-900 dark:text-white">Tandai Semua Tercek</div>
-          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Centang selesai audit untuk seluruh item</div>
+          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Centang selesai audit untuk item unit aktif</div>
         </div>
       </button>
       <button type="button" onclick="sheetGo(() => confirmSyncAll())" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-left transition">
         <span class="w-10 h-10 rounded-xl bg-[#E6F0FA] dark:bg-sky-950/60 text-[#005596] dark:text-[#38BDF8] flex items-center justify-center shrink-0"><i data-lucide="equal" class="w-4 h-4"></i></span>
         <div>
           <div class="text-slate-900 dark:text-white">Samakan Fisik = Sistem</div>
-          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Isi semua stok fisik mengikuti saldo buku</div>
+          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Isi stok fisik unit aktif mengikuti saldo buku</div>
         </div>
       </button>
       <button type="button" onclick="sheetGo(() => confirmMarkAll(false))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-left transition">
         <span class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></span>
         <div>
           <div class="text-slate-900 dark:text-white">Reset Centang Audit</div>
-          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Hapus tanda cek tanpa mengubah angka stok</div>
+          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Hapus tanda cek unit aktif tanpa ubah angka stok</div>
         </div>
       </button>
     </div>
@@ -923,7 +1018,7 @@
         <span class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-[#C59B27] dark:text-[#D4AF37] flex items-center justify-center shrink-0"><i data-lucide="plus" class="w-4 h-4"></i></span>
         <div>
           <div class="text-slate-900 dark:text-white">Tambah Master Souvenir</div>
-          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Daftarkan jenis/SKU souvenir baru</div>
+          <div class="text-[11px] font-normal text-slate-500 dark:text-slate-400">Daftarkan jenis/SKU souvenir baru untuk unit aktif</div>
         </div>
       </button>
     </div>
@@ -931,17 +1026,17 @@
     <!-- Panduan Cara Pakai -->
     <div id="helpSheet" class="sheet-panel hidden w-full md:max-w-md max-h-[88vh] overflow-y-auto bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 pb-[calc(1.75rem+env(safe-area-inset-bottom))] md:pb-5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl">
       <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
-      <h4 class="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">Cara Pakai Stock Opname</h4>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Ikuti langkah ini saat menghitung souvenir di gudang.</p>
+      <h4 class="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">Cara Pakai Stock Opname Multi-Unit</h4>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Ikuti langkah ini saat menghitung souvenir di gudang unit Anda.</p>
 
       <ol class="mt-4 space-y-3.5 text-sm">
         <li class="flex gap-3">
           <span class="shrink-0 w-7 h-7 rounded-full bg-[#002F6C] dark:bg-[#0F294A] text-white text-xs font-bold flex items-center justify-center tabular-nums">1</span>
-          <div><div class="font-bold text-slate-900 dark:text-white">Hitung barang di gudang</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Hitung jumlah souvenir yang benar-benar ada di rak.</div></div>
+          <div><div class="font-bold text-slate-900 dark:text-white">Pastikan Unit Kerja Aktif</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Cek bar <b>Lantai & Unit</b> di bawah header. Ketuk <b>Ganti Unit</b> untuk berpindah unit atau membuka <b>Rekap Kantor</b>.</div></div>
         </li>
         <li class="flex gap-3">
           <span class="shrink-0 w-7 h-7 rounded-full bg-[#002F6C] dark:bg-[#0F294A] text-white text-xs font-bold flex items-center justify-center tabular-nums">2</span>
-          <div><div class="font-bold text-slate-900 dark:text-white">Isi Stok Fisik</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Ketuk <b>−</b> atau <b>+</b>, atau ketuk angkanya lalu ketik jumlahnya.</div></div>
+          <div><div class="font-bold text-slate-900 dark:text-white">Hitung & Isi Stok Fisik</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Ketuk <b>−</b> atau <b>+</b>, atau ketuk angkanya lalu ketik jumlah hasil hitung di rak.</div></div>
         </li>
         <li class="flex gap-3">
           <span class="shrink-0 w-7 h-7 rounded-full bg-[#002F6C] dark:bg-[#0F294A] text-white text-xs font-bold flex items-center justify-center tabular-nums">3</span>
@@ -953,7 +1048,7 @@
         </li>
         <li class="flex gap-3">
           <span class="shrink-0 w-7 h-7 rounded-full bg-[#002F6C] dark:bg-[#0F294A] text-white text-xs font-bold flex items-center justify-center tabular-nums">5</span>
-          <div><div class="font-bold text-slate-900 dark:text-white">Finalisasi</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Setelah semua item dicek, tekan <b>Finalisasi Berita Acara Opname</b> di bagian bawah daftar untuk mengesahkan dan mencetak hasilnya.</div></div>
+          <div><div class="font-bold text-slate-900 dark:text-white">Finalisasi Berita Acara</div><div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Setelah item unit dicek, tekan <b>Finalisasi Berita Acara Opname</b> untuk mengesahkan dan mencetak dokumen resmi unit.</div></div>
         </li>
       </ol>
 
@@ -962,7 +1057,7 @@
         <div><b>Saldo Buku</b>: jumlah menurut catatan aplikasi.</div>
         <div><b>Stok Fisik</b>: jumlah hasil hitung langsung di gudang.</div>
         <div><b>Selisih</b>: Stok Fisik dikurangi Saldo Buku.</div>
-        <div><b>Menu ⋮ di kartu atas</b>: tandai semua tercek, samakan fisik = sistem, atau reset centang.</div>
+        <div><b>Menu ⋮ di kartu atas</b>: aksi massal audit khusus item unit aktif.</div>
         <div><b>Menu ⋮ di pojok kartu item</b>: edit data souvenir atau hapus item.</div>
       </div>
 
@@ -973,6 +1068,10 @@
     <div id="dataSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 pb-[calc(1.75rem+env(safe-area-inset-bottom))] md:pb-5 space-y-2.5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl">
       <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
       <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">Manajemen Data & Aplikasi</h4>
+      <button type="button" onclick="sheetGo(() => openUnitSwitcherModal())" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-slate-800 dark:text-slate-100 text-left transition">
+        <i data-lucide="building-2" class="w-5 h-5 text-bi-gold dark:text-bi-goldDark"></i>
+        <span>Ganti Lantai & Unit Kerja</span>
+      </button>
       <button type="button" onclick="sheetGo(() => openSheet('helpSheet'))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-slate-800 dark:text-slate-100 text-left transition">
         <i data-lucide="circle-help" class="w-5 h-5 text-[#005596] dark:text-[#38BDF8]"></i>
         <span>Panduan Cara Pakai</span>
@@ -1014,229 +1113,34 @@
     'use strict';
 
     /**
-     * KONFIGURASI BACKEND & STORAGE
+     * KONFIGURASI BACKEND, STORAGE & MULTI-UNIT WORKSPACE
      */
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxcBn02hK5fRgZ4boMl6aFk_ETYTmb4bPykku1Jj5UgPZQ45XaV7rObAE6fE45iDn9r/exec';
     const STORAGE_KEY = 'bi_souvenir_opname_pro_v2';
+    const WORKSPACE_STORAGE_KEY = 'bi_active_workspace_v1';
 
-    const DEFAULT_DATA = {
-      items: [
-        {
-          id: 'itm-1',
-          sku: 'SVN-BI-001',
-          name: 'Plakat Kristal Gedung Bank Indonesia',
-          category: 'VIP & Eksekutif',
-          systemStock: 18,
-          physicalStock: 18,
-          minStock: 10,
-          unit: 'Box',
-          location: 'Lemari Kaca VIP - Lt. 2',
-          verified: true
-        },
-        {
-          id: 'itm-2',
-          sku: 'SVN-BI-002',
-          name: 'Tumbler Vacuum Stainless Logo BI',
-          category: 'Seminar & Rakor',
-          systemStock: 65,
-          physicalStock: 63,
-          minStock: 25,
-          unit: 'Pcs',
-          location: 'Rak Gudang Humas A1',
-          verified: true
-        },
-        {
-          id: 'itm-3',
-          sku: 'SVN-BI-003',
-          name: 'Goodie Bag & Buku Edukasi CBP Rupiah',
-          category: 'Sosialisasi CBP Rupiah',
-          systemStock: 140,
-          physicalStock: 140,
-          minStock: 50,
-          unit: 'Paket',
-          location: 'Rak Gudang Utama B2',
-          verified: false
-        },
-        {
-          id: 'itm-4',
-          sku: 'SVN-BI-004',
-          name: 'Payung Lipat Otomatis Eksklusif QRIS',
-          category: 'Edukasi QRIS & Digital',
-          systemStock: 12,
-          physicalStock: 12,
-          minStock: 20,
-          unit: 'Pcs',
-          location: 'Rak Gudang Humas A2',
-          verified: false
-        },
-        {
-          id: 'itm-5',
-          sku: 'SVN-BI-005',
-          name: 'Pouch Tenun Nusantara & Pin Resmi BI',
-          category: 'VIP & Eksekutif',
-          systemStock: 24,
-          physicalStock: 25,
-          minStock: 15,
-          unit: 'Set',
-          location: 'Lemari Kaca VIP - Lt. 2',
-          verified: true
-        },
-        {
-          id: 'itm-6',
-          sku: 'SVN-BI-006',
-          name: 'Notes Kulit & Pulpen Metal BI',
-          category: 'Umum & Kunjungan',
-          systemStock: 0,
-          physicalStock: 0,
-          minStock: 30,
-          unit: 'Set',
-          location: 'Rak Gudang Utama B1',
-          verified: false
-        }
-      ],
-      mutations: [
-        {
-          id: 'mut-101',
-          date: new Date().toISOString().split('T')[0],
-          type: 'OUT',
-          itemId: 'itm-3',
-          itemSku: 'SVN-BI-003',
-          itemName: 'Goodie Bag & Buku Edukasi CBP Rupiah',
-          qty: 60,
-          activity: 'Sosialisasi Cinta Bangga Paham (CBP) Rupiah - Universitas',
-          pic: 'Unit Kehumasan & Edukasi'
-        },
-        {
-          id: 'mut-102',
-          date: new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0],
-          type: 'OUT',
-          itemId: 'itm-1',
-          itemSku: 'SVN-BI-001',
-          itemName: 'Plakat Kristal Gedung Bank Indonesia',
-          qty: 4,
-          activity: 'Rapat Koordinasi Tim Pengendalian Inflasi Daerah (TPID)',
-          pic: 'Fungsi Pelaksanaan Pengembangan UMKM & KI'
-        },
-        {
-          id: 'mut-103',
-          date: new Date(Date.now() - 86400000 * 5).toISOString().split('T')[0],
-          type: 'IN',
-          itemId: 'itm-2',
-          itemSku: 'SVN-BI-002',
-          itemName: 'Tumbler Vacuum Stainless Logo BI',
-          qty: 100,
-          activity: 'Penerimaan Pengadaan Souvenir Batch II',
-          pic: 'Logistik & Pengadaan'
-        }
-      ],
-      reports: []
+    const OFFICE_UNITS = [
+      { floor: 'LT 1', code: 'PUR',        name: 'Pengelolaan Uang Rupiah',                 skuPrefix: 'SVN-PUR-' },
+      { floor: 'LT 3', code: 'SDM',        name: 'Sumber Daya Manusia',                     skuPrefix: 'SVN-SDM-' },
+      { floor: 'LT 3', code: 'LOGISTIK',   name: 'Logistik & Pengadaan',                    skuPrefix: 'SVN-LOG-' },
+      { floor: 'LT 4', code: 'IKSP',       name: 'Implementasi Kebijakan Sistem Pembayaran', skuPrefix: 'SVN-IKSP-' },
+      { floor: 'LT 4', code: 'PENGAWASAN', name: 'Pengawasan SP & PUR',                     skuPrefix: 'SVN-PGW-' },
+      { floor: 'LT 5', code: 'FPPU',       name: 'Fungsi Pelaksanaan Pengembangan UMKM',    skuPrefix: 'SVN-FPPU-' },
+      { floor: 'LT 5', code: 'HUMAS',      name: 'Kehumasan',                               skuPrefix: 'SVN-HMS-' },
+      { floor: 'LT 5', code: 'KPKP',       name: 'Kehumasan / Komunikasi & Kebijakan',      skuPrefix: 'SVN-KPKP-' },
+      { floor: 'LT 5', code: 'FDSEK',      name: 'Fungsi Data & Statistik Ekonomi Keuangan', skuPrefix: 'SVN-FDSEK-' },
+      { floor: 'ALL',  code: 'ALL',        name: 'Semua Unit (Rekap Kantor)',               skuPrefix: 'SVN-BI-' }
+    ];
+
+    const OFFICE_FLOORS = ['LT 1', 'LT 3', 'LT 4', 'LT 5'];
+    const FLOOR_LABELS = {
+      'LT 1': 'Lantai 1',
+      'LT 3': 'Lantai 3',
+      'LT 4': 'Lantai 4',
+      'LT 5': 'Lantai 5'
     };
-
-    function sanitizeState(raw) {
-      const base = raw && typeof raw === 'object' ? raw : {};
-      const items = Array.isArray(base.items)
-        ? base.items.map((item, idx) => ({
-            id: String(item.id || `itm-${Date.now()}-${idx}`),
-            sku: String(item.sku || `SVN-BI-${String(idx + 1).padStart(3, '0')}`).toUpperCase(),
-            name: String(item.name || 'Item Souvenir'),
-            category: String(item.category || 'Umum & Kunjungan'),
-            systemStock: Math.max(0, parseInt(item.systemStock, 10) || 0),
-            physicalStock: Math.max(0, parseInt(item.physicalStock, 10) || 0),
-            minStock: Math.max(1, parseInt(item.minStock, 10) || 10),
-            unit: String(item.unit || 'Pcs'),
-            location: String(item.location || '-'),
-            verified: Boolean(item.verified)
-          }))
-        : JSON.parse(JSON.stringify(DEFAULT_DATA.items));
-
-      const mutations = Array.isArray(base.mutations) ? base.mutations : [];
-      const reports = Array.isArray(base.reports) ? base.reports : [];
-      return { items, mutations, reports };
-    }
-
-    function setSyncStatus(label, colorClass = 'bg-emerald-400') {
-      const textEl = document.getElementById('syncStatusText');
-      const badgeEl = document.getElementById('syncStatusBadge');
-      if (!textEl || !badgeEl) return;
-      textEl.textContent = label;
-      badgeEl.title = `Status sinkronisasi: ${label}`;
-      const isBusy = String(label).includes('...');
-      const dot = badgeEl.querySelector('.sync-dot') || badgeEl.querySelector('span');
-      if (dot) dot.className = `sync-dot w-2 h-2 rounded-full shrink-0 ${colorClass}${isBusy ? ' animate-pulse' : ''}`;
-    }
-
-    const StorageAdapter = {
-      loadLocal() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) {
-            const initial = sanitizeState(DEFAULT_DATA);
-            this.saveLocal(initial);
-            return initial;
-          }
-          return sanitizeState(JSON.parse(raw));
-        } catch (err) {
-          console.error('Local load error:', err);
-          return sanitizeState(DEFAULT_DATA);
-        }
-      },
-      saveLocal(data) {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        } catch (err) {
-          console.error('Local save error:', err);
-        }
-      },
-      async syncFromCloud() {
-        if (!GAS_URL) {
-          setSyncStatus('Mode Lokal', 'bg-emerald-400');
-          return;
-        }
-        try {
-          setSyncStatus('Sinkron...', 'bg-amber-400');
-          const res = await fetch(`${GAS_URL}?action=load&t=${Date.now()}`, { cache: 'no-store' });
-          const json = await res.json();
-          if (json && json.status === 'success' && json.data) {
-            appState = sanitizeState(json.data);
-            this.saveLocal(appState);
-            renderInventoryTable();
-            renderMutationTable();
-            renderReportsList();
-          }
-          setSyncStatus('Cloud Aktif', 'bg-emerald-400');
-        } catch (err) {
-          console.warn('Cloud sync fallback to local:', err);
-          setSyncStatus('Offline Lokal', 'bg-amber-400');
-        }
-      },
-      save(data) {
-        this.saveLocal(data);
-        if (!GAS_URL) return;
-        setSyncStatus('Menyimpan...', 'bg-amber-400');
-        fetch(GAS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'save', data })
-        })
-          .then(r => r.json())
-          .then(() => setSyncStatus('Tersimpan', 'bg-emerald-400'))
-          .catch(() => setSyncStatus('Gagal Sync', 'bg-rose-400'));
-      }
-    };
-
-    let appState = StorageAdapter.loadLocal();
-    let pendingConfirmCallback = null;
-    let isCheckingUpdate = false;
-
-    function escapeHtml(str) {
-      if (str === null || str === undefined) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
+    const DEFAULT_MIGRATION_FLOOR = 'LT 5';
+    const DEFAULT_MIGRATION_UNIT = 'HUMAS';
 
     const BULAN_INDONESIA = [
       'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -1273,11 +1177,742 @@
       return raw;
     }
 
+    function getUnitMeta(code) {
+      const normalized = String(code || '').toUpperCase().trim();
+      return OFFICE_UNITS.find(u => u.code === normalized) || OFFICE_UNITS.find(u => u.code === DEFAULT_MIGRATION_UNIT);
+    }
+
+    function isValidUnitCode(code) {
+      const normalized = String(code || '').toUpperCase().trim();
+      return OFFICE_UNITS.some(u => u.code === normalized);
+    }
+
+    function isSpecificUnitCode(code) {
+      const normalized = String(code || '').toUpperCase().trim();
+      return OFFICE_UNITS.some(u => u.code === normalized && u.code !== 'ALL');
+    }
+
+    const DEFAULT_DATA = {
+      items: [
+        {
+          id: 'itm-pur-1',
+          floor: 'LT 1',
+          unitOwner: 'PUR',
+          sku: 'SVN-PUR-001',
+          name: 'Goodie Bag & Buku Edukasi CBP Rupiah',
+          category: 'Sosialisasi CBP Rupiah',
+          systemStock: 140,
+          physicalStock: 140,
+          minStock: 50,
+          unit: 'Paket',
+          location: 'Gudang Edukasi PUR - Lt. 1',
+          verified: false
+        },
+        {
+          id: 'itm-pur-2',
+          floor: 'LT 1',
+          unitOwner: 'PUR',
+          sku: 'SVN-PUR-002',
+          name: 'Pouch Penyimpanan Uang Layak Edar',
+          category: 'Sosialisasi CBP Rupiah',
+          systemStock: 85,
+          physicalStock: 85,
+          minStock: 30,
+          unit: 'Pcs',
+          location: 'Lemari Layanan Kas PUR - Lt. 1',
+          verified: true
+        },
+        {
+          id: 'itm-sdm-1',
+          floor: 'LT 3',
+          unitOwner: 'SDM',
+          sku: 'SVN-SDM-001',
+          name: 'Tumbler Vacuum Stainless Logo BI',
+          category: 'Seminar & Rakor',
+          systemStock: 45,
+          physicalStock: 43,
+          minStock: 20,
+          unit: 'Pcs',
+          location: 'Lemari Logistik SDM - Lt. 3',
+          verified: true
+        },
+        {
+          id: 'itm-sdm-2',
+          floor: 'LT 3',
+          unitOwner: 'SDM',
+          sku: 'SVN-SDM-002',
+          name: 'Notes Kulit & Pulpen Metal BI',
+          category: 'Umum & Kunjungan',
+          systemStock: 0,
+          physicalStock: 0,
+          minStock: 25,
+          unit: 'Set',
+          location: 'Rak Arsip SDM - Lt. 3',
+          verified: false
+        },
+        {
+          id: 'itm-log-1',
+          floor: 'LT 3',
+          unitOwner: 'LOGISTIK',
+          sku: 'SVN-LOG-001',
+          name: 'Tote Bag Kanvas Premium KPwBI Jateng',
+          category: 'Umum & Kunjungan',
+          systemStock: 120,
+          physicalStock: 120,
+          minStock: 40,
+          unit: 'Pcs',
+          location: 'Gudang Utama Logistik A1 - Lt. 3',
+          verified: true
+        },
+        {
+          id: 'itm-log-2',
+          floor: 'LT 3',
+          unitOwner: 'LOGISTIK',
+          sku: 'SVN-LOG-002',
+          name: 'Payung Golf Eksklusif Bank Indonesia',
+          category: 'VIP & Eksekutif',
+          systemStock: 14,
+          physicalStock: 14,
+          minStock: 20,
+          unit: 'Pcs',
+          location: 'Gudang Utama Logistik A2 - Lt. 3',
+          verified: false
+        },
+        {
+          id: 'itm-iksp-1',
+          floor: 'LT 4',
+          unitOwner: 'IKSP',
+          sku: 'SVN-IKSP-001',
+          name: 'Payung Lipat Otomatis Eksklusif QRIS',
+          category: 'Edukasi QRIS & Digital',
+          systemStock: 12,
+          physicalStock: 12,
+          minStock: 20,
+          unit: 'Pcs',
+          location: 'Rak Souvenir IKSP - Lt. 4',
+          verified: false
+        },
+        {
+          id: 'itm-iksp-2',
+          floor: 'LT 4',
+          unitOwner: 'IKSP',
+          sku: 'SVN-IKSP-002',
+          name: 'Card Holder RFID & Lanyard QRIS',
+          category: 'Edukasi QRIS & Digital',
+          systemStock: 90,
+          physicalStock: 90,
+          minStock: 30,
+          unit: 'Set',
+          location: 'Lemari Edukasi Digital IKSP - Lt. 4',
+          verified: true
+        },
+        {
+          id: 'itm-pgw-1',
+          floor: 'LT 4',
+          unitOwner: 'PENGAWASAN',
+          sku: 'SVN-PGW-001',
+          name: 'Flashdisk Metal 32GB Logo BI',
+          category: 'Seminar & Rakor',
+          systemStock: 36,
+          physicalStock: 36,
+          minStock: 15,
+          unit: 'Pcs',
+          location: 'Lemari Pengawasan SP & PUR - Lt. 4',
+          verified: true
+        },
+        {
+          id: 'itm-fppu-1',
+          floor: 'LT 5',
+          unitOwner: 'FPPU',
+          sku: 'SVN-FPPU-001',
+          name: 'Pouch Tenun Nusantara & Pin Resmi BI',
+          category: 'VIP & Eksekutif',
+          systemStock: 24,
+          physicalStock: 25,
+          minStock: 15,
+          unit: 'Set',
+          location: 'Lemari Showcase UMKM FPPU - Lt. 5',
+          verified: true
+        },
+        {
+          id: 'itm-fppu-2',
+          floor: 'LT 5',
+          unitOwner: 'FPPU',
+          sku: 'SVN-FPPU-002',
+          name: 'Gift Box Kopi & Batik UMKM Binaan BI',
+          category: 'VIP & Eksekutif',
+          systemStock: 16,
+          physicalStock: 16,
+          minStock: 10,
+          unit: 'Box',
+          location: 'Ruang Pengembangan UMKM - Lt. 5',
+          verified: false
+        },
+        {
+          id: 'itm-hms-1',
+          floor: 'LT 5',
+          unitOwner: 'HUMAS',
+          sku: 'SVN-HMS-001',
+          name: 'Plakat Kristal Gedung Bank Indonesia',
+          category: 'VIP & Eksekutif',
+          systemStock: 18,
+          physicalStock: 18,
+          minStock: 10,
+          unit: 'Box',
+          location: 'Lemari Kaca VIP Humas - Lt. 5',
+          verified: true
+        },
+        {
+          id: 'itm-hms-2',
+          floor: 'LT 5',
+          unitOwner: 'HUMAS',
+          sku: 'SVN-HMS-002',
+          name: 'Kit Media & Buku Profil KPwBI Jateng',
+          category: 'Umum & Kunjungan',
+          systemStock: 52,
+          physicalStock: 50,
+          minStock: 20,
+          unit: 'Paket',
+          location: 'Rak Gudang Humas A1 - Lt. 5',
+          verified: true
+        },
+        {
+          id: 'itm-hms-3',
+          floor: 'LT 5',
+          unitOwner: 'HUMAS',
+          sku: 'SVN-HMS-003',
+          name: 'Pin Logam Emas & Map Eksklusif BI',
+          category: 'VIP & Eksekutif',
+          systemStock: 9,
+          physicalStock: 9,
+          minStock: 15,
+          unit: 'Set',
+          location: 'Lemari Kaca VIP Humas - Lt. 5',
+          verified: false
+        },
+        {
+          id: 'itm-kpkp-1',
+          floor: 'LT 5',
+          unitOwner: 'KPKP',
+          sku: 'SVN-KPKP-001',
+          name: 'Powerbank Slim 10.000mAh Branding BI',
+          category: 'Seminar & Rakor',
+          systemStock: 28,
+          physicalStock: 28,
+          minStock: 15,
+          unit: 'Unit',
+          location: 'Lemari Komunikasi Kebijakan - Lt. 5',
+          verified: false
+        },
+        {
+          id: 'itm-fdsek-1',
+          floor: 'LT 5',
+          unitOwner: 'FDSEK',
+          sku: 'SVN-FDSEK-001',
+          name: 'Mug Keramik & Coaster Statistik Ekonomi',
+          category: 'Seminar & Rakor',
+          systemStock: 40,
+          physicalStock: 40,
+          minStock: 15,
+          unit: 'Set',
+          location: 'Rak Unit FDSEK - Lt. 5',
+          verified: true
+        }
+      ],
+      mutations: [
+        {
+          id: 'mut-101',
+          date: getLocalISODate(new Date()),
+          type: 'OUT',
+          floor: 'LT 1',
+          unitOwner: 'PUR',
+          itemId: 'itm-pur-1',
+          itemSku: 'SVN-PUR-001',
+          itemName: 'Goodie Bag & Buku Edukasi CBP Rupiah',
+          qty: 60,
+          activity: 'Sosialisasi Cinta Bangga Paham (CBP) Rupiah - Universitas',
+          pic: 'PUR — Pengelolaan Uang Rupiah'
+        },
+        {
+          id: 'mut-102',
+          date: getLocalISODate(new Date(Date.now() - 86400000 * 2)),
+          type: 'OUT',
+          floor: 'LT 5',
+          unitOwner: 'HUMAS',
+          itemId: 'itm-hms-1',
+          itemSku: 'SVN-HMS-001',
+          itemName: 'Plakat Kristal Gedung Bank Indonesia',
+          qty: 4,
+          activity: 'Kunjungan Kerja & Pertemuan Tahunan Media Massa',
+          pic: 'HUMAS — Kehumasan'
+        },
+        {
+          id: 'mut-103',
+          date: getLocalISODate(new Date(Date.now() - 86400000 * 4)),
+          type: 'IN',
+          floor: 'LT 3',
+          unitOwner: 'LOGISTIK',
+          itemId: 'itm-log-1',
+          itemSku: 'SVN-LOG-001',
+          itemName: 'Tote Bag Kanvas Premium KPwBI Jateng',
+          qty: 100,
+          activity: 'Penerimaan Pengadaan Souvenir Batch II',
+          pic: 'LOGISTIK — Logistik & Pengadaan'
+        },
+        {
+          id: 'mut-104',
+          date: getLocalISODate(new Date(Date.now() - 86400000 * 5)),
+          type: 'OUT',
+          floor: 'LT 4',
+          unitOwner: 'IKSP',
+          itemId: 'itm-iksp-2',
+          itemSku: 'SVN-IKSP-002',
+          itemName: 'Card Holder RFID & Lanyard QRIS',
+          qty: 35,
+          activity: 'Pekan QRIS Nasional & Edukasi Merchant Digital',
+          pic: 'IKSP — Implementasi Kebijakan Sistem Pembayaran'
+        }
+      ],
+      reports: []
+    };
+
+    function sanitizeState(raw) {
+      const base = raw && typeof raw === 'object' ? raw : {};
+      const items = Array.isArray(base.items)
+        ? base.items.map((item, idx) => {
+            const rawUnit = String(item.unitOwner || '').toUpperCase().trim();
+            const unitOwner = isSpecificUnitCode(rawUnit) ? rawUnit : DEFAULT_MIGRATION_UNIT;
+            const unitMeta = getUnitMeta(unitOwner);
+            const floor = String(item.floor || '').trim() || unitMeta.floor || DEFAULT_MIGRATION_FLOOR;
+            return {
+              id: String(item.id || `itm-${Date.now()}-${idx}`),
+              floor,
+              unitOwner,
+              sku: String(item.sku || `${unitMeta.skuPrefix}${String(idx + 1).padStart(3, '0')}`).toUpperCase(),
+              name: String(item.name || 'Item Souvenir'),
+              category: String(item.category || 'Umum & Kunjungan'),
+              systemStock: Math.max(0, parseInt(item.systemStock, 10) || 0),
+              physicalStock: Math.max(0, parseInt(item.physicalStock, 10) || 0),
+              minStock: Math.max(1, parseInt(item.minStock, 10) || 10),
+              unit: String(item.unit || 'Pcs'),
+              location: String(item.location || '-'),
+              verified: Boolean(item.verified)
+            };
+          })
+        : JSON.parse(JSON.stringify(DEFAULT_DATA.items));
+
+      const itemById = new Map(items.map(i => [i.id, i]));
+
+      const mutations = Array.isArray(base.mutations)
+        ? base.mutations.map(m => {
+            const linked = m && m.itemId ? itemById.get(String(m.itemId)) : null;
+            const rawUnit = String(m.unitOwner || '').toUpperCase().trim();
+            const unitOwner = isSpecificUnitCode(rawUnit)
+              ? rawUnit
+              : (linked ? linked.unitOwner : DEFAULT_MIGRATION_UNIT);
+            const floor = String(m.floor || '').trim()
+              || (linked ? linked.floor : getUnitMeta(unitOwner).floor)
+              || DEFAULT_MIGRATION_FLOOR;
+            return {
+              ...m,
+              floor,
+              unitOwner
+            };
+          })
+        : [];
+
+      const reports = Array.isArray(base.reports)
+        ? base.reports.map(r => {
+            const rawUnit = String(r.unitOwner || '').toUpperCase().trim();
+            let unitOwner = isValidUnitCode(rawUnit) ? rawUnit : '';
+            if (!unitOwner) {
+              unitOwner = String(r.id || '').includes('KPWBI') ? 'ALL' : DEFAULT_MIGRATION_UNIT;
+            }
+            const floor = String(r.floor || '').trim()
+              || (unitOwner === 'ALL' ? 'ALL' : getUnitMeta(unitOwner).floor)
+              || DEFAULT_MIGRATION_FLOOR;
+            return {
+              ...r,
+              floor,
+              unitOwner
+            };
+          })
+        : [];
+
+      return { items, mutations, reports };
+    }
+
+    function setSyncStatus(label, colorClass = 'bg-emerald-400') {
+      const textEl = document.getElementById('syncStatusText');
+      const badgeEl = document.getElementById('syncStatusBadge');
+      if (!textEl || !badgeEl) return;
+      textEl.textContent = label;
+      badgeEl.title = `Status sinkronisasi: ${label}`;
+      const isBusy = String(label).includes('...');
+      const dot = badgeEl.querySelector('.sync-dot') || badgeEl.querySelector('span');
+      if (dot) dot.className = `sync-dot w-2 h-2 rounded-full shrink-0 ${colorClass}${isBusy ? ' animate-pulse' : ''}`;
+    }
+
+    let activeWorkspace = DEFAULT_MIGRATION_UNIT;
+    let deletedItemIds = [];
+
+    function getActiveWorkspace() {
+      return isValidUnitCode(activeWorkspace) ? activeWorkspace : DEFAULT_MIGRATION_UNIT;
+    }
+
+    function isAllWorkspace() {
+      return getActiveWorkspace() === 'ALL';
+    }
+
+    const StorageAdapter = {
+      loadLocal() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) {
+            const initial = sanitizeState(DEFAULT_DATA);
+            this.saveLocal(initial);
+            return initial;
+          }
+          return sanitizeState(JSON.parse(raw));
+        } catch (err) {
+          console.error('Local load error:', err);
+          return sanitizeState(DEFAULT_DATA);
+        }
+      },
+      saveLocal(data) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (err) {
+          console.error('Local save error:', err);
+        }
+      },
+      async syncFromCloud() {
+        if (!GAS_URL) {
+          setSyncStatus('Mode Lokal', 'bg-emerald-400');
+          return;
+        }
+        try {
+          setSyncStatus('Sinkron...', 'bg-amber-400');
+          const res = await fetch(`${GAS_URL}?action=load&t=${Date.now()}`, { cache: 'no-store' });
+          const json = await res.json();
+          if (json && json.status === 'success' && json.data) {
+            appState = sanitizeState(json.data);
+            this.saveLocal(appState);
+            renderWorkspaceBar();
+            renderInventoryTable();
+            renderMutationTable();
+            renderReportsList();
+          }
+          setSyncStatus('Cloud Aktif', 'bg-emerald-400');
+        } catch (err) {
+          console.warn('Cloud sync fallback to local:', err);
+          setSyncStatus('Offline Lokal', 'bg-amber-400');
+        }
+      },
+      save(data, options = {}) {
+        this.saveLocal(data);
+        if (!GAS_URL) return;
+        const scopeUnit = options.scopeUnit || getActiveWorkspace() || 'ALL';
+        const pendingDeletes = Array.from(new Set(deletedItemIds));
+        setSyncStatus('Menyimpan...', 'bg-amber-400');
+        fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'save',
+            scopeUnit,
+            deletedItemIds: pendingDeletes,
+            data
+          })
+        })
+          .then(r => r.json())
+          .then(() => {
+            if (pendingDeletes.length > 0) {
+              deletedItemIds = deletedItemIds.filter(id => !pendingDeletes.includes(id));
+            }
+            setSyncStatus('Tersimpan', 'bg-emerald-400');
+          })
+          .catch(() => setSyncStatus('Gagal Sync', 'bg-rose-400'));
+      }
+    };
+
+    let appState = StorageAdapter.loadLocal();
+    let pendingConfirmCallback = null;
+    let isCheckingUpdate = false;
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     function updateMutDateDisplay() {
       const input = document.getElementById('mutDate');
       const display = document.getElementById('mutDateDisplay');
       if (!input || !display) return;
       display.textContent = input.value ? formatTanggalIndonesia(input.value) : 'Pilih tanggal';
+    }
+
+    /**
+     * =====================================================================
+     * MULTI-UNIT WORKSPACE ENGINE
+     * =====================================================================
+     */
+    function getScopedItems() {
+      const ws = getActiveWorkspace();
+      if (ws === 'ALL') return appState.items;
+      return appState.items.filter(i => i.unitOwner === ws);
+    }
+
+    function getScopedItemsWithUnitFilter() {
+      let list = getScopedItems();
+      if (isAllWorkspace()) {
+        const unitFilterEl = document.getElementById('unitFilter');
+        const uf = unitFilterEl ? unitFilterEl.value : 'ALL';
+        if (uf && uf !== 'ALL') {
+          if (uf.startsWith('FLOOR:')) {
+            const fl = uf.slice(6);
+            list = list.filter(i => i.floor === fl);
+          } else if (uf.startsWith('UNIT:')) {
+            const un = uf.slice(5);
+            list = list.filter(i => i.unitOwner === un);
+          }
+        }
+      }
+      return list;
+    }
+
+    function getScopedMutations() {
+      const ws = getActiveWorkspace();
+      if (ws === 'ALL') return appState.mutations;
+      return appState.mutations.filter(m => m.unitOwner === ws);
+    }
+
+    function getScopedReports() {
+      const ws = getActiveWorkspace();
+      if (ws === 'ALL') return appState.reports;
+      return appState.reports.filter(r => r.unitOwner === ws);
+    }
+
+    function populateUnitFilterOptions() {
+      const sel = document.getElementById('unitFilter');
+      if (!sel) return;
+      const currentVal = sel.value || 'ALL';
+      const floorOpts = OFFICE_FLOORS.map(fl => `<option value="FLOOR:${fl}">Semua Unit ${fl} (${FLOOR_LABELS[fl]})</option>`).join('');
+      const unitOpts = OFFICE_UNITS
+        .filter(u => u.code !== 'ALL')
+        .map(u => `<option value="UNIT:${u.code}">${u.floor} • ${u.code} (${u.name})</option>`)
+        .join('');
+      sel.innerHTML = `
+        <option value="ALL">Semua Lantai & Unit (LT 1–LT 5)</option>
+        <optgroup label="Filter per Lantai">${floorOpts}</optgroup>
+        <optgroup label="Filter per Unit">${unitOpts}</optgroup>
+      `;
+      sel.value = currentVal;
+      if (!sel.value) sel.value = 'ALL';
+    }
+
+    function populateItemUnitOwnerOptions() {
+      const sel = document.getElementById('itemUnitOwner');
+      if (!sel) return;
+      sel.innerHTML = OFFICE_FLOORS.map(fl => {
+        const unitsInFloor = OFFICE_UNITS.filter(u => u.floor === fl);
+        return `
+          <optgroup label="${FLOOR_LABELS[fl]} (${fl})">
+            ${unitsInFloor.map(u => `<option value="${u.code}">${u.floor} • ${u.code} — ${u.name}</option>`).join('')}
+          </optgroup>
+        `;
+      }).join('');
+    }
+
+    function generateNextSkuForUnit(unitCode) {
+      const meta = getUnitMeta(unitCode);
+      const prefix = meta.skuPrefix || 'SVN-BI-';
+      let maxNum = 0;
+      const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`^${escapedPrefix}(\\d+)$`, 'i');
+      appState.items.forEach(item => {
+        const m = String(item.sku || '').trim().match(regex);
+        if (m) {
+          const n = parseInt(m[1], 10);
+          if (n > maxNum) maxNum = n;
+        }
+      });
+      let next = maxNum + 1;
+      let candidate = `${prefix}${String(next).padStart(3, '0')}`;
+      while (appState.items.some(i => i.sku.toUpperCase() === candidate.toUpperCase())) {
+        next++;
+        candidate = `${prefix}${String(next).padStart(3, '0')}`;
+      }
+      return candidate;
+    }
+
+    function renderWorkspaceBar() {
+      const ws = getActiveWorkspace();
+      const meta = getUnitMeta(ws);
+      const scopedItems = getScopedItems();
+
+      const floorBadge = document.getElementById('wsFloorBadge');
+      const unitTitle = document.getElementById('wsUnitTitle');
+      const unitSub = document.getElementById('wsUnitSubtitle');
+      const mobSub = document.getElementById('wsMobileSubtitle');
+      const skuBadge = document.getElementById('wsSkuCountBadge');
+      const unitFilterEl = document.getElementById('unitFilter');
+
+      if (ws === 'ALL') {
+        if (floorBadge) {
+          floorBadge.textContent = 'REKAP KANTOR';
+          floorBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-[#C59B27] text-[#001B40] shrink-0';
+        }
+        if (unitTitle) unitTitle.textContent = 'SEMUA UNIT (LT 1–LT 5)';
+        if (unitSub) unitSub.textContent = '• Pemantauan Seluruh Lantai';
+        if (mobSub) mobSub.textContent = 'Pemantauan Seluruh Lantai (LT 1–LT 5)';
+        if (unitFilterEl) {
+          populateUnitFilterOptions();
+          unitFilterEl.classList.remove('hidden');
+        }
+      } else {
+        if (floorBadge) {
+          floorBadge.textContent = meta.floor;
+          floorBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-[#002F6C] text-white dark:bg-[#38BDF8]/15 dark:text-[#38BDF8] shrink-0';
+        }
+        if (unitTitle) unitTitle.textContent = meta.code;
+        if (unitSub) unitSub.textContent = `• ${meta.name}`;
+        if (mobSub) mobSub.textContent = meta.name;
+        if (unitFilterEl) {
+          unitFilterEl.value = 'ALL';
+          unitFilterEl.classList.add('hidden');
+        }
+      }
+
+      if (skuBadge) skuBadge.textContent = `${scopedItems.length} SKU`;
+      lucide.createIcons();
+    }
+
+    function buildUnitSelectorHTML(isOnboarding = false) {
+      const currentWs = isOnboarding ? '' : getActiveWorkspace();
+      const allCount = appState.items.length;
+      const allVerified = appState.items.filter(i => i.verified).length;
+      const allPct = allCount > 0 ? Math.round((allVerified / allCount) * 100) : 0;
+
+      const floorsHtml = OFFICE_FLOORS.map(fl => {
+        const units = OFFICE_UNITS.filter(u => u.floor === fl);
+        const gridCols = units.length === 1 ? 'grid-cols-1' : 'grid-cols-2';
+        const cardsHtml = units.map(u => {
+          const uItems = appState.items.filter(i => i.unitOwner === u.code);
+          const uCount = uItems.length;
+          const uVerified = uItems.filter(i => i.verified).length;
+          const uPct = uCount > 0 ? Math.round((uVerified / uCount) * 100) : 0;
+          const isActive = !isOnboarding && currentWs === u.code;
+
+          return `
+            <button
+              type="button"
+              onclick="selectWorkspace('${u.code}', ${isOnboarding ? 'true' : 'false'})"
+              class="text-left p-3 rounded-xl border transition flex flex-col justify-between gap-2 ${isActive
+                ? 'border-[#002F6C] dark:border-[#38BDF8] bg-[#E6F0FA]/70 dark:bg-sky-950/50 ring-2 ring-[#005596]/15 dark:ring-[#38BDF8]/20'
+                : 'border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-[#1E293B]/60 hover:bg-[#E6F0FA]/40 dark:hover:bg-[#1E293B] hover:border-[#005596]/50'}"
+            >
+              <div class="flex items-start justify-between gap-1.5 w-full">
+                <div class="min-w-0">
+                  <div class="font-extrabold text-xs sm:text-[13px] text-slate-900 dark:text-white leading-tight truncate">${escapeHtml(u.code)}</div>
+                  <div class="text-[10.5px] font-medium text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2 leading-snug">${escapeHtml(u.name)}</div>
+                </div>
+                ${isActive ? `<span class="w-5 h-5 rounded-full bg-[#002F6C] dark:bg-[#38BDF8] text-white dark:text-[#090D16] flex items-center justify-center shrink-0"><i data-lucide="check" class="w-3 h-3 stroke-[3]"></i></span>` : ''}
+              </div>
+              <div class="flex items-center justify-between gap-1.5 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60 w-full tabular-nums">
+                <span class="text-[10.5px] font-bold text-[#005596] dark:text-[#38BDF8]">${uCount} SKU</span>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full ${uPct === 100 && uCount > 0 ? 'bg-emerald-100 text-[#059669] dark:bg-emerald-950/70 dark:text-[#34D399]' : 'bg-white dark:bg-[#111827] text-slate-500 dark:text-slate-400'}">${uVerified}/${uCount} (${uPct}%)</span>
+              </div>
+            </button>
+          `;
+        }).join('');
+
+        return `
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300">${fl}</span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">${FLOOR_LABELS[fl]}</span>
+            </div>
+            <div class="grid ${gridCols} gap-2">
+              ${cardsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const isAllActive = !isOnboarding && currentWs === 'ALL';
+      const allCardHtml = `
+        <div class="pt-2.5 border-t border-slate-200/80 dark:border-slate-800">
+          <button
+            type="button"
+            onclick="selectWorkspace('ALL', ${isOnboarding ? 'true' : 'false'})"
+            class="w-full text-left p-3.5 rounded-xl border transition flex items-center justify-between gap-3 ${isAllActive
+              ? 'border-[#C59B27] dark:border-[#D4AF37] bg-[#FBF6E8] dark:bg-amber-950/30 ring-2 ring-[#C59B27]/20'
+              : 'border-amber-200/80 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-950/35'}"
+          >
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-9 h-9 rounded-xl bg-[#002F6C] dark:bg-[#0F294A] text-bi-gold dark:text-bi-goldDark flex items-center justify-center shrink-0">
+                <i data-lucide="layout-grid" class="w-4 h-4"></i>
+              </span>
+              <div class="min-w-0">
+                <div class="font-extrabold text-xs sm:text-[13px] text-slate-900 dark:text-white leading-tight">Semua Unit (Rekap Kantor)</div>
+                <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5 truncate">Pantau seluruh inventaris LT 1 hingga LT 5</div>
+              </div>
+            </div>
+            <div class="flex flex-col items-end gap-1 shrink-0 tabular-nums">
+              <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-[#002F6C] text-white dark:bg-[#D4AF37] dark:text-[#001B40]">${allCount} SKU</span>
+              <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400">${allPct}% tercek</span>
+            </div>
+          </button>
+        </div>
+      `;
+
+      return floorsHtml + allCardHtml;
+    }
+
+    function openUnitOnboardingModal() {
+      const container = document.getElementById('onboardingUnitsContainer');
+      if (container) container.innerHTML = buildUnitSelectorHTML(true);
+      openModal('unitOnboardingModal');
+    }
+
+    function openUnitSwitcherModal() {
+      const container = document.getElementById('switcherUnitsContainer');
+      if (container) container.innerHTML = buildUnitSelectorHTML(false);
+      openModal('unitSwitcherModal');
+    }
+
+    function selectWorkspace(unitCode, fromOnboarding = false) {
+      if (!isValidUnitCode(unitCode)) return;
+      activeWorkspace = unitCode;
+      try {
+        localStorage.setItem(WORKSPACE_STORAGE_KEY, activeWorkspace);
+      } catch (e) {}
+
+      if (fromOnboarding) {
+        closeModal('unitOnboardingModal');
+      } else {
+        closeModal('unitSwitcherModal');
+      }
+
+      const unitFilterEl = document.getElementById('unitFilter');
+      if (unitFilterEl) unitFilterEl.value = 'ALL';
+
+      renderWorkspaceBar();
+      renderInventoryTable();
+      renderMutationTable();
+      renderReportsList();
+
+      const meta = getUnitMeta(activeWorkspace);
+      const label = activeWorkspace === 'ALL'
+        ? 'Rekap Kantor • Semua Unit (LT 1–LT 5)'
+        : `${meta.floor} • ${meta.code} (${meta.name})`;
+      showToast(`Workspace aktif: ${label}`, 'info');
     }
 
     /**
@@ -1351,7 +1986,7 @@
         display: 'standalone',
         background_color: '#002F6C',
         theme_color: '#002F6C',
-        description: 'Sistem Monitoring Inventaris & Stock Opname Souvenir Bank Indonesia'
+        description: 'Sistem Monitoring Inventaris & Stock Opname Souvenir Multi-Unit KPwBI Jawa Tengah'
       };
       const encoded = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
       const linkEl = document.getElementById('pwaManifest');
@@ -1454,10 +2089,11 @@
     }
 
     /**
-     * Update KPIs & Audit Progress Bar (Desktop & Mobile)
+     * Update KPIs & Audit Progress Bar (Scoped by Active Workspace)
      */
     function updateKPIs() {
-      const items = appState.items;
+      const items = getScopedItems();
+      const reports = getScopedReports();
       const totalSku = items.length;
       const categories = new Set(items.map(i => i.category)).size;
       const totalSystem = items.reduce((sum, i) => sum + Number(i.systemStock), 0);
@@ -1468,6 +2104,10 @@
       const verifiedCount = items.filter(i => i.verified).length;
       const pct = totalSku > 0 ? Math.round((verifiedCount / totalSku) * 100) : 0;
 
+      // Sync Workspace Bar SKU Count
+      const wsSkuBadge = document.getElementById('wsSkuCountBadge');
+      if (wsSkuBadge) wsSkuBadge.textContent = `${totalSku} SKU`;
+
       // Desktop KPIs
       document.getElementById('kpiTotalSku').textContent = totalSku;
       document.getElementById('kpiTotalCategories').textContent = `${categories} kategori aktif`;
@@ -1476,8 +2116,8 @@
       document.getElementById('kpiLowStock').textContent = lowStock + outStock;
       document.getElementById('kpiOutStock').textContent = outStock;
       document.getElementById('kpiVarianceCount').textContent = varianceCount;
-      document.getElementById('kpiLastOpname').textContent = appState.reports.length > 0
-        ? `BA Terakhir: ${formatTanggalIndonesia(appState.reports[0].date)}`
+      document.getElementById('kpiLastOpname').textContent = reports.length > 0
+        ? `BA Terakhir: ${formatTanggalIndonesia(reports[0].date)}`
         : 'Belum ada BA';
 
       document.getElementById('auditProgressText').textContent = `${verifiedCount}/${totalSku} SKU (${pct}%)`;
@@ -1544,7 +2184,7 @@
     }
 
     /**
-     * Render Master Inventory & Inline Opname Table
+     * Render Master Inventory & Inline Opname Table (Scoped per Active Unit)
      */
     function renderInventoryTable() {
       const tbody = document.getElementById('inventoryTableBody');
@@ -1557,13 +2197,17 @@
 
       const catFilter = document.getElementById('categoryFilter').value;
       const statusFilter = document.getElementById('statusFilter').value;
+      const showUnitBadge = isAllWorkspace();
+      const baseItems = getScopedItemsWithUnitFilter();
       updateStatusChips();
 
-      const filtered = appState.items.filter(item => {
+      const filtered = baseItems.filter(item => {
         const matchSearch =
           item.sku.toLowerCase().includes(search) ||
           item.name.toLowerCase().includes(search) ||
-          item.location.toLowerCase().includes(search);
+          item.location.toLowerCase().includes(search) ||
+          item.unitOwner.toLowerCase().includes(search) ||
+          item.floor.toLowerCase().includes(search);
         const matchCat = catFilter === 'ALL' || item.category === catFilter;
 
         const variance = item.physicalStock - item.systemStock;
@@ -1577,10 +2221,12 @@
       });
 
       if (filtered.length === 0) {
-        const allChecked = statusFilter === 'UNVERIFIED' && !search && catFilter === 'ALL' && appState.items.length > 0;
+        const allChecked = statusFilter === 'UNVERIFIED' && !search && catFilter === 'ALL' && baseItems.length > 0;
         const emptyMsg = allChecked
-          ? 'Semua item sudah dicek fisik. Lanjutkan dengan Finalisasi Berita Acara Opname di bawah.'
-          : 'Tidak ada item souvenir yang sesuai dengan filter.';
+          ? 'Semua item pada workspace ini sudah dicek fisik. Lanjutkan dengan Finalisasi Berita Acara Opname.'
+          : (baseItems.length === 0
+              ? 'Belum ada item souvenir terdaftar pada unit ini. Tambahkan souvenir baru dengan tombol +.'
+              : 'Tidak ada item souvenir yang sesuai dengan filter.');
         tbody.innerHTML = `
           <tr>
             <td colspan="8" class="py-12 text-center text-slate-400">
@@ -1601,6 +2247,10 @@
           item.physicalStock === 0 ? 'row-empty' : (item.physicalStock <= item.minStock ? 'row-low' : ''),
           item.verified ? 'row-verified' : ''
         ].filter(Boolean).join(' ');
+
+        const unitOwnerBadge = showUnitBadge
+          ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold tracking-wide bg-[#002F6C]/10 text-[#002F6C] dark:bg-sky-950/80 dark:text-[#38BDF8] border border-[#002F6C]/15 dark:border-[#38BDF8]/25 whitespace-nowrap">${escapeHtml(item.floor)} • ${escapeHtml(item.unitOwner)}</span>`
+          : '';
 
         let varianceBadge = '';
         if (variance === 0) {
@@ -1643,10 +2293,11 @@
 
             <!-- Zona Atas (Mobile) / Kode & Nama Souvenir (Desktop) -->
             <td class="py-4 px-4">
-              <!-- Baris 1 Mobile: SKU + Status Badge + Menu Titik Tiga -->
+              <!-- Baris 1 Mobile: SKU + Unit Badge (ALL) + Status Badge + Menu Titik Tiga -->
               <div class="flex items-center justify-between gap-2 md:block">
-                <div class="flex items-center gap-2 min-w-0">
+                <div class="flex items-center flex-wrap gap-1.5 min-w-0">
                   <span class="font-mono text-xs md:text-[11.5px] font-bold text-[#005596] dark:text-[#38BDF8] truncate">${escapeHtml(item.sku)}</span>
+                  ${unitOwnerBadge}
                   <span class="md:hidden shrink-0">${stockStatusBadge}</span>
                 </div>
 
@@ -1779,7 +2430,7 @@
       item.physicalStock = Math.max(0, Number(item.physicalStock) + delta);
       item.verified = true;
       if (navigator.vibrate) navigator.vibrate(8);
-      StorageAdapter.save(appState);
+      StorageAdapter.save(appState, { scopeUnit: item.unitOwner });
       renderKeepFocus();
     }
 
@@ -1791,7 +2442,7 @@
       if (item.physicalStock === safeVal && item.verified) return;
       item.physicalStock = safeVal;
       item.verified = true;
-      StorageAdapter.save(appState);
+      StorageAdapter.save(appState, { scopeUnit: item.unitOwner });
       setTimeout(renderKeepFocus, 0);
     }
 
@@ -1800,7 +2451,7 @@
       if (!item) return;
       item.verified = !item.verified;
       if (navigator.vibrate) navigator.vibrate(8);
-      StorageAdapter.save(appState);
+      StorageAdapter.save(appState, { scopeUnit: item.unitOwner });
       renderInventoryTable();
     }
 
@@ -1813,7 +2464,7 @@
     function updateStatusChips() {
       const wrap = document.getElementById('statusChips');
       if (!wrap) return;
-      const items = appState.items;
+      const items = getScopedItemsWithUnitFilter();
       const counts = {
         ALL: items.length,
         UNVERIFIED: items.filter(i => !i.verified).length,
@@ -1837,47 +2488,77 @@
       });
     }
 
+    function getActiveScopeDisplayName() {
+      const ws = getActiveWorkspace();
+      if (ws === 'ALL') return 'SEMUA UNIT (LT 1–LT 5)';
+      const meta = getUnitMeta(ws);
+      return `${meta.floor} • ${meta.code}`;
+    }
+
     function confirmMarkAll(status) {
+      const scopeName = getActiveScopeDisplayName();
       showConfirmDialog(
         status ? 'Tandai semua sudah dicek?' : 'Reset semua centang?',
         status
-          ? 'Semua item akan ditandai sudah dicek fisik, termasuk yang belum Anda hitung. Lanjutkan hanya jika semua stok sudah benar-benar dihitung.'
-          : 'Semua tanda sudah dicek akan dihapus. Angka Stok Fisik tidak berubah.',
+          ? `Semua item milik workspace ${scopeName} akan ditandai sudah dicek fisik. Unit lain tidak terpengaruh. Lanjutkan?`
+          : `Semua tanda sudah dicek pada workspace ${scopeName} akan dihapus. Angka Stok Fisik dan data unit lain tidak berubah.`,
         () => markAllVerified(status)
       );
     }
 
     function confirmSyncAll() {
+      const scopeName = getActiveScopeDisplayName();
       showConfirmDialog(
-        'Samakan semua Stok Fisik dengan Saldo Buku?',
-        'Angka Stok Fisik yang sudah Anda hitung akan ditimpa dengan Saldo Buku untuk SEMUA item. Gunakan hanya jika yakin jumlah di gudang sama dengan catatan.',
+        'Samakan Stok Fisik dengan Saldo Buku?',
+        `Angka Stok Fisik pada workspace ${scopeName} akan ditimpa mengikuti Saldo Buku. Data unit lain tidak terpengaruh. Lanjutkan?`,
         () => syncAllPhysicalToSystem()
       );
     }
 
     function markAllVerified(status) {
-      appState.items.forEach(i => { i.verified = status; });
-      StorageAdapter.save(appState);
+      const scoped = getScopedItems();
+      scoped.forEach(i => { i.verified = status; });
+      StorageAdapter.save(appState, { scopeUnit: getActiveWorkspace() });
       renderInventoryTable();
-      showToast(status ? 'Semua item ditandai sudah dicek fisik.' : 'Status centang verifikasi di-reset.', 'info');
+      showToast(
+        status
+          ? `Semua item (${getActiveScopeDisplayName()}) ditandai sudah dicek fisik.`
+          : `Centang verifikasi (${getActiveScopeDisplayName()}) di-reset.`,
+        'info'
+      );
     }
 
     function syncAllPhysicalToSystem() {
-      appState.items.forEach(item => {
+      const scoped = getScopedItems();
+      scoped.forEach(item => {
         item.physicalStock = item.systemStock;
       });
-      StorageAdapter.save(appState);
+      StorageAdapter.save(appState, { scopeUnit: getActiveWorkspace() });
       renderInventoryTable();
-      showToast('Seluruh stok fisik disamakan dengan saldo buku.', 'info');
+      showToast(`Stok fisik (${getActiveScopeDisplayName()}) disamakan dengan saldo buku.`, 'info');
     }
 
     /**
      * Modals & Bottom Sheets
      */
+    const ALL_MODAL_IDS = [
+      'unitOnboardingModal',
+      'unitSwitcherModal',
+      'itemModal',
+      'mutationModal',
+      'opnameModal',
+      'baPreviewModal',
+      'confirmModal'
+    ];
+
     function syncBodyScrollLock() {
-      const anyModalOpen = ['itemModal', 'mutationModal', 'opnameModal', 'baPreviewModal', 'confirmModal']
-        .some(id => !document.getElementById(id).classList.contains('hidden'));
-      const sheetOpen = !document.getElementById('sheetOverlay').classList.contains('hidden');
+      const anyModalOpen = ALL_MODAL_IDS
+        .some(id => {
+          const el = document.getElementById(id);
+          return el && !el.classList.contains('hidden');
+        });
+      const sheetEl = document.getElementById('sheetOverlay');
+      const sheetOpen = sheetEl && !sheetEl.classList.contains('hidden');
       document.body.classList.toggle('overflow-hidden', anyModalOpen || sheetOpen);
     }
 
@@ -1916,6 +2597,13 @@
       if (!overlayHistoryPushed) return;
       overlayHistoryPushed = false;
       const top = overlayStack[overlayStack.length - 1];
+      if (top === 'unitOnboardingModal' && !localStorage.getItem(WORKSPACE_STORAGE_KEY)) {
+        try {
+          history.pushState({ overlay: true }, '');
+          overlayHistoryPushed = true;
+        } catch (e) {}
+        return;
+      }
       if (top === '__sheet') closeSheet();
       else if (top) closeModal(top);
       if (overlayStack.length > 0) {
@@ -1954,6 +2642,7 @@
     function openModal(id) {
       closeAllCardMenus();
       const modal = document.getElementById(id);
+      if (!modal) return;
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       syncBodyScrollLock();
@@ -1963,6 +2652,7 @@
 
     function closeModal(id) {
       const modal = document.getElementById(id);
+      if (!modal) return;
       modal.classList.add('hidden');
       modal.classList.remove('flex');
       syncBodyScrollLock();
@@ -1970,16 +2660,34 @@
     }
 
     /**
-     * Master Item CRUD
+     * Master Item CRUD (Multi-Unit Aware)
      */
+    function onItemUnitOwnerChange() {
+      const editId = document.getElementById('editItemId').value;
+      if (editId) return; // Jangan ubah SKU otomatis saat mode edit
+      const chosenUnit = document.getElementById('itemUnitOwner').value;
+      const skuEl = document.getElementById('itemSku');
+      if (skuEl && chosenUnit) {
+        skuEl.value = generateNextSkuForUnit(chosenUnit);
+      }
+    }
+
     function openItemModal(itemId = null) {
       const form = document.getElementById('itemForm');
       form.reset();
       document.getElementById('editItemId').value = '';
+      populateItemUnitOwnerOptions();
+
+      const infoBadge = document.getElementById('itemUnitInfoBadge');
+      const infoText = document.getElementById('itemUnitInfoText');
+      const selectWrap = document.getElementById('itemUnitSelectWrap');
+      const unitSelect = document.getElementById('itemUnitOwner');
+      const ws = getActiveWorkspace();
 
       if (itemId) {
         const item = appState.items.find(i => i.id === itemId);
         if (!item) return;
+        const meta = getUnitMeta(item.unitOwner);
         document.getElementById('itemModalTitle').innerHTML = `<i data-lucide="pencil" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i> Edit Master Souvenir`;
         document.getElementById('editItemId').value = item.id;
         document.getElementById('itemSku').value = item.sku;
@@ -1989,10 +2697,32 @@
         document.getElementById('itemMinStock').value = item.minStock;
         document.getElementById('itemUnit').value = item.unit;
         document.getElementById('itemLocation').value = item.location;
+        unitSelect.value = item.unitOwner;
+
+        if (ws === 'ALL') {
+          infoBadge.classList.add('hidden');
+          selectWrap.classList.remove('hidden');
+        } else {
+          selectWrap.classList.add('hidden');
+          infoBadge.classList.remove('hidden');
+          infoText.textContent = `Unit Pemilik: ${item.floor} • ${meta.code} (${meta.name})`;
+        }
       } else {
         document.getElementById('itemModalTitle').innerHTML = `<i data-lucide="package-plus" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i> Tambah Item Souvenir Baru`;
-        const nextNum = String(appState.items.length + 1).padStart(3, '0');
-        document.getElementById('itemSku').value = `SVN-BI-${nextNum}`;
+        if (ws === 'ALL') {
+          infoBadge.classList.add('hidden');
+          selectWrap.classList.remove('hidden');
+          const defaultUnit = DEFAULT_MIGRATION_UNIT;
+          unitSelect.value = defaultUnit;
+          document.getElementById('itemSku').value = generateNextSkuForUnit(defaultUnit);
+        } else {
+          const meta = getUnitMeta(ws);
+          selectWrap.classList.add('hidden');
+          infoBadge.classList.remove('hidden');
+          infoText.textContent = `Unit Pemilik: ${meta.floor} • ${meta.code} (${meta.name})`;
+          unitSelect.value = meta.code;
+          document.getElementById('itemSku').value = generateNextSkuForUnit(meta.code);
+        }
       }
 
       openModal('itemModal');
@@ -2009,6 +2739,14 @@
       const unit = document.getElementById('itemUnit').value.trim() || 'Pcs';
       const location = document.getElementById('itemLocation').value.trim();
 
+      const ws = getActiveWorkspace();
+      const selectedUnitCode = ws === 'ALL'
+        ? document.getElementById('itemUnitOwner').value
+        : ws;
+      const targetMeta = getUnitMeta(selectedUnitCode);
+      const unitOwner = targetMeta.code === 'ALL' ? DEFAULT_MIGRATION_UNIT : targetMeta.code;
+      const floor = getUnitMeta(unitOwner).floor;
+
       const isDuplicateSku = appState.items.some(i => i.sku.toUpperCase() === sku && i.id !== id);
       if (isDuplicateSku) {
         showToast(`Kode SKU "${sku}" sudah dipakai item lain.`, 'error');
@@ -2018,12 +2756,26 @@
       if (id) {
         const item = appState.items.find(i => i.id === id);
         if (item) {
-          Object.assign(item, { sku, category, name, systemStock, minStock, unit, location });
+          const updatedUnit = ws === 'ALL' ? unitOwner : item.unitOwner;
+          const updatedFloor = ws === 'ALL' ? floor : item.floor;
+          Object.assign(item, {
+            floor: updatedFloor,
+            unitOwner: updatedUnit,
+            sku,
+            category,
+            name,
+            systemStock,
+            minStock,
+            unit,
+            location
+          });
         }
         showToast('Data master souvenir berhasil diperbarui.');
       } else {
         appState.items.unshift({
           id: 'itm-' + Date.now(),
+          floor,
+          unitOwner,
           sku,
           name,
           category,
@@ -2034,11 +2786,12 @@
           location,
           verified: false
         });
-        showToast('Souvenir baru berhasil ditambahkan.');
+        showToast(`Souvenir baru (${floor} • ${unitOwner}) berhasil ditambahkan.`);
       }
 
-      StorageAdapter.save(appState);
+      StorageAdapter.save(appState, { scopeUnit: unitOwner });
       closeModal('itemModal');
+      renderWorkspaceBar();
       renderInventoryTable();
     }
 
@@ -2047,10 +2800,13 @@
       if (!item) return;
       showConfirmDialog(
         'Hapus Master Souvenir',
-        `Hapus "${item.name}" (${item.sku}) dari daftar inventaris?`,
+        `Hapus "${item.name}" (${item.sku}) milik ${item.floor} • ${item.unitOwner} dari daftar inventaris?`,
         () => {
+          const deletedScope = item.unitOwner;
           appState.items = appState.items.filter(i => i.id !== id);
-          StorageAdapter.save(appState);
+          if (!deletedItemIds.includes(id)) deletedItemIds.push(id);
+          StorageAdapter.save(appState, { scopeUnit: deletedScope });
+          renderWorkspaceBar();
           renderInventoryTable();
           showToast('Item souvenir telah dihapus.', 'info');
         }
@@ -2058,20 +2814,25 @@
     }
 
     /**
-     * Mutation Modal & Live Stock Calculator
+     * Mutation Modal & Live Stock Calculator (Scoped per Active Unit)
      */
     function openMutationModal(defaultType = 'OUT', preselectItemId = null) {
       const select = document.getElementById('mutItemId');
-      if (appState.items.length === 0) {
-        showToast('Tambahkan item souvenir terlebih dahulu.', 'error');
+      const scopedItems = getScopedItems();
+      if (scopedItems.length === 0) {
+        showToast('Belum ada item souvenir di unit ini. Tambahkan item terlebih dahulu.', 'error');
         return;
       }
 
-      select.innerHTML = appState.items.map(i =>
-        `<option value="${escapeHtml(i.id)}">[${escapeHtml(i.sku)}] ${escapeHtml(i.name)} (Stok: ${i.systemStock} ${escapeHtml(i.unit)})</option>`
-      ).join('');
+      const showUnitTag = isAllWorkspace();
+      select.innerHTML = scopedItems.map(i => {
+        const tag = showUnitTag ? `[${escapeHtml(i.floor)}•${escapeHtml(i.unitOwner)}] ` : '';
+        return `<option value="${escapeHtml(i.id)}">${tag}[${escapeHtml(i.sku)}] ${escapeHtml(i.name)} (Stok: ${i.systemStock} ${escapeHtml(i.unit)})</option>`;
+      }).join('');
 
-      if (preselectItemId) select.value = preselectItemId;
+      if (preselectItemId && scopedItems.some(i => i.id === preselectItemId)) {
+        select.value = preselectItemId;
+      }
 
       const radio = document.querySelector(`input[name="mutType"][value="${defaultType}"]`);
       if (radio) radio.checked = true;
@@ -2079,9 +2840,15 @@
       document.getElementById('mutDate').value = getLocalISODate();
       updateMutDateDisplay();
       document.getElementById('mutActivity').value = '';
-      document.getElementById('mutPic').value = '';
-      updateMutationPreview();
 
+      if (!isAllWorkspace()) {
+        const meta = getUnitMeta(getActiveWorkspace());
+        document.getElementById('mutPic').value = `${meta.code} — ${meta.name}`;
+      } else {
+        document.getElementById('mutPic').value = '';
+      }
+
+      updateMutationPreview();
       openModal('mutationModal');
     }
 
@@ -2161,6 +2928,8 @@
         id: 'mut-' + Date.now(),
         date,
         type,
+        floor: item.floor,
+        unitOwner: item.unitOwner,
         itemId: item.id,
         itemSku: item.sku,
         itemName: item.name,
@@ -2169,7 +2938,7 @@
         pic
       });
 
-      StorageAdapter.save(appState);
+      StorageAdapter.save(appState, { scopeUnit: item.unitOwner });
       closeModal('mutationModal');
       renderInventoryTable();
       renderMutationTable();
@@ -2179,10 +2948,12 @@
     function renderMutationTable() {
       const tbody = document.getElementById('mutationTableBody');
       const filter = document.getElementById('mutationTypeFilter').value;
-      const filtered = appState.mutations.filter(m => filter === 'ALL' || m.type === filter);
+      const scopedMutations = getScopedMutations();
+      const filtered = scopedMutations.filter(m => filter === 'ALL' || m.type === filter);
+      const showUnitBadge = isAllWorkspace();
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-slate-400">Belum ada riwayat mutasi pada kategori ini.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-slate-400">Belum ada riwayat mutasi pada unit/kategori ini.</td></tr>`;
         return;
       }
 
@@ -2195,6 +2966,10 @@
         } else {
           badge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200/70 dark:border-purple-800/50"><i data-lucide="sliders-horizontal" class="w-3 h-3"></i> Opname</span>`;
         }
+
+        const unitOwnerBadge = showUnitBadge
+          ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-extrabold bg-[#002F6C]/10 text-[#002F6C] dark:bg-sky-950/80 dark:text-[#38BDF8] border border-[#002F6C]/15 dark:border-[#38BDF8]/25">${escapeHtml(m.floor)} • ${escapeHtml(m.unitOwner)}</span>`
+          : '';
 
         const isNegative = m.type === 'OUT' || String(m.qty).startsWith('-');
         const prefix = m.type === 'OUT' ? '-' : (m.type === 'IN' ? '+' : '');
@@ -2213,7 +2988,10 @@
               <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
                   <div class="font-bold text-[14.5px] md:text-[13.5px] text-slate-900 dark:text-white leading-snug">${escapeHtml(m.itemName)}</div>
-                  <div class="text-[11px] font-mono font-semibold text-[#005596] dark:text-[#38BDF8] mt-0.5">${escapeHtml(m.itemSku)}</div>
+                  <div class="flex items-center flex-wrap gap-1.5 mt-0.5">
+                    <span class="text-[11px] font-mono font-semibold text-[#005596] dark:text-[#38BDF8]">${escapeHtml(m.itemSku)}</span>
+                    ${unitOwnerBadge}
+                  </div>
                 </div>
                 <span class="md:hidden font-extrabold tabular-nums text-base shrink-0 ${qtyColor}">
                   ${prefix}${escapeHtml(m.qty)}
@@ -2235,20 +3013,34 @@
     }
 
     /**
-     * Berita Acara Stock Opname
+     * Berita Acara Stock Opname (Multi-Unit Aware)
      */
     function openFinalizeOpnameModal() {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') {
         document.activeElement.blur();
       }
 
-      const items = appState.items;
+      const items = getScopedItems();
+      if (items.length === 0) {
+        showToast('Tidak ada item souvenir pada workspace ini untuk dibuat Berita Acara.', 'error');
+        return;
+      }
+
+      const ws = getActiveWorkspace();
+      const meta = getUnitMeta(ws);
       const variances = items.filter(i => i.physicalStock !== i.systemStock);
       const unverified = items.filter(i => !i.verified).length;
       const totalSystem = items.reduce((s, i) => s + i.systemStock, 0);
       const totalPhysical = items.reduce((s, i) => s + i.physicalStock, 0);
 
+      const defaultUnitLabel = ws === 'ALL'
+        ? 'KPwBI Prov. Jawa Tengah — Semua Unit (LT 1–LT 5)'
+        : `KPwBI Prov. Jawa Tengah — Unit ${meta.code} (${meta.floor})`;
+      const unitInput = document.getElementById('opnameUnit');
+      if (unitInput) unitInput.value = defaultUnitLabel;
+
       document.getElementById('opnameSummaryBox').innerHTML = `
+        <div class="flex justify-between gap-2"><span class="text-slate-500 dark:text-slate-400">Workspace Audit</span><strong class="text-[#002F6C] dark:text-[#38BDF8]">${escapeHtml(getActiveScopeDisplayName())}</strong></div>
         <div class="flex justify-between gap-2"><span class="text-slate-500 dark:text-slate-400">Total Item Diaudit</span><strong class="text-slate-900 dark:text-white">${items.length} SKU (${items.length - unverified} tercek)</strong></div>
         <div class="flex justify-between gap-2"><span class="text-slate-500 dark:text-slate-400">Saldo Buku vs Stok Fisik</span><strong class="text-slate-900 dark:text-white">${totalSystem.toLocaleString('id-ID')} vs ${totalPhysical.toLocaleString('id-ID')} unit</strong></div>
         <div class="flex justify-between gap-2">
@@ -2266,13 +3058,27 @@
       const unit = document.getElementById('opnameUnit').value.trim();
       const notes = document.getElementById('opnameNotes').value.trim();
       const shouldSync = document.getElementById('opnameSyncCheckbox').checked;
+
+      const ws = getActiveWorkspace();
+      const meta = getUnitMeta(ws);
+      const scopedItems = getScopedItems();
+      const scopedReports = getScopedReports();
+
       const now = new Date();
       const today = getLocalISODate(now);
       const romanMonths = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
-      const seq = String(appState.reports.length + 1).padStart(3, '0');
-      const docNumber = `BA-SO/BI/${romanMonths[now.getMonth()]}/${now.getFullYear()}/${seq}`;
+      const docCodeSegment = ws === 'ALL' ? 'KPWBI-JATENG' : meta.code;
 
-      const snapshot = appState.items.map(i => ({
+      let seqNum = scopedReports.length + 1;
+      let docNumber = `BA-SO/${docCodeSegment}/${romanMonths[now.getMonth()]}/${now.getFullYear()}/${String(seqNum).padStart(3, '0')}`;
+      while (appState.reports.some(r => r.id === docNumber)) {
+        seqNum++;
+        docNumber = `BA-SO/${docCodeSegment}/${romanMonths[now.getMonth()]}/${now.getFullYear()}/${String(seqNum).padStart(3, '0')}`;
+      }
+
+      const snapshot = scopedItems.map(i => ({
+        floor: i.floor,
+        unitOwner: i.unitOwner,
         sku: i.sku,
         name: i.name,
         category: i.category,
@@ -2285,13 +3091,15 @@
       const varianceItemsCount = snapshot.filter(s => s.variance !== 0).length;
 
       if (shouldSync) {
-        appState.items.forEach((item, idx) => {
+        scopedItems.forEach((item, idx) => {
           const diff = item.physicalStock - item.systemStock;
           if (diff !== 0) {
             appState.mutations.unshift({
               id: `mut-${Date.now()}-${idx}-${Math.random().toString(16).slice(2, 6)}`,
               date: today,
               type: 'ADJ',
+              floor: item.floor,
+              unitOwner: item.unitOwner,
               itemId: item.id,
               itemSku: item.sku,
               itemName: item.name,
@@ -2307,6 +3115,8 @@
       const report = {
         id: docNumber,
         date: today,
+        floor: ws === 'ALL' ? 'ALL' : meta.floor,
+        unitOwner: ws,
         auditor,
         unit,
         notes: notes || 'Pelaksanaan stock opname rutin inventaris souvenir kegiatan sosialisasi.',
@@ -2317,7 +3127,7 @@
       };
 
       appState.reports.unshift(report);
-      StorageAdapter.save(appState);
+      StorageAdapter.save(appState, { scopeUnit: ws });
       closeModal('opnameModal');
       renderInventoryTable();
       renderReportsList();
@@ -2327,11 +3137,14 @@
 
     function renderReportsList() {
       const container = document.getElementById('opnameReportsList');
-      if (appState.reports.length === 0) {
+      const reports = getScopedReports();
+      const showUnitBadge = isAllWorkspace();
+
+      if (reports.length === 0) {
         container.innerHTML = `
           <div class="col-span-full py-12 px-4 text-center text-slate-400 bg-white dark:bg-[#111827] border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl">
             <i data-lucide="file-check-2" class="w-10 h-10 mx-auto mb-2.5 opacity-50"></i>
-            <p class="font-bold text-sm text-slate-600 dark:text-slate-300">Belum ada Berita Acara Stock Opname yang disahkan.</p>
+            <p class="font-bold text-sm text-slate-600 dark:text-slate-300">Belum ada Berita Acara Stock Opname untuk workspace ini.</p>
             <p class="text-xs mt-1 text-slate-500 dark:text-slate-400">Lakukan penghitungan fisik pada tab Stok, lalu klik "Finalisasi Berita Acara Opname".</p>
           </div>
         `;
@@ -2339,34 +3152,43 @@
         return;
       }
 
-      container.innerHTML = appState.reports.map(rep => `
-        <div class="p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#111827] shadow-card hover:shadow-cardHover transition-shadow flex flex-col justify-between gap-4">
-          <div>
-            <div class="flex items-center justify-between gap-2">
-              <span class="font-mono text-xs font-bold text-[#002F6C] dark:text-[#38BDF8] bg-[#E6F0FA] dark:bg-sky-950/60 px-2.5 py-1 rounded-lg">
-                ${escapeHtml(rep.id)}
-              </span>
-              <span class="text-xs tabular-nums text-slate-500 dark:text-slate-400 font-semibold">${escapeHtml(formatTanggalIndonesia(rep.date))}</span>
-            </div>
-            <h4 class="font-bold text-[15px] text-slate-900 dark:text-white mt-3 leading-snug">${escapeHtml(rep.unit)}</h4>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Petugas Pelaksana: <strong class="text-slate-800 dark:text-slate-200">${escapeHtml(rep.auditor)}</strong></p>
-            <p class="text-xs text-slate-600 dark:text-slate-300 mt-2.5 italic leading-relaxed">"${escapeHtml(rep.notes)}"</p>
-          </div>
+      container.innerHTML = reports.map(rep => {
+        const repBadge = showUnitBadge
+          ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold ${rep.unitOwner === 'ALL' ? 'bg-[#C59B27]/20 text-[#926F12] dark:text-[#D4AF37]' : 'bg-slate-100 dark:bg-[#1E293B] text-slate-600 dark:text-slate-300'}">${rep.unitOwner === 'ALL' ? 'REKAP KANTOR' : `${escapeHtml(rep.floor)} • ${escapeHtml(rep.unitOwner)}`}</span>`
+          : '';
 
-          <div class="pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div class="flex items-center gap-2.5 tabular-nums">
-              <span class="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-[#1E293B] text-slate-700 dark:text-slate-200 font-semibold"><strong>${rep.totalSku}</strong> SKU</span>
-              <span class="px-2.5 py-1 rounded-full font-bold ${rep.varianceItemsCount > 0 ? 'bg-amber-50 text-[#D97706] dark:bg-amber-950/50 dark:text-[#FBBF24]' : 'bg-emerald-50 text-[#059669] dark:bg-emerald-950/50 dark:text-[#34D399]'}">
-                ${rep.varianceItemsCount} Selisih
-              </span>
+        return `
+          <div class="p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#111827] shadow-card hover:shadow-cardHover transition-shadow flex flex-col justify-between gap-4">
+            <div>
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="font-mono text-xs font-bold text-[#002F6C] dark:text-[#38BDF8] bg-[#E6F0FA] dark:bg-sky-950/60 px-2.5 py-1 rounded-lg">
+                    ${escapeHtml(rep.id)}
+                  </span>
+                  ${repBadge}
+                </div>
+                <span class="text-xs tabular-nums text-slate-500 dark:text-slate-400 font-semibold">${escapeHtml(formatTanggalIndonesia(rep.date))}</span>
+              </div>
+              <h4 class="font-bold text-[15px] text-slate-900 dark:text-white mt-3 leading-snug">${escapeHtml(rep.unit)}</h4>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Petugas Pelaksana: <strong class="text-slate-800 dark:text-slate-200">${escapeHtml(rep.auditor)}</strong></p>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-2.5 italic leading-relaxed">"${escapeHtml(rep.notes)}"</p>
             </div>
-            <button type="button" onclick="openBeritaAcaraPreview('${escapeHtml(rep.id)}')" class="min-h-[40px] inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white font-semibold transition">
-              <i data-lucide="printer" class="w-3.5 h-3.5 text-bi-gold dark:text-bi-goldDark"></i>
-              Pratinjau & Cetak
-            </button>
+
+            <div class="pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div class="flex items-center gap-2.5 tabular-nums">
+                <span class="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-[#1E293B] text-slate-700 dark:text-slate-200 font-semibold"><strong>${rep.totalSku}</strong> SKU</span>
+                <span class="px-2.5 py-1 rounded-full font-bold ${rep.varianceItemsCount > 0 ? 'bg-amber-50 text-[#D97706] dark:bg-amber-950/50 dark:text-[#FBBF24]' : 'bg-emerald-50 text-[#059669] dark:bg-emerald-950/50 dark:text-[#34D399]'}">
+                  ${rep.varianceItemsCount} Selisih
+                </span>
+              </div>
+              <button type="button" onclick="openBeritaAcaraPreview('${escapeHtml(rep.id)}')" class="min-h-[40px] inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white font-semibold transition">
+                <i data-lucide="printer" class="w-3.5 h-3.5 text-bi-gold dark:text-bi-goldDark"></i>
+                Pratinjau & Cetak
+              </button>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
       lucide.createIcons();
     }
@@ -2375,29 +3197,35 @@
       const totalSys = rep.details.reduce((s, d) => s + Number(d.systemStock), 0);
       const totalPhy = rep.details.reduce((s, d) => s + Number(d.physicalStock), 0);
       const totalVar = totalPhy - totalSys;
+      const isRecap = rep.unitOwner === 'ALL';
+      const unitHeading = rep.unit || (isRecap
+        ? 'KPwBI Prov. Jawa Tengah — Semua Unit (LT 1–LT 5)'
+        : `KPwBI Prov. Jawa Tengah — Unit ${rep.unitOwner} (${rep.floor})`);
+      const formattedDate = formatTanggalIndonesia(rep.date);
 
       return `
         <div style="font-family: Arial, Helvetica, sans-serif; color: #111827; min-width: 580px; max-width: 800px; margin: 0 auto;">
           <div style="border-bottom: 3px solid #002F6C; padding-bottom: 12px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; gap: 16px;">
             <div>
               <h2 style="margin: 0; color: #002F6C; font-size: 18px; letter-spacing: 0.5px;">BANK INDONESIA</h2>
-              <p style="margin: 3px 0 0; font-size: 12px; color: #374151; font-weight: bold;">${escapeHtml(rep.unit)}</p>
+              <p style="margin: 3px 0 0; font-size: 12px; color: #374151; font-weight: bold;">${escapeHtml(unitHeading)}</p>
             </div>
             <div style="text-align: right;">
               <strong style="font-size: 13px; color: #002F6C;">BERITA ACARA STOCK OPNAME</strong>
               <p style="margin: 3px 0 0; font-size: 11px; color: #4B5563;">Nomor: ${escapeHtml(rep.id)}</p>
-              <p style="margin: 2px 0 0; font-size: 11px; color: #4B5563;">Tanggal: ${escapeHtml(formatTanggalIndonesia(rep.date))}</p>
+              <p style="margin: 2px 0 0; font-size: 11px; color: #4B5563;">Tanggal: ${escapeHtml(formattedDate)}</p>
             </div>
           </div>
 
           <p style="font-size: 12px; line-height: 1.6; margin-bottom: 14px;">
-            Pada hari ini tanggal <strong>${escapeHtml(formatTanggalIndonesia(rep.date))}</strong>, telah dilaksanakan pemeriksaan fisik (<em>Stock Opname</em>) persediaan souvenir kegiatan/sosialisasi pada <strong>${escapeHtml(rep.unit)}</strong> dengan rincian sebagai berikut:
+            Pada hari ini tanggal <strong>${escapeHtml(formattedDate)}</strong>, telah dilaksanakan pemeriksaan fisik (<em>Stock Opname</em>) persediaan souvenir kegiatan/sosialisasi pada <strong>${escapeHtml(unitHeading)}</strong> dengan rincian sebagai berikut:
           </p>
 
           <table class="ba-official-table" style="width: 100%; border-collapse: collapse; font-size: 11px; margin: 14px 0; font-variant-numeric: tabular-nums;">
             <thead>
               <tr style="background: #F1F5F9;">
                 <th style="border: 1px solid #CBD5E1; padding: 8px; text-align: center; width: 32px;">No</th>
+                ${isRecap ? '<th style="border: 1px solid #CBD5E1; padding: 8px; text-align: left;">Unit / Lantai</th>' : ''}
                 <th style="border: 1px solid #CBD5E1; padding: 8px; text-align: left;">Kode SKU</th>
                 <th style="border: 1px solid #CBD5E1; padding: 8px; text-align: left;">Nama Souvenir</th>
                 <th style="border: 1px solid #CBD5E1; padding: 8px; text-align: center;">Saldo Buku</th>
@@ -2409,6 +3237,7 @@
               ${rep.details.map((d, idx) => `
                 <tr>
                   <td style="border: 1px solid #CBD5E1; padding: 6px 8px; text-align: center;">${idx + 1}</td>
+                  ${isRecap ? `<td style="border: 1px solid #CBD5E1; padding: 6px 8px; white-space: nowrap;">${escapeHtml(d.floor || 'LT 5')} • ${escapeHtml(d.unitOwner || 'HUMAS')}</td>` : ''}
                   <td style="border: 1px solid #CBD5E1; padding: 6px 8px; font-family: monospace;">${escapeHtml(d.sku)}</td>
                   <td style="border: 1px solid #CBD5E1; padding: 6px 8px;">${escapeHtml(d.name)}</td>
                   <td style="border: 1px solid #CBD5E1; padding: 6px 8px; text-align: center;">${d.systemStock} ${escapeHtml(d.unit)}</td>
@@ -2417,7 +3246,7 @@
                 </tr>
               `).join('')}
               <tr style="background: #F8FAFC; font-weight: bold;">
-                <td colspan="3" style="border: 1px solid #CBD5E1; padding: 8px; text-align: right;">TOTAL KESELURUHAN (${rep.totalSku} SKU)</td>
+                <td colspan="${isRecap ? 4 : 3}" style="border: 1px solid #CBD5E1; padding: 8px; text-align: right;">TOTAL KESELURUHAN (${rep.totalSku} SKU)</td>
                 <td style="border: 1px solid #CBD5E1; padding: 8px; text-align: center;">${totalSys}</td>
                 <td style="border: 1px solid #CBD5E1; padding: 8px; text-align: center;">${totalPhy}</td>
                 <td style="border: 1px solid #CBD5E1; padding: 8px; text-align: center;">${totalVar > 0 ? '+' + totalVar : totalVar}</td>
@@ -2465,8 +3294,12 @@
      * CSV Export, Backup & Restore
      */
     function exportToCSV() {
-      const headers = ['Kode SKU', 'Nama Souvenir', 'Kategori', 'Lokasi', 'Saldo Buku', 'Stok Fisik', 'Selisih', 'Batas Min', 'Satuan', 'Status Cek'];
-      const rows = appState.items.map(i => [
+      const scoped = getScopedItems();
+      const ws = getActiveWorkspace();
+      const headers = ['Lantai', 'Unit Pemilik', 'Kode SKU', 'Nama Souvenir', 'Kategori', 'Lokasi', 'Saldo Buku', 'Stok Fisik', 'Selisih', 'Batas Min', 'Satuan', 'Status Cek'];
+      const rows = scoped.map(i => [
+        `"${i.floor}"`,
+        `"${i.unitOwner}"`,
         `"${i.sku}"`,
         `"${i.name.replace(/"/g, '""')}"`,
         `"${i.category}"`,
@@ -2484,10 +3317,10 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Stock_Opname_Souvenir_BI_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `Stock_Opname_Souvenir_BI_${ws}_${getLocalISODate()}.csv`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast('Laporan Excel (.CSV) berhasil diunduh.');
+      showToast(`Laporan Excel (.CSV) ${getActiveScopeDisplayName()} berhasil diunduh.`);
     }
 
     function exportBackupJSON() {
@@ -2495,7 +3328,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Backup_SIM_Souvenir_BI_${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `Backup_SIM_Souvenir_BI_${getLocalISODate()}.json`;
       a.click();
       URL.revokeObjectURL(url);
       showToast('Backup database (.JSON) berhasil diunduh.');
@@ -2510,7 +3343,9 @@
           const parsed = JSON.parse(e.target.result);
           if (!parsed || !Array.isArray(parsed.items)) throw new Error('Format tidak valid');
           appState = sanitizeState(parsed);
-          StorageAdapter.save(appState);
+          deletedItemIds = [];
+          StorageAdapter.save(appState, { scopeUnit: 'ALL' });
+          renderWorkspaceBar();
           renderInventoryTable();
           renderMutationTable();
           renderReportsList();
@@ -2526,14 +3361,16 @@
     function confirmResetDemoData() {
       showConfirmDialog(
         'Reset ke Data Simulasi Awal',
-        'Seluruh perubahan stok, mutasi baru, dan berita acara akan dikembalikan ke data awal simulasi Bank Indonesia. Lanjutkan?',
+        'Seluruh perubahan stok, mutasi baru, dan berita acara untuk semua unit akan dikembalikan ke data awal simulasi KPwBI Provinsi Jawa Tengah. Lanjutkan?',
         () => {
           appState = sanitizeState(DEFAULT_DATA);
-          StorageAdapter.save(appState);
+          deletedItemIds = [];
+          StorageAdapter.save(appState, { scopeUnit: 'ALL' });
+          renderWorkspaceBar();
           renderInventoryTable();
           renderMutationTable();
           renderReportsList();
-          showToast('Data berhasil dikembalikan ke simulasi awal.', 'info');
+          showToast('Data berhasil dikembalikan ke simulasi awal multi-unit.', 'info');
         }
       );
     }
@@ -2547,7 +3384,11 @@
       if (e.key === 'Escape') {
         closeAllCardMenus();
         closeSheet();
-        ['itemModal', 'mutationModal', 'opnameModal', 'baPreviewModal', 'confirmModal'].forEach(closeModal);
+        const onboardingRequired = !localStorage.getItem(WORKSPACE_STORAGE_KEY);
+        ALL_MODAL_IDS.forEach(id => {
+          if (id === 'unitOnboardingModal' && onboardingRequired) return;
+          closeModal(id);
+        });
       }
     });
 
@@ -2565,17 +3406,34 @@
 
       setupPWAManifest();
       initTheme();
+
+      // Muat workspace tersimpan atau munculkan First-Time Onboarding
+      let savedWorkspace = null;
+      try {
+        savedWorkspace = localStorage.getItem(WORKSPACE_STORAGE_KEY);
+      } catch (e) {}
+
+      const needsOnboarding = !savedWorkspace || !isValidUnitCode(savedWorkspace);
+      activeWorkspace = needsOnboarding ? DEFAULT_MIGRATION_UNIT : savedWorkspace;
+
+      populateUnitFilterOptions();
+      populateItemUnitOwnerOptions();
+      renderWorkspaceBar();
       renderInventoryTable();
       renderMutationTable();
       renderReportsList();
 
-      // Pengguna baru di HP: tampilkan panduan singkat satu kali saja
-      try {
-        if (!localStorage.getItem('bi_help_seen') && window.matchMedia('(max-width: 767px)').matches) {
-          localStorage.setItem('bi_help_seen', '1');
-          setTimeout(() => openSheet('helpSheet'), 700);
-        }
-      } catch (e) {}
+      if (needsOnboarding) {
+        openUnitOnboardingModal();
+      } else {
+        // Pengguna baru di HP (setelah memilih unit): tampilkan panduan singkat satu kali saja
+        try {
+          if (!localStorage.getItem('bi_help_seen') && window.matchMedia('(max-width: 767px)').matches) {
+            localStorage.setItem('bi_help_seen', '1');
+            setTimeout(() => openSheet('helpSheet'), 700);
+          }
+        } catch (e) {}
+      }
 
       StorageAdapter.syncFromCloud();
       checkAppUpdate(false);

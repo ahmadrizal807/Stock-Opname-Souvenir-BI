@@ -10,7 +10,7 @@
   <!-- =================================================================== -->
   <!-- KONFIGURASI AUTO-UPDATE APK (UBAH ANGKA VERSI TIAP EDIT KE GITHUB)  -->
   <!-- =================================================================== -->
-  <meta name="app-version" content="1.0.5" />
+  <meta name="app-version" content="1.0.7" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -122,10 +122,8 @@
     .sheet-panel:not(.hidden) {
       animation: sheetSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    @media (min-width: 768px) {
-      .modal-surface {
-        animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      }
+    .modal-surface {
+      animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     /* Scoped Mobile Card Transformation (< 768px) */
@@ -194,15 +192,19 @@
 
       header.app-header { padding-top: env(safe-area-inset-top); }
 
-      .responsive-modal { align-items: flex-end !important; padding: 0 !important; }
+      .responsive-modal {
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 1rem 1rem calc(3rem + env(safe-area-inset-bottom)) !important;
+      }
       .responsive-modal > div {
-        max-width: 100% !important;
-        border-radius: 1.35rem 1.35rem 0 0 !important;
-        max-height: 92vh;
-        max-height: 92dvh;
+        border-radius: 1rem !important;
+        max-height: 82vh;
+        max-height: 82dvh;
         overflow-y: auto;
-        padding-bottom: env(safe-area-inset-bottom);
-        animation: sheetSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .sheet-panel {
+        padding-bottom: calc(1.75rem + env(safe-area-inset-bottom));
       }
     }
 
@@ -604,7 +606,7 @@
   <!-- Desktop Footer -->
   <footer class="hidden md:block border-t border-slate-200/80 dark:border-slate-800/80 py-4 px-6 text-xs text-slate-500 dark:text-slate-400">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <span>SIM-SOUVENIR BI <span id="footerVersionLabel" class="font-mono text-[11px] opacity-80">v1.0.5</span> &bull; Tata Kelola Inventaris & Stock Opname Kegiatan Sosialisasi</span>
+      <span>SIM-SOUVENIR BI <span id="footerVersionLabel" class="font-mono text-[11px] opacity-80">v1.0.7</span> &bull; Tata Kelola Inventaris & Stock Opname Kegiatan Sosialisasi</span>
       <button type="button" onclick="confirmResetDemoData()" class="hover:text-[#E11D48] dark:hover:text-[#FB7185] underline underline-offset-2 transition">Reset ke Data Simulasi Awal</button>
     </div>
   </footer>
@@ -612,12 +614,9 @@
   <!-- ===================================================================== -->
   <!-- MODAL 1: TAMBAH / EDIT MASTER SOUVENIR                                -->
   <!-- ===================================================================== -->
-  <div id="itemModal" onclick="if(event.target===this) closeModal('itemModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
-    <div class="modal-surface bg-white dark:bg-[#111827] rounded-2xl max-w-lg w-full border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden">
-      <div class="md:hidden pt-2.5 pb-1 bg-[#002F6C] dark:bg-[#0F294A] flex justify-center">
-        <div class="w-10 h-1 rounded-full bg-white/30"></div>
-      </div>
-      <div class="px-6 py-4 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between">
+  <div id="itemModal" onclick="if(event.target===this) closeModal('itemModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 pb-12 md:pb-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] w-full max-w-md md:max-w-lg rounded-2xl max-h-[82dvh] overflow-y-auto border border-slate-200/80 dark:border-slate-800 shadow-2xl">
+      <div class="px-4 py-3 md:px-6 md:py-4 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between">
         <h3 id="itemModalTitle" class="font-bold text-sm flex items-center gap-2">
           <i data-lucide="package-plus" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
           Tambah Item Souvenir Baru
@@ -626,16 +625,16 @@
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <form id="itemForm" onsubmit="saveItem(event)" class="p-6 space-y-4 text-xs">
+      <form id="itemForm" onsubmit="saveItem(event)" class="p-4 md:p-6 space-y-2.5 md:space-y-4 text-xs">
         <input type="hidden" id="editItemId" />
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-2.5 md:gap-4">
           <div>
-            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Kode SKU *</label>
-            <input type="text" id="itemSku" required placeholder="SVN-BI-001" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] uppercase font-mono outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] focus:ring-2 focus:ring-[#005596]/15 transition" />
+            <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Kode SKU *</label>
+            <input type="text" id="itemSku" required placeholder="SVN-BI-001" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] uppercase font-mono outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] focus:ring-2 focus:ring-[#005596]/15 transition" />
           </div>
           <div>
-            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Kategori Kegiatan *</label>
-            <select id="itemCategory" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition">
+            <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Kategori Kegiatan *</label>
+            <select id="itemCategory" required class="w-full h-10 py-2 px-3 pr-8 truncate rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition">
               <option value="VIP & Eksekutif">VIP & Eksekutif</option>
               <option value="Sosialisasi CBP Rupiah">Sosialisasi CBP Rupiah</option>
               <option value="Edukasi QRIS & Digital">Edukasi QRIS & Digital</option>
@@ -646,33 +645,33 @@
         </div>
 
         <div>
-          <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Nama Barang / Souvenir *</label>
-          <input type="text" id="itemName" required placeholder="Contoh: Plakat Kristal Gedung Bank Indonesia" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] focus:ring-2 focus:ring-[#005596]/15 transition" />
+          <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Nama Barang / Souvenir *</label>
+          <input type="text" id="itemName" required placeholder="Contoh: Plakat Kristal Gedung Bank Indonesia" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] focus:ring-2 focus:ring-[#005596]/15 transition" />
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-3 gap-2.5 md:gap-3">
           <div>
-            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Saldo Buku *</label>
-            <input type="number" id="itemSystemStock" min="0" required value="0" inputmode="numeric" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] tabular-nums font-semibold outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
+            <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Saldo Buku *</label>
+            <input type="number" id="itemSystemStock" min="0" required value="0" inputmode="numeric" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] tabular-nums font-semibold outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
           <div>
-            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Batas Min *</label>
-            <input type="number" id="itemMinStock" min="1" required value="10" inputmode="numeric" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] tabular-nums font-semibold outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
+            <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Batas Min *</label>
+            <input type="number" id="itemMinStock" min="1" required value="10" inputmode="numeric" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] tabular-nums font-semibold outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
           <div>
-            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Satuan *</label>
-            <input type="text" id="itemUnit" required value="Pcs" placeholder="Pcs / Box" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
+            <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Satuan *</label>
+            <input type="text" id="itemUnit" required value="Pcs" placeholder="Pcs / Box" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
         </div>
 
         <div>
-          <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Lokasi Penyimpanan / Rak *</label>
-          <input type="text" id="itemLocation" required placeholder="Contoh: Lemari Souvenir A1 - Ruang Humas" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] focus:ring-2 focus:ring-[#005596]/15 transition" />
+          <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Lokasi Penyimpanan / Rak *</label>
+          <input type="text" id="itemLocation" required placeholder="Contoh: Lemari Souvenir A1 - Ruang Humas" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] focus:ring-2 focus:ring-[#005596]/15 transition" />
         </div>
 
-        <div class="pt-3 flex justify-end gap-2.5 border-t border-slate-200/80 dark:border-slate-800">
-          <button type="button" onclick="closeModal('itemModal')" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white font-bold shadow-card transition">Simpan Souvenir</button>
+        <div class="grid grid-cols-2 gap-2.5 pt-2.5 border-t border-slate-200/80 dark:border-slate-800">
+          <button type="button" onclick="closeModal('itemModal')" class="h-10 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
+          <button type="submit" class="h-10 rounded-xl text-xs font-bold bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white shadow-card transition">Simpan Souvenir</button>
         </div>
       </form>
     </div>
@@ -681,12 +680,9 @@
   <!-- ===================================================================== -->
   <!-- MODAL 2: CATAT MUTASI (DISTRIBUSI KEGIATAN / PENGADAAN)               -->
   <!-- ===================================================================== -->
-  <div id="mutationModal" onclick="if(event.target===this) closeModal('mutationModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
-    <div class="modal-surface bg-white dark:bg-[#111827] rounded-2xl max-w-lg w-full border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden">
-      <div class="md:hidden pt-2.5 pb-1 bg-[#002F6C] dark:bg-[#0F294A] flex justify-center">
-        <div class="w-10 h-1 rounded-full bg-white/30"></div>
-      </div>
-      <div class="px-6 py-4 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between">
+  <div id="mutationModal" onclick="if(event.target===this) closeModal('mutationModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 pb-12 md:pb-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] w-full max-w-md md:max-w-lg rounded-2xl max-h-[82dvh] overflow-y-auto border border-slate-200/80 dark:border-slate-800 shadow-2xl">
+      <div class="px-4 py-3 md:px-6 md:py-4 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between">
         <h3 class="font-bold text-sm flex items-center gap-2">
           <i data-lucide="arrow-left-right" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
           Catat Mutasi Souvenir
@@ -695,55 +691,59 @@
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <form id="mutationForm" onsubmit="saveMutation(event)" class="p-6 space-y-4 text-xs">
-        <div class="grid grid-cols-2 gap-3">
+      <form id="mutationForm" onsubmit="saveMutation(event)" class="p-4 md:p-6 space-y-2.5 md:space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-2.5 md:gap-3">
           <label class="cursor-pointer">
             <input type="radio" name="mutType" value="OUT" checked class="peer hidden" onchange="updateMutationPreview()" />
-            <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 peer-checked:border-[#E11D48] dark:peer-checked:border-[#FB7185] peer-checked:bg-rose-50/70 dark:peer-checked:bg-rose-950/30 peer-checked:ring-2 peer-checked:ring-rose-500/15 text-center font-bold transition">
-              <i data-lucide="arrow-up-right" class="w-4 h-4 mx-auto mb-1 text-[#E11D48] dark:text-[#FB7185]"></i>
-              Keluar (Kegiatan)
+            <div class="py-2 px-3 md:py-2.5 md:px-3 rounded-xl border border-slate-200 dark:border-slate-700 peer-checked:border-[#E11D48] dark:peer-checked:border-[#FB7185] peer-checked:bg-rose-50/70 dark:peer-checked:bg-rose-950/30 peer-checked:ring-2 peer-checked:ring-rose-500/15 flex items-center justify-center gap-1.5 text-center font-bold transition">
+              <i data-lucide="arrow-up-right" class="w-4 h-4 shrink-0 text-[#E11D48] dark:text-[#FB7185]"></i>
+              <span class="truncate">Keluar (Kegiatan)</span>
             </div>
           </label>
           <label class="cursor-pointer">
             <input type="radio" name="mutType" value="IN" class="peer hidden" onchange="updateMutationPreview()" />
-            <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 peer-checked:border-[#059669] dark:peer-checked:border-[#34D399] peer-checked:bg-emerald-50/70 dark:peer-checked:bg-emerald-950/30 peer-checked:ring-2 peer-checked:ring-emerald-500/15 text-center font-bold transition">
-              <i data-lucide="arrow-down-left" class="w-4 h-4 mx-auto mb-1 text-[#059669] dark:text-[#34D399]"></i>
-              Masuk (Pengadaan)
+            <div class="py-2 px-3 md:py-2.5 md:px-3 rounded-xl border border-slate-200 dark:border-slate-700 peer-checked:border-[#059669] dark:peer-checked:border-[#34D399] peer-checked:bg-emerald-50/70 dark:peer-checked:bg-emerald-950/30 peer-checked:ring-2 peer-checked:ring-emerald-500/15 flex items-center justify-center gap-1.5 text-center font-bold transition">
+              <i data-lucide="arrow-down-left" class="w-4 h-4 shrink-0 text-[#059669] dark:text-[#34D399]"></i>
+              <span class="truncate">Masuk (Pengadaan)</span>
             </div>
           </label>
         </div>
 
         <div>
-          <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Pilih Souvenir *</label>
-          <select id="mutItemId" required onchange="updateMutationPreview()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition"></select>
+          <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Pilih Souvenir *</label>
+          <select id="mutItemId" required onchange="updateMutationPreview()" class="w-full h-10 py-2 px-3 pr-8 truncate rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition"></select>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Jumlah Unit *</label>
-            <input type="number" id="mutQty" min="1" required inputmode="numeric" oninput="updateMutationPreview()" placeholder="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] font-bold tabular-nums transition" />
+        <div class="grid grid-cols-12 gap-2.5 md:gap-3">
+          <div class="col-span-5">
+            <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Jumlah Unit *</label>
+            <input type="number" id="mutQty" min="1" required inputmode="numeric" oninput="updateMutationPreview()" placeholder="0" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] font-bold tabular-nums transition" />
           </div>
-          <div>
-            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Tanggal *</label>
-            <input type="date" id="mutDate" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
+          <div class="col-span-7">
+            <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Tanggal *</label>
+            <div class="relative h-10 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus-within:bg-white dark:focus-within:bg-[#111827] focus-within:border-[#005596] dark:focus-within:border-[#38BDF8] focus-within:ring-2 focus-within:ring-[#005596]/15 transition flex items-center justify-between px-3">
+              <span id="mutDateDisplay" class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 truncate pr-2">Pilih tanggal</span>
+              <i data-lucide="calendar" class="w-4 h-4 text-slate-400 shrink-0 pointer-events-none"></i>
+              <input type="date" id="mutDate" required onchange="updateMutDateDisplay()" oninput="updateMutDateDisplay()" onclick="try{this.showPicker && this.showPicker()}catch(e){}" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            </div>
           </div>
         </div>
 
-        <div id="mutStockPreview" class="px-3.5 py-2.5 rounded-xl bg-slate-100/90 dark:bg-[#1E293B] text-xs flex items-center justify-between gap-2 tabular-nums"></div>
+        <div id="mutStockPreview" class="px-3 py-2 md:px-3.5 md:py-2.5 rounded-xl bg-slate-100/90 dark:bg-[#1E293B] text-xs flex items-center justify-between gap-2 tabular-nums"></div>
 
         <div>
-          <label id="mutActivityLabel" class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Nama Kegiatan Sosialisasi / Keperluan *</label>
-          <input type="text" id="mutActivity" required placeholder="Contoh: Sosialisasi Cinta Bangga Paham Rupiah" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
+          <label id="mutActivityLabel" class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Nama Kegiatan Sosialisasi / Keperluan *</label>
+          <input type="text" id="mutActivity" required placeholder="Contoh: Sosialisasi Cinta Bangga Paham Rupiah" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
         </div>
 
         <div>
-          <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Fungsi / Unit Pemohon / PIC *</label>
-          <input type="text" id="mutPic" required placeholder="Contoh: Unit Kehumasan / SPPUR / UMKM" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
+          <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Fungsi / Unit Pemohon / PIC *</label>
+          <input type="text" id="mutPic" required placeholder="Contoh: Unit Kehumasan / SPPUR / UMKM" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
         </div>
 
-        <div class="pt-3 flex justify-end gap-2.5 border-t border-slate-200/80 dark:border-slate-800">
-          <button type="button" onclick="closeModal('mutationModal')" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
-          <button type="submit" id="mutSubmitBtn" class="px-5 py-2.5 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white font-bold shadow-card disabled:opacity-40 disabled:cursor-not-allowed transition">Simpan Mutasi</button>
+        <div class="grid grid-cols-2 gap-2.5 pt-2.5 border-t border-slate-200/80 dark:border-slate-800">
+          <button type="button" onclick="closeModal('mutationModal')" class="h-10 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
+          <button type="submit" id="mutSubmitBtn" class="h-10 rounded-xl text-xs font-bold bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white shadow-card disabled:opacity-40 disabled:cursor-not-allowed transition">Simpan Mutasi</button>
         </div>
       </form>
     </div>
@@ -752,12 +752,9 @@
   <!-- ===================================================================== -->
   <!-- MODAL 3: FINALISASI BERITA ACARA STOCK OPNAME                         -->
   <!-- ===================================================================== -->
-  <div id="opnameModal" onclick="if(event.target===this) closeModal('opnameModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
-    <div class="modal-surface bg-white dark:bg-[#111827] rounded-2xl max-w-lg w-full border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden">
-      <div class="md:hidden pt-2.5 pb-1 bg-[#002F6C] dark:bg-[#0F294A] flex justify-center">
-        <div class="w-10 h-1 rounded-full bg-white/30"></div>
-      </div>
-      <div class="px-6 py-4 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between">
+  <div id="opnameModal" onclick="if(event.target===this) closeModal('opnameModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 pb-12 md:pb-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] w-full max-w-md md:max-w-lg rounded-2xl max-h-[82dvh] overflow-y-auto border border-slate-200/80 dark:border-slate-800 shadow-2xl">
+      <div class="px-4 py-3 md:px-6 md:py-4 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between">
         <h3 class="font-bold text-sm flex items-center gap-2">
           <i data-lucide="file-check-2" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
           Pengesahan Berita Acara Stock Opname
@@ -766,35 +763,35 @@
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <form onsubmit="finalizeStockOpname(event)" class="p-6 space-y-4 text-xs">
-        <div id="opnameSummaryBox" class="p-4 rounded-xl bg-slate-100/90 dark:bg-[#1E293B] space-y-2 border border-slate-200/70 dark:border-slate-700/70 tabular-nums"></div>
+      <form onsubmit="finalizeStockOpname(event)" class="p-4 md:p-6 space-y-2.5 md:space-y-4 text-xs">
+        <div id="opnameSummaryBox" class="p-3 md:p-4 rounded-xl bg-slate-100/90 dark:bg-[#1E293B] space-y-1.5 md:space-y-2 border border-slate-200/70 dark:border-slate-700/70 tabular-nums"></div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 md:gap-3">
           <div>
-            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Petugas Pelaksana *</label>
-            <input type="text" id="opnameAuditor" required placeholder="Nama Pegawai / PIC" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
+            <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Petugas Pelaksana *</label>
+            <input type="text" id="opnameAuditor" required placeholder="Nama Pegawai / PIC" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
           <div>
-            <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Satuan Kerja / Unit *</label>
-            <input type="text" id="opnameUnit" required value="KPWBI Prov. Jawa Tengah" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
+            <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Satuan Kerja / Unit *</label>
+            <input type="text" id="opnameUnit" required value="KPWBI Prov. Jawa Tengah" class="w-full h-10 py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition" />
           </div>
         </div>
 
         <div>
-          <label class="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Catatan / Penjelasan Selisih Audit</label>
-          <textarea id="opnameNotes" rows="2" placeholder="Contoh: Stock opname rutin bulanan. Selisih telah dikonfirmasi dengan PIC kegiatan." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition"></textarea>
+          <label class="block font-semibold text-[11px] mb-1 text-slate-700 dark:text-slate-300">Catatan / Penjelasan Selisih Audit</label>
+          <textarea id="opnameNotes" rows="2" placeholder="Contoh: Stock opname rutin bulanan. Selisih telah dikonfirmasi dengan PIC kegiatan." class="w-full py-2 px-3 rounded-xl text-sm border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1E293B] focus:bg-white dark:focus:bg-[#111827] outline-none focus:border-[#005596] dark:focus:border-[#38BDF8] transition"></textarea>
         </div>
 
-        <label class="flex items-start gap-2.5 p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 cursor-pointer">
+        <label class="flex items-start gap-2.5 p-2.5 md:p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 cursor-pointer">
           <input type="checkbox" id="opnameSyncCheckbox" checked class="mt-0.5 rounded text-[#002F6C] focus:ring-[#005596]" />
-          <span class="text-slate-700 dark:text-slate-300 leading-relaxed">
+          <span class="text-slate-700 dark:text-slate-300 leading-snug md:leading-relaxed">
             <strong>Rekonsiliasi Otomatis:</strong> Sesuaikan Saldo Buku mengikuti Stok Fisik dan catat selisihnya ke <em>Log Mutasi</em>.
           </span>
         </label>
 
-        <div class="pt-3 flex justify-end gap-2.5 border-t border-slate-200/80 dark:border-slate-800">
-          <button type="button" onclick="closeModal('opnameModal')" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white font-bold shadow-card transition">Sahkan Berita Acara</button>
+        <div class="grid grid-cols-2 gap-2.5 pt-2.5 border-t border-slate-200/80 dark:border-slate-800">
+          <button type="button" onclick="closeModal('opnameModal')" class="h-10 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
+          <button type="submit" class="h-10 rounded-xl text-xs font-bold bg-[#002F6C] hover:bg-[#001F4D] dark:bg-[#0F294A] dark:hover:bg-[#163864] text-white shadow-card transition">Sahkan Berita Acara</button>
         </div>
       </form>
     </div>
@@ -803,9 +800,9 @@
   <!-- ===================================================================== -->
   <!-- MODAL 4: PRATINJAU & CETAK BERITA ACARA RESMI                         -->
   <!-- ===================================================================== -->
-  <div id="baPreviewModal" onclick="if(event.target===this) closeModal('baPreviewModal')" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-2 sm:p-4">
-    <div class="modal-surface bg-white dark:bg-[#111827] rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden">
-      <div class="px-5 py-3.5 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between shrink-0">
+  <div id="baPreviewModal" onclick="if(event.target===this) closeModal('baPreviewModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 pb-12 md:pb-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] w-full max-w-md sm:max-w-3xl rounded-2xl max-h-[82dvh] md:max-h-[90vh] flex flex-col border border-slate-200/80 dark:border-slate-800 shadow-2xl overflow-hidden">
+      <div class="px-4 py-3 md:px-5 md:py-3.5 bg-[#002F6C] dark:bg-[#0F294A] text-white flex items-center justify-between shrink-0">
         <h3 class="font-bold text-sm flex items-center gap-2">
           <i data-lucide="file-text" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
           Pratinjau Dokumen Resmi Berita Acara
@@ -815,11 +812,11 @@
         </button>
       </div>
       <div id="baPreviewContent" class="p-4 sm:p-6 overflow-y-auto overflow-x-auto bg-white text-slate-900 flex-1"></div>
-      <div class="px-5 py-3.5 bg-slate-50 dark:bg-[#1E293B]/80 border-t border-slate-200/80 dark:border-slate-800 flex justify-end gap-2.5 shrink-0" style="padding-bottom: calc(0.875rem + env(safe-area-inset-bottom))">
-        <button type="button" onclick="closeModal('baPreviewModal')" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Tutup</button>
-        <button type="button" onclick="triggerPrintBA()" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] text-white text-xs font-bold shadow-card transition">
+      <div class="px-4 py-3 md:px-5 md:py-3.5 bg-slate-50 dark:bg-[#1E293B]/80 border-t border-slate-200/80 dark:border-slate-800 grid grid-cols-2 sm:flex sm:justify-end gap-2.5 shrink-0">
+        <button type="button" onclick="closeModal('baPreviewModal')" class="h-10 sm:h-auto px-4 sm:py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Tutup</button>
+        <button type="button" onclick="triggerPrintBA()" class="h-10 sm:h-auto justify-center inline-flex items-center gap-1.5 px-4 sm:px-5 sm:py-2 rounded-xl bg-[#002F6C] hover:bg-[#001F4D] text-white text-xs font-bold shadow-card transition">
           <i data-lucide="printer" class="w-4 h-4 text-bi-gold dark:text-bi-goldDark"></i>
-          Cetak / Simpan PDF
+          Cetak / PDF
         </button>
       </div>
     </div>
@@ -828,9 +825,9 @@
   <!-- ===================================================================== -->
   <!-- MODAL 5: CUSTOM CONFIRMATION DIALOG                                   -->
   <!-- ===================================================================== -->
-  <div id="confirmModal" onclick="if(event.target===this) closeModal('confirmModal')" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
-    <div class="modal-surface bg-white dark:bg-[#111827] rounded-2xl max-w-md w-full border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden">
-      <div class="p-6 space-y-4">
+  <div id="confirmModal" onclick="if(event.target===this) closeModal('confirmModal')" class="responsive-modal fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 pb-12 md:pb-4">
+    <div class="modal-surface bg-white dark:bg-[#111827] w-full max-w-md rounded-2xl max-h-[82dvh] overflow-y-auto border border-slate-200/80 dark:border-slate-800 shadow-2xl">
+      <div class="p-5 md:p-6 space-y-4">
         <div class="flex items-start gap-3.5">
           <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-[#E11D48] dark:text-[#FB7185] flex items-center justify-center shrink-0">
             <i data-lucide="alert-triangle" class="w-5 h-5"></i>
@@ -840,9 +837,9 @@
             <p id="confirmMessage" class="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed"></p>
           </div>
         </div>
-        <div class="flex justify-end gap-2.5 pt-2">
-          <button type="button" onclick="closeModal('confirmModal')" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
-          <button type="button" id="confirmActionBtn" class="px-4 py-2.5 rounded-xl bg-[#E11D48] hover:bg-rose-700 text-white text-xs font-bold shadow-card transition">Ya, Lanjutkan</button>
+        <div class="grid grid-cols-2 sm:flex sm:justify-end gap-2.5 pt-2.5 border-t border-slate-200/80 dark:border-slate-800">
+          <button type="button" onclick="closeModal('confirmModal')" class="h-10 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
+          <button type="button" id="confirmActionBtn" class="h-10 px-4 rounded-xl bg-[#E11D48] hover:bg-rose-700 text-white text-xs font-bold shadow-card transition">Ya, Lanjutkan</button>
         </div>
       </div>
     </div>
@@ -878,7 +875,7 @@
   <!-- Action Sheet Overlay -->
   <div id="sheetOverlay" class="fixed inset-0 z-40 hidden items-end md:items-center justify-center bg-slate-950/60 backdrop-blur-sm p-0 md:p-4" onclick="if(event.target===this) closeSheet()">
     <!-- Opname Batch Options Sheet -->
-    <div id="opnameOptionsSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 space-y-2.5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
+    <div id="opnameOptionsSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 pb-[calc(1.75rem+env(safe-area-inset-bottom))] md:pb-5 space-y-2.5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl">
       <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
       <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">Opsi Audit & Penghitungan</h4>
       <button type="button" onclick="sheetGo(() => confirmMarkAll(true))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-left transition">
@@ -905,7 +902,7 @@
     </div>
 
     <!-- Quick Add Sheet -->
-    <div id="addSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 space-y-2.5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
+    <div id="addSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 pb-[calc(1.75rem+env(safe-area-inset-bottom))] md:pb-5 space-y-2.5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl">
       <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
       <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">Pilih Tindakan Cepat</h4>
       <button type="button" onclick="sheetGo(() => openMutationModal('OUT'))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-left transition">
@@ -932,7 +929,7 @@
     </div>
 
     <!-- Panduan Cara Pakai -->
-    <div id="helpSheet" class="sheet-panel hidden w-full md:max-w-md max-h-[88vh] overflow-y-auto bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
+    <div id="helpSheet" class="sheet-panel hidden w-full md:max-w-md max-h-[88vh] overflow-y-auto bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 pb-[calc(1.75rem+env(safe-area-inset-bottom))] md:pb-5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl">
       <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
       <h4 class="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">Cara Pakai Stock Opname</h4>
       <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Ikuti langkah ini saat menghitung souvenir di gudang.</p>
@@ -973,7 +970,7 @@
     </div>
 
     <!-- Data & Backup Sheet -->
-    <div id="dataSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 space-y-2.5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
+    <div id="dataSheet" class="sheet-panel hidden w-full md:max-w-sm bg-white dark:bg-[#111827] rounded-t-2xl md:rounded-2xl p-5 pb-[calc(1.75rem+env(safe-area-inset-bottom))] md:pb-5 space-y-2.5 border-t md:border border-slate-200/80 dark:border-slate-800 shadow-xl">
       <div class="w-10 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 md:hidden"></div>
       <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">Manajemen Data & Aplikasi</h4>
       <button type="button" onclick="sheetGo(() => openSheet('helpSheet'))" class="flex items-center gap-3 w-full p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-sm font-bold text-slate-800 dark:text-slate-100 text-left transition">
@@ -1241,6 +1238,48 @@
         .replace(/'/g, '&#039;');
     }
 
+    const BULAN_INDONESIA = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    function getLocalISODate(dateObj = new Date()) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatTanggalIndonesia(dateStr) {
+      if (!dateStr) return '-';
+      if (dateStr instanceof Date) {
+        if (isNaN(dateStr.getTime())) return '-';
+        return `${dateStr.getDate()} ${BULAN_INDONESIA[dateStr.getMonth()]} ${dateStr.getFullYear()}`;
+      }
+      const raw = String(dateStr).trim();
+      const match = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (match) {
+        const year = parseInt(match[1], 10);
+        const monthIdx = parseInt(match[2], 10) - 1;
+        const day = parseInt(match[3], 10);
+        if (monthIdx >= 0 && monthIdx <= 11 && day >= 1 && day <= 31) {
+          return `${day} ${BULAN_INDONESIA[monthIdx]} ${year}`;
+        }
+      }
+      const parsed = new Date(raw);
+      if (!isNaN(parsed.getTime())) {
+        return `${parsed.getDate()} ${BULAN_INDONESIA[parsed.getMonth()]} ${parsed.getFullYear()}`;
+      }
+      return raw;
+    }
+
+    function updateMutDateDisplay() {
+      const input = document.getElementById('mutDate');
+      const display = document.getElementById('mutDateDisplay');
+      if (!input || !display) return;
+      display.textContent = input.value ? formatTanggalIndonesia(input.value) : 'Pilih tanggal';
+    }
+
     /**
      * =====================================================================
      * AUTO-UPDATE ENGINE UNTUK APK & GITHUB PAGES
@@ -1438,7 +1477,7 @@
       document.getElementById('kpiOutStock').textContent = outStock;
       document.getElementById('kpiVarianceCount').textContent = varianceCount;
       document.getElementById('kpiLastOpname').textContent = appState.reports.length > 0
-        ? `BA Terakhir: ${appState.reports[0].date}`
+        ? `BA Terakhir: ${formatTanggalIndonesia(appState.reports[0].date)}`
         : 'Belum ada BA';
 
       document.getElementById('auditProgressText').textContent = `${verifiedCount}/${totalSku} SKU (${pct}%)`;
@@ -2037,7 +2076,8 @@
       const radio = document.querySelector(`input[name="mutType"][value="${defaultType}"]`);
       if (radio) radio.checked = true;
       document.getElementById('mutQty').value = '';
-      document.getElementById('mutDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('mutDate').value = getLocalISODate();
+      updateMutDateDisplay();
       document.getElementById('mutActivity').value = '';
       document.getElementById('mutPic').value = '';
       updateMutationPreview();
@@ -2162,9 +2202,9 @@
 
         return `
           <tr class="md:hover:bg-blue-50/30 md:dark:hover:bg-slate-800/40 transition-colors">
-            <td class="py-4 px-4 font-mono tabular-nums text-[11.5px] font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+            <td class="py-4 px-4 tabular-nums text-xs font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap">
               <div class="flex items-center justify-between md:block">
-                <span>${escapeHtml(m.date)}</span>
+                <span>${escapeHtml(formatTanggalIndonesia(m.date))}</span>
                 <span class="md:hidden">${badge}</span>
               </div>
             </td>
@@ -2227,7 +2267,7 @@
       const notes = document.getElementById('opnameNotes').value.trim();
       const shouldSync = document.getElementById('opnameSyncCheckbox').checked;
       const now = new Date();
-      const today = now.toISOString().split('T')[0];
+      const today = getLocalISODate(now);
       const romanMonths = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
       const seq = String(appState.reports.length + 1).padStart(3, '0');
       const docNumber = `BA-SO/BI/${romanMonths[now.getMonth()]}/${now.getFullYear()}/${seq}`;
@@ -2306,7 +2346,7 @@
               <span class="font-mono text-xs font-bold text-[#002F6C] dark:text-[#38BDF8] bg-[#E6F0FA] dark:bg-sky-950/60 px-2.5 py-1 rounded-lg">
                 ${escapeHtml(rep.id)}
               </span>
-              <span class="text-xs font-mono tabular-nums text-slate-500 dark:text-slate-400 font-semibold">${escapeHtml(rep.date)}</span>
+              <span class="text-xs tabular-nums text-slate-500 dark:text-slate-400 font-semibold">${escapeHtml(formatTanggalIndonesia(rep.date))}</span>
             </div>
             <h4 class="font-bold text-[15px] text-slate-900 dark:text-white mt-3 leading-snug">${escapeHtml(rep.unit)}</h4>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Petugas Pelaksana: <strong class="text-slate-800 dark:text-slate-200">${escapeHtml(rep.auditor)}</strong></p>
@@ -2346,12 +2386,12 @@
             <div style="text-align: right;">
               <strong style="font-size: 13px; color: #002F6C;">BERITA ACARA STOCK OPNAME</strong>
               <p style="margin: 3px 0 0; font-size: 11px; color: #4B5563;">Nomor: ${escapeHtml(rep.id)}</p>
-              <p style="margin: 2px 0 0; font-size: 11px; color: #4B5563;">Tanggal: ${escapeHtml(rep.date)}</p>
+              <p style="margin: 2px 0 0; font-size: 11px; color: #4B5563;">Tanggal: ${escapeHtml(formatTanggalIndonesia(rep.date))}</p>
             </div>
           </div>
 
           <p style="font-size: 12px; line-height: 1.6; margin-bottom: 14px;">
-            Pada hari ini tanggal <strong>${escapeHtml(rep.date)}</strong>, telah dilaksanakan pemeriksaan fisik (<em>Stock Opname</em>) persediaan souvenir kegiatan/sosialisasi pada <strong>${escapeHtml(rep.unit)}</strong> dengan rincian sebagai berikut:
+            Pada hari ini tanggal <strong>${escapeHtml(formatTanggalIndonesia(rep.date))}</strong>, telah dilaksanakan pemeriksaan fisik (<em>Stock Opname</em>) persediaan souvenir kegiatan/sosialisasi pada <strong>${escapeHtml(rep.unit)}</strong> dengan rincian sebagai berikut:
           </p>
 
           <table class="ba-official-table" style="width: 100%; border-collapse: collapse; font-size: 11px; margin: 14px 0; font-variant-numeric: tabular-nums;">
